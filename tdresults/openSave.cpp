@@ -112,42 +112,46 @@ bool openSave::htmlExport(string file, string query, list<string> engines, strin
     ofstream myfile;
     myfile.open(file.c_str(),ios::out|ios::trunc);
     if (myfile.is_open()) {
-        myfile << "<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=" << HTTP_DEFAULT_CHARSET << "\"><title>Teardrop search results</title></head><body>" << endl;
-        myfile << "<h1>Query</h1>" << endl;
-        myfile << "<ul>" << endl;
+        myfile << "<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=" << HTTP_DEFAULT_CHARSET << "\"><title>Teardrop search results</title><link rel='stylesheet' type='text/css' href='file:///home/olivier/tmp/teardrop.css' /></head><body>" << endl;
+        myfile << "<div class=\"main_title\">Query</div>" << endl;
+        myfile << "<div class=\"info\">" << endl;
         //Engines
-        myfile << "\t<li>Engines : ";
+        myfile << "\t<div class=\"engines\">Engines : ";
         for(list<string>::iterator lit = engines.begin(); lit != engines.end(); ++ lit) {
             myfile << *lit << " ";
         }
-        myfile << "</li>" << endl;
+        myfile << "</div>" << endl;
         //Query
-        myfile << "\t<li>Query : " << query << "</li>" << endl;
+        myfile << "\t<div class=\"query\">Query : " << query << "</div>" << endl;
         //Limit
-        myfile << "\t<li>Results per engines : " << limit << "</li>" << endl;
+        myfile << "\t<div class=\"limit\">Results per engines : " << limit << "</div>" << endl;
         //Rows
-        myfile << "</ul>"<< endl;
-        myfile << "<h1>Results</h1>" << endl;
-        myfile << "<table>" << endl;
+        myfile << "</div>"<< endl;
+        myfile << "<div class=\"title\">Results</div>" << endl;
+        myfile << "<div class=\"table\">" << endl;
         for(vector<row>::iterator lit = r.begin(); lit != r.end(); ++ lit) {
-            myfile << "\t<tr>" << endl;
-            myfile << "\t\t<td>" << lit->getNum() << "</td><td><ul>" << endl;
-            myfile << "\t\t<li>Engines : ";
+            myfile << "\t<div class=\"line\">" << endl;
+            myfile << "\t\t<div class=\"num\">" << lit->getNum() << "</div><div class=\"engines\">" << endl;
             list<string> lrEngines = lit->getEngine();
             for(list<string>::iterator englst = lrEngines.begin(); englst != lrEngines.end(); ++ englst) {
                 myfile << *englst << " ";
             }
-            myfile << "\t\t</li>" << endl;
+            myfile << "\t\t</div>" << endl;
             for(map<string, string, compstr>::iterator flds = lit->getFields().begin(); flds != lit->getFields().end(); ++flds) {
-                if (flds->first != "url")
-                    myfile << "\t\t<li>" << flds->first << " : " << flds->second << "</li>" << endl;
-                else
-                    myfile << "\t\t<li>" << flds->first << " : <a href=\"" << flds->second << "\">" << flds->second << "</a></li>" << endl;
+//                if (flds->first != "url")
+//                    myfile << "\t\t<li>" << flds->first << " : " << flds->second << "</li>" << endl;
+//                else
+//                    myfile << "\t\t<li>" << flds->first << " : <a href=\"" << flds->second << "\">" << flds->second << "</a></li>" << endl;
+					  
+					  if (flds->first != "url")
+					  	myfile << "\t\t<span class=\"" << flds->first << "\">" << flds->second << "</span>" << endl;
+					  else
+					    myfile << "\t\t<a class=\"" << flds->first << "\" href=\"" << flds->second << "\">" << flds->second << "</a>" << endl;
                 
             }
-            myfile << "\t</ul></td></tr>" << endl;
+            myfile << "\t</div>" << endl;
         }
-        myfile << "</table></body></html>" << endl;
+        myfile << "</div></body></html>" << endl;
         return true;
     }
     return false;
