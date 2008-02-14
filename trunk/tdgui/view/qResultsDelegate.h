@@ -12,7 +12,7 @@
 #include "rawContainer.h"
 #include "../control/rawUrl.h"
 #include "../control/resultsColumns.h"
-#include "../control/myWindow.h"
+#include "myWindow.h"
 
 #include <iostream>
 using namespace std;
