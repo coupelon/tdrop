@@ -32,6 +32,7 @@
 #include <iostream>
 #include <fstream>
 #include <set>
+#include <vector>
 #include "row.h"
 #include "net/getHttp.h"
 #include "xml/xmlFile.h"

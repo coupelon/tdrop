@@ -27,7 +27,7 @@ metaRank::metaRank(engineResults *res,tdParam *t) {
 }
 
 void metaRank::init(engineResults *res,tdParam *t) {
-	ranked_results = res;
+  ranked_results = res;
   tdp = t;
 }
 
@@ -38,9 +38,9 @@ metaRank::~metaRank() {
 void metaRank::startParsing() {
     pageParser *p;
     for(map<string,int>::const_iterator eng = ranked_results->getEngines().begin(); ranked_results->getEngines().end() != eng; ++eng) {
-        p = new pageParser(eng->first,ranked_results, &threads.getMutex(), tdp);
+        p = new pageParser(eng->first,ranked_results, &threads, tdp);
         pplist.push_back(p);
-        threads.createThread(*p);
+        threads.createThread(&(*p));
     }
 }
 

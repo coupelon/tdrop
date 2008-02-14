@@ -25,30 +25,37 @@
 
 */
 
-
 #ifndef REGEXP_H
 #define REGEXP_H
 
-#include <string>
-#include <boost/regex.hpp>
+#include <iostream>
+#include <pcre.h>
+
+#include "../tdExcp.h"
+
+#define VECTORSIZE 30
 
 using namespace std;
-using namespace boost;
 
 class regExp {
 public:
 	static string replaceAll(string,string,string);
-	regExp(string,string &);
-	regExp(string);
+	regExp(string ,string &);
+    regExp(string);
 	~regExp();
-	void newPage(string &);
+    void newPage(string &);
 	void next();
 	bool endOfMatch();
 	string getMatch(int);
-	int getMatchNumber();
+	int getMatchNumber(); 
 private:
-	regex *reg;
-	boost::sregex_iterator *reg_iterator;
+	pcre *reg;
+	const char *error;
+        int erroffset;
+	string page;
+	int ovector[VECTORSIZE];
+	int rc;
+	int offset;
 };
 
 #endif

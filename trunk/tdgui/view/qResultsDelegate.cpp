@@ -44,7 +44,7 @@ int qResultsDelegate::drawThumbnail(QPainter *painter, const QStyleOptionViewIte
                                     const QModelIndex &index) const {
     static map<string,rawContainer *> imgLoaded;
     static set<string> imgQueued;
-    static threadPool thread;
+    static threadPool<rawUrl> thread;
     int lineSpacing = painter->fontMetrics().lineSpacing();
     
     QString text;
@@ -64,13 +64,12 @@ int qResultsDelegate::drawThumbnail(QPainter *painter, const QStyleOptionViewIte
             imageWidth+=2;
         } else {
             //Download the image
-            boost::recursive_mutex::scoped_lock scoped_lock(thread.getMutex());
-            //threadPool<rawUrl>::lock(thread);
+            threadPool<rawUrl>::lock(thread);
             if (imgQueued.find(image) == imgQueued.end()) {
                 imgQueued.insert(image);
-                //threadPool<rawUrl>::unlock(thread);
-                thread.createThread(*(new rawUrl(image,&imgLoaded,tdp,mw)));
-            }// else threadPool<rawUrl>::unlock(thread);
+                threadPool<rawUrl>::unlock(thread);
+                thread.createThread(&(*(new rawUrl(image,&imgLoaded,tdp,mw))));
+            } else threadPool<rawUrl>::unlock(thread);
         }
     }
     return imageWidth;

@@ -22,15 +22,15 @@
 
 #include "pageParser.h"
 
-pageParser::pageParser(const string & e, engineResults *ler, recursive_mutex *mut, tdParam *t) {
+pageParser::pageParser(const string & e, engineResults *ler, threadPool<pageParser> *mut, tdParam *t) {
 	engname = e;
 	eng = NULL;
 	query = ler->getQuery();
 	limit = ler->getLimit();
 	global_results = ler;
-	this->mut = mut;
-  tdp = t;
-  //setAbort(false);
+	results_lock = mut;
+    tdp = t;
+    //setAbort(false);
 }
 
 pageParser::pageParser(const pageParser & pp) {
@@ -42,8 +42,8 @@ pageParser::pageParser(const pageParser & pp) {
 	visited_pages = pp.visited_pages;
 	results = pp.results;
 	global_results = pp.global_results;
-	mut = pp.mut;
-  tdp = pp.tdp;
+	results_lock = pp.results_lock;
+    tdp = pp.tdp;
   //abort = pp.abort;
 }
 
@@ -132,8 +132,9 @@ void pageParser::doParse() {
 
 void pageParser::closeParse() {
 	if (getAbort()) return;
-	boost::recursive_mutex::scoped_lock scoped_lock(*mut);
+	threadPool<pageParser>::lock(results_lock);
 	global_results->addRankedResults(results, eng->getName());
+	threadPool<pageParser>::unlock(results_lock);
 }
 
 void pageParser::startParsing() {
