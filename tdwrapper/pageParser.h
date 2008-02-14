@@ -31,7 +31,6 @@
 #include <iostream>
 #include <list>
 #include <set>
-#include <boost/thread.hpp>
 #include "row.h"
 #include "regexp/regExp.h"
 #include "xml/xmlEngine.h"
@@ -41,10 +40,10 @@
 #include "debugmacro.h"
 #include "tdParam.h"
 #include "tdExcp.h"
+#include "threads/threadPool.h"
 
 
 using namespace std;
-using namespace boost;
 
 class pageParser {
 private:
@@ -55,10 +54,10 @@ private:
 	set<address> visited_pages;
 	vector<row> results;
 	engineResults *global_results;
-	recursive_mutex *mut;
+	threadPool<pageParser> *results_lock;
 	unsigned long limit;
 	getHttp gh;
-  tdParam *tdp;
+    tdParam *tdp;
 
 	bool initParse();
 	void doParse();
@@ -66,7 +65,7 @@ private:
 	row generateRow(regExp &);
 	address getNextAddress();
 public:
-	pageParser(const string &, engineResults *, recursive_mutex *, tdParam *);
+	pageParser(const string &, engineResults *, threadPool<pageParser> *, tdParam *);
 	pageParser(const pageParser &);
 	~pageParser();
 	void startParsing();

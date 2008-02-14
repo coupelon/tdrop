@@ -103,7 +103,7 @@ public:
     void sortResults(string s, bool ascending = true);
     
 private:
-    threadPool threads;
+    threadPool<pageParser> threads;
     list<pageParser *> pplist;
     engineResults *ranked_results;
     static string intToString(int);
