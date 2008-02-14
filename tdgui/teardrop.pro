@@ -4,61 +4,48 @@
 
 TEMPLATE = app
 TARGET = 
-DEPENDPATH += . lib nav qt xml
-INCLUDEPATH += . qt xml lib nav
+DEPENDPATH += . view control ../tdresults ../tdwrapper ../tdcommon ../tdcommon/net ../tdcommon/regexp ../tdcommon/threads ../tdcommon/xml
+INCLUDEPATH += . view control ../tdresults ../tdwrapper ../tdcommon ../tdcommon/net ../tdcommon/regexp ../tdcommon/threads ../tdcommon/xml
 QMAKE_CFLAGS += $$system(curl-config --cflags) $$system(xml2-config --cflags)
 QMAKE_CXXFLAGS += $$system(curl-config --cflags) $$system(xml2-config --cflags)
-LIBS += -lboost_regex -lboost_thread $$system(xml2-config --libs) $$system(curl-config --libs)
+LIBS += -lboost_regex -lboost_thread $$system(xml2-config --libs) $$system(curl-config --libs) ../tdresults/Debug/libtdresults.so ../tdwrapper/Debug/libtdwrapper.so ../tdcommon/Debug/libtdcommon.so
 CONFIG += qt debug
 
 # Input
-HEADERS += lib/address.h \
-           lib/debugmacro.h \
-           lib/getHttp.h \
-           lib/rawContainer.h \
-           lib/regExp.h \
-           lib/row.h \
-           lib/selectFile.h \
-           lib/tdExcp.h \
-           lib/tdParam.h \
-           lib/threadPool.h \
-           nav/engineResults.h \
-           nav/metaRank.h \
-           nav/openSave.h \
-           nav/pageParser.h \
-           nav/validPages.h \
-           qt/myWindow.h \
-           qt/qResultsDelegate.h \
-           qt/searchManager.h \
-           qt/searchResults.h \
-           qt/treeManager.h \
-           qt/rawUrl.h \
-           qt/prefDialog.h \
-           xml/nodeDoc.h \
-           xml/xmlEngine.h \
-           xml/xmlFile.h \
-           icons/xmag.xpm \
-           icons/page.xpm
+HEADERS += ../tdcommon/address.h \
+           ../tdcommon/debugmacro.h \
+           ../tdcommon/net/getHttp.h \
+           ../tdcommon/net/rawContainer.h \
+           ../tdcommon/regexp/regExp.h \
+           ../tdcommon/row.h \
+           ../tdcommon/selectFile.h \
+           ../tdcommon/tdExcp.h \
+           ../tdcommon/tdParam.h \
+           ../tdcommon/threads/threadPool.h \
+           ../tdcommon/engineResults.h \
+           ../tdwrapper/metaRank.h \
+           ../tdresults/openSave.h \
+           ../tdwrapper/pageParser.h \
+           ../tdresults/validPages.h \
+           view/myWindow.h \
+           view/qResultsDelegate.h \
+           control/searchManager.h \
+           control/searchResults.h \
+           view/treeManager.h \
+           control/rawUrl.h \
+           view/prefDialog.h \
+           ../tdcommon/xml/nodeDoc.h \
+           ../tdcommon/xml/xmlEngine.h \
+           ../tdcommon/xml/xmlFile.h \
+           view/icons/xmag.xpm \
+           view/icons/page.xpm
 FORMS += teardrop.ui preferences.ui
-SOURCES += main.cpp \
-           lib/getHttp.cpp \
-           lib/regExp.cpp \
-           lib/row.cpp \
-           lib/selectFile.cpp \
-           lib/tdParam.cpp \
-           nav/engineResults.cpp \
-           nav/metaRank.cpp \
-           nav/openSave.cpp \
-           nav/pageParser.cpp \
-           nav/validPages.cpp \
-           qt/myWindow.cpp \
-           qt/qResultsDelegate.cpp \
-           qt/searchManager.cpp \
-           qt/searchResults.cpp \
-           qt/treeManager.cpp \
-           qt/rawUrl.cpp \
-           qt/prefDialog.cpp \
-           xml/nodeDoc.cpp \
-           xml/xmlEngine.cpp \
-           xml/xmlFile.cpp
-RESOURCES += tdres.qrc
+SOURCES += tdgui.cpp \
+           view/myWindow.cpp \
+           view/qResultsDelegate.cpp \
+           control/searchManager.cpp \
+           control/searchResults.cpp \
+           view/treeManager.cpp \
+           control/rawUrl.cpp \
+           view/prefDialog.cpp
+RESOURCES += view/tdres.qrc
