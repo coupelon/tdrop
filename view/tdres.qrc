@@ -1,0 +1,17 @@
+<RCC>
+    <qresource prefix="/images" >
+        <file>icons/arrow-down-double.png</file>
+        <file>icons/arrow-up-double.png</file>
+        <file>icons/downarrow.png</file>
+        <file>icons/file-find.png</file>
+        <file>icons/fileexport.png</file>
+        <file>icons/fileopen.png</file>
+        <file>icons/filesaveas.png</file>
+        <file>icons/folder_html.xpm</file>
+        <file>icons/help.png</file>
+        <file>icons/icon.png</file>
+        <file>icons/process-stop.png</file>
+        <file>icons/search.xpm</file>
+        <file>icons/uparrow.png</file>
+    </qresource>
+</RCC>
