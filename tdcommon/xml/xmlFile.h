@@ -47,34 +47,11 @@ public:
   void close();
 
 public:
-  /** This method tries to find the given tag, by its name,
-  in the children of the given xmlNode */
-  xmlNode *findChildByName(xmlNode *,string);
-
-  /** This method tries to find the given tag, by its name,
-  after the given xmlNode */
-  xmlNode *findNodeByName(xmlNode *,string);
-
-  /** This method tries to find the given tag, by its name,
-  before the given xmlNode */
-  xmlNode *findPreviousNodeByName(xmlNode *,string);
-
-  /** This method tries to find the given attribute, by its name,
-  in the given xmlNode */
-  xmlAttr *getAttributeByName(xmlNode *,string);
-
-  /** Returns the value of the given node's attribute name.
-  Returns "" if none found. */
-  string getAttributeValueByName(xmlNode *n, string name);
-
-  /** Returns the value of the given node */
-  string getNodeValue(xmlNode *);
 
   /** Saves the XML doc to the specified file */
   bool saveDocTo(string &);
   
-  /** Sets the content of the given node. Create it if needed */
-  void setNodeContent(xmlNode *, string, string);
+
 
   string filename;
   xmlDoc *doc;

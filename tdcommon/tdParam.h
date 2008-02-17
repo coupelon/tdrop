@@ -31,6 +31,7 @@
 #include <curl/curl.h>
 #include <string>
 #include "xml/xmlFile.h"
+#include "xml/nodeDoc.h"
 #include "selectFile.h"
 
 #define CURL_TIMEOUT 90

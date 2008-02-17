@@ -80,31 +80,30 @@ void tdParam::getInitValues() {
   string path;
   if (selectFile::find("config",".xml",path) && xf.openFile(path + "config.xml"))
   {
-    xmlNode *n;
-    n = xf.findChildByName(NULL,"browser");
-    if (n != NULL)
+    nodeDoc *n = new nodeDoc(&xf,"browser");
+    if (n->isValid())
     {
-      browser = xf.getNodeValue(n);
+      browser = n->getNodeValue();
     }
-    n = xf.findChildByName(NULL,"proxy-address");
-    if (n != NULL)
+    n->findChildByName("proxy-address",NULL);
+    if (n->isValid())
     {
-      proxy_address = xf.getNodeValue(n);
+      proxy_address = n->getNodeValue();
     }
-    n = xf.findChildByName(NULL,"proxy-port");
-    if (n != NULL)
+    n->findChildByName("proxy-port",NULL);
+    if (n->isValid())
     {
-      proxy_port = (xf.getNodeValue(n) == "SOCKS5")?CURLPROXY_SOCKS5:CURLPROXY_HTTP;
+      proxy_port = (n->getNodeValue() == "SOCKS5")?CURLPROXY_SOCKS5:CURLPROXY_HTTP;
     }
-    n = xf.findChildByName(NULL,"proxy-type");
-    if (n != NULL)
+    n->findChildByName("proxy-type",NULL);
+    if (n->isValid())
     {
-      proxy_type = atol(xf.getNodeValue(n).c_str());
+      proxy_type = atol(n->getNodeValue().c_str());
     }
-    n = xf.findChildByName(NULL,"timeout");
-    if (n != NULL)
+    n->findChildByName("timeout",NULL);
+    if (n->isValid())
     {
-      curl_timeout = atol(xf.getNodeValue(n).c_str());
+      curl_timeout = atol(n->getNodeValue().c_str());
     }
   }
 }
@@ -114,11 +113,16 @@ void tdParam::commit() {
   string path;
   if (selectFile::find("config",".xml",path) && xf.openFile(path + "config.xml"))
   {
-    xf.setNodeContent(NULL,"browser",getBrowser());
-    xf.setNodeContent(NULL,"proxy-address",getProxyAddress());
-    xf.setNodeContent(NULL,"proxy-port",xmlFile::ltoa(getProxyPort()));
-    xf.setNodeContent(NULL,"proxy-type",(getProxyType()==CURLPROXY_HTTP)?"HTTP":"SOCKS5");
-    xf.setNodeContent(NULL,"timeout",xmlFile::ltoa(getTimeout()));
+  	nodeDoc n(&xf,"browser");
+	n.setNodeContent(getBrowser());
+	n.findChildByName("proxy-address",NULL);
+	n.setNodeContent(getProxyAddress());
+	n.findChildByName("proxy-port",NULL);
+	n.setNodeContent(xmlFile::ltoa(getProxyPort()));
+    n.findChildByName("proxy-type",NULL);
+    n.setNodeContent((getProxyType()==CURLPROXY_HTTP)?"HTTP":"SOCKS5");
+    n.findChildByName("timeout",NULL);
+    n.setNodeContent(xmlFile::ltoa(getTimeout()));
 
     string out = selectFile::getHomeDirectory() + "config.xml";
     xf.saveDocTo(out);
