@@ -33,6 +33,7 @@
 #include <libxml/tree.h>
 
 #include "xmlFile.h"
+#include "nodeDoc.h"
 #include "../regexp/regExp.h"
 #include "../address.h"
 #include "../net/getHttp.h"
@@ -41,26 +42,26 @@
 
 using namespace std;
 
-class xmlEngine : public xmlFile {
-	public:
-        /** xmlEngine constructor. Takes the engines name
-        for parameter, namely the engine filename without it's path
-        and .xml.
-        */
-		xmlEngine();
-		~xmlEngine();
+class xmlEngine {
+public:
+    /** xmlEngine constructor. Takes the engines name
+    for parameter, namely the engine filename without it's path
+    and .xml.
+    */
+	xmlEngine();
+	~xmlEngine();
 
     bool openEngine(string);
 
     /** Returns the name of the current search engine */      
-		string getName();
-		
-		/** Returns the charset expected to be used by the search engine
-		It is used when the returned content header doesn't contain this information
-		If it is not referenced here and no content information is given by the
-		engine, the content is passed directly to the application
-        */
-		string getCharset();
+	string getName();
+	
+	/** Returns the charset expected to be used by the search engine
+	It is used when the returned content header doesn't contain this information
+	If it is not referenced here and no content information is given by the
+	engine, the content is passed directly to the application
+    */
+	string getCharset();
 
     /** Returns the separator to be used in the query to split words */
     string getSeparator();
@@ -138,10 +139,7 @@ class xmlEngine : public xmlFile {
     string getNextInputUrl();
 
     /** Generic function used to retrieve a url from a given tag */
-    string getUrl(xmlNode *);
-
-    /** This method increments a given tag pointer to it's next block */
-    bool getNext(xmlNode **, string, xmlNode * = NULL);
+    string getUrl(nodeDoc *);
 
     /** Returns the value of the given init inputfield */
     methodParam getInitInputFields(engineResults *, regExp *, bool methodGet);
@@ -153,7 +151,7 @@ class xmlEngine : public xmlFile {
     methodParam getNextInputFields(engineResults *, regExp *, bool methodGet, int res);      
     
     /** This method generate the value of a given inputfield */
-    methodParam getInputFields(engineResults *, regExp *,xmlNode *,bool methodGet, int res = -1);
+    methodParam getInputFields(engineResults *, regExp *,nodeDoc *,bool methodGet, int res = -1);
 
     /** Returns the input method of the init block */
     string getInitMethod();
@@ -165,14 +163,16 @@ class xmlEngine : public xmlFile {
     string getNextInputMethod();
     
     /** Returns the input method of the given block */
-    string getMethod(xmlNode *);
+    string getMethod(nodeDoc *);
 
-		xmlNode *init;
-		xmlNode *query;
-        xmlNode *result;
-        xmlNode *header;
+	nodeDoc *init;
+	nodeDoc *query;
+    nodeDoc *result;
+    nodeDoc *header;
+    
+    xmlFile *xml;
 
-        getHttp *gh;
+    getHttp *gh;
 };
 
 #endif

@@ -53,74 +53,7 @@ void xmlFile::close() {
         xmlFreeDoc(doc);
 }
 
-xmlNode *xmlFile::findChildByName(xmlNode *p, string c) {
-    if (p == NULL) p = root_element;
-    xmlNode *child = p->children;
-    while(child) {
-        if( child->type == XML_ELEMENT_NODE ) {
-            string name = (char *) child->name;
-            if (name == c) return child;
-        }
-        child = child->next;
-    }
-    return child;
-}
 
-xmlNode *xmlFile::findNodeByName(xmlNode *p, string c) {
-    if (p == NULL) p = root_element;
-    xmlNode *child = p;
-    while(child) {
-        if( child->type == XML_ELEMENT_NODE ) {
-            string name = (char *) child->name;
-            if (name == c) return child;
-        }
-        child = child->next;
-    }
-    return NULL;
-}
-
-xmlNode *xmlFile::findPreviousNodeByName(xmlNode *p, string c) {
-    if (p == NULL) return NULL;
-    xmlNode *child = p;
-    while(child) {
-        if( child->type == XML_ELEMENT_NODE ) {
-            string name = (char *) child->name;
-            if (name == c) return child;
-        }
-        child = child->prev;
-    }
-    return child;
-}
-
-xmlAttr *xmlFile::getAttributeByName(xmlNode *p,string c) {
-    if (p == NULL) p = root_element;
-    xmlAttr *attribute = p->properties;
-    while( attribute ){
-        string name = (char *) attribute->name;
-        if (name == c) return attribute;
-        attribute = attribute->next;
-    }
-    return attribute;
-}
-
-string xmlFile::getAttributeValueByName(xmlNode *n, string name) {
-    if (n == NULL) n = root_element;
-    xmlAttr *attr;
-    if (n) {   
-        if ((attr = getAttributeByName(n,name))) {
-            if (attr->children && attr->children->content)
-                return (char *) attr->children->content;
-        }
-    }
-    return "";
-}
-
-string xmlFile::getNodeValue(xmlNode *n) {
-    //if (n == NULL) n = root_element;
-    if (n && n->children && n->children->content)
-        return (char *) n->children->content;
-    return "";
-}
 
 bool xmlFile::saveDocTo(string & file) {
     FILE *f = fopen(file.c_str(),"wb");
@@ -133,16 +66,6 @@ bool xmlFile::saveDocTo(string & file) {
         fclose(f);
     }
     return false;
-}
-
-void xmlFile::setNodeContent(xmlNode *p, string s, string c) {
-    if (!p) p = root_element;
-    xmlNode *n = findChildByName(p,s.c_str());
-    if (n) {
-        xmlNodeSetContent(n,(const xmlChar*) c.c_str());
-    } else {
-        xmlNewChild(p,NULL,(const xmlChar*) s.c_str(),(const xmlChar*) c.c_str());
-    }
 }
 
 string xmlFile::itoa(int i) {

@@ -64,43 +64,43 @@ bool openSave::xmlOpen(string file, string & query, list<string> & engines, stri
     getHttp gh;
     xmlFile input;
     if (input.openFile(file)) {
-        xmlNode *cur = input.findChildByName(NULL,"engines");
-        if(!cur) return false;
-        cur = input.findChildByName(cur,"name");
-        while(cur) {
-            engines.push_back(gh.unescape(input.getNodeValue(cur)));
-            cur = input.findNodeByName(cur->next,"name");
+    	nodeDoc *cur = new nodeDoc(&input,"engines");
+        if(!cur->isValid()) return false;
+        cur->findChildByName("name");
+        while(cur->isValid()) {
+            engines.push_back(gh.unescape(cur->getNodeValue()));
+            cur->next();
         }
         
-        cur = input.findChildByName(NULL,"query");
-        if (!cur) return false;
-        query = gh.unescape(input.getNodeValue(cur));
+        cur->findChildByName("query",NULL);
+        if (!cur->isValid()) return false;
+        query = gh.unescape(cur->getNodeValue());
         
-        cur = input.findChildByName(NULL,"limit");
-        if (!cur) return false;
-        limit = gh.unescape(input.getNodeValue(cur));
+        cur->findChildByName("limit",NULL);
+        if (!cur->isValid()) return false;
+        limit = gh.unescape(cur->getNodeValue());
         
-        cur = input.findChildByName(NULL,"row");
-        while(cur) {
-            xmlNode *xmlRow = input.findChildByName(cur,"number");
-            if(!xmlRow) return false;
-            row rw(atoi(input.getNodeValue(xmlRow).c_str()));
+        cur->findChildByName("row",NULL);
+        while(cur->isValid()) {
+            nodeDoc *xmlRow = new nodeDoc(&input,"number",*cur);
+            if(!xmlRow->isValid()) return false;
+            row rw(atoi(xmlRow->getNodeValue().c_str()));
             
-            xmlRow = input.findChildByName(cur,"engines");
-            if(!xmlRow) return false;
-            xmlRow = input.findChildByName(xmlRow,"name");
-            while(xmlRow) {
-                rw.addEngine(gh.unescape(input.getNodeValue(xmlRow)));
-                xmlRow = input.findNodeByName(xmlRow->next,"name");
+            xmlRow->findChildByName("engines",cur);
+            if(!xmlRow->isValid()) return false;
+            xmlRow->findChildByName("name");
+            while(xmlRow->isValid()) {
+                rw.addEngine(gh.unescape(xmlRow->getNodeValue()));
+                xmlRow->next();
             }
-            xmlRow = input.findChildByName(cur,"fields");
-            if(!xmlRow) return false;
-            while(xmlRow) {
-                rw.addField(gh.unescape(input.getNodeValue(xmlRow)), gh.unescape(input.getAttributeValueByName(xmlRow,"name")));
-                xmlRow = input.findNodeByName(xmlRow->next,"fields");
+            xmlRow->findChildByName("fields",cur);
+            if(!xmlRow->isValid()) return false;
+            while(xmlRow->isValid()) {
+                rw.addField(gh.unescape(xmlRow->getNodeValue()), gh.unescape(xmlRow->getAttributeValueByName("name")));
+                xmlRow->next();
             }
             r.push_back(rw);
-            cur = input.findNodeByName(cur->next,"row");
+            cur->next();
         }
         return true;
     }
