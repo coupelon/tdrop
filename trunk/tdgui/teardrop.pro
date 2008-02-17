@@ -8,7 +8,7 @@ DEPENDPATH += . view control ../tdresults ../tdwrapper ../tdcommon ../tdcommon/n
 INCLUDEPATH += . view control ../tdresults ../tdwrapper ../tdcommon ../tdcommon/net ../tdcommon/regexp ../tdcommon/threads ../tdcommon/xml
 QMAKE_CFLAGS += $$system(curl-config --cflags) $$system(xml2-config --cflags) $$system(pcre-config --cflags)
 QMAKE_CXXFLAGS += $$system(curl-config --cflags) $$system(xml2-config --cflags) $$system(pcre-config --cflags)
-LIBS += -lboost_regex -lboost_thread $$system(xml2-config --libs) $$system(curl-config --libs)  $$system(pcre-config --libs) ../tdresults/Debug/libtdresults.so ../tdwrapper/Debug/libtdwrapper.so ../tdcommon/Debug/libtdcommon.so
+LIBS += $$system(xml2-config --libs) $$system(curl-config --libs)  $$system(pcre-config --libs) ../tdresults/Debug/libtdresults.so ../tdwrapper/Debug/libtdwrapper.so ../tdcommon/Debug/libtdcommon.so
 CONFIG += qt debug
 
 # Input
