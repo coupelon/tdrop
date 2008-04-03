@@ -40,6 +40,8 @@ show_index(struct shttpd_arg *arg)
 	query_string = shttpd_get_env(arg, "QUERY_STRING");
 	cookie_string = shttpd_get_header(arg, "Cookie");
 
+	cout << request_uri << endl;
+	
 	if(!cookie_string) {
 		shttpd_printf(arg, "%s", "HTTP/1.1 200 OK\r\n");
 		shttpd_printf(arg, "%s", "Set-Cookie: query=0192825;\r\n");
@@ -62,6 +64,8 @@ show_index(struct shttpd_arg *arg)
 static void
 show_tree(struct shttpd_arg *arg)
 {
+	const char *request_uri = shttpd_get_env(arg, "REQUEST_URI");
+	cout << request_uri << endl;
 	shttpd_printf(arg, "%s", "HTTP/1.1 200 OK\r\n");
 	shttpd_printf(arg, "%s", "Content-Type: text/plain\r\n\r\n");
 	

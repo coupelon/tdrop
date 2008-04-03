@@ -43,7 +43,7 @@ unix: $(OBJS)
 
 linux: $(OBJS)
 	$(AR) -r lib$(PROG).a $(OBJS) && ranlib lib$(PROG).a
-	g++ -c daemon.c $(CFLAGS)
+	g++ -c daemon.cpp $(CFLAGS)
 	$(CC) $(CFLAGS) compat_unix.c daemon.o \
 		-o $(PROG) $(LIBS) -L. -l$(PROG)
 
