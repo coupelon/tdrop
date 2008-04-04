@@ -153,24 +153,46 @@ show_wi(struct shttpd_arg *arg)
     if (fp == NULL) {
     	show_404(arg);
     } else {
-    	shttpd_printf(arg, "%s", "HTTP/1.1 200 OK\r\n");
+//    	shttpd_printf(arg, "%s", "HTTP/1.1 200 OK\r\n");
 //    	filename = filename.substr(filename.size()-4,4);
 //    	
 //    	if (filename == "html")
 //    		shttpd_printf(arg, "%s", "Content-Type: text/html\r\n\r\n");
 //    	else
 //    		shttpd_printf(arg, "%s", "Content-Type: text/plain\r\n\r\n");
-		shttpd_printf(arg, "%s", "\r\n");
+//		shttpd_printf(arg, "%s", "\r\n");
 		
-    	char *buffer = new char[1025];
-    	while (!feof(fp)) {
-	    	int nb = fread(buffer,1,1024,fp);
-	    	buffer[nb] = 0;
-	    	shttpd_printf(arg,"%.1024s", buffer);
-    	}
-    	delete[] buffer;
-    	fclose(fp);
-		arg->flags |= SHTTPD_END_OF_OUTPUT;
+//    	char *buffer = new char[1025];
+//    	while (!feof(fp)) {
+//	    	int nb = fread(buffer,1,1024,fp);
+//	    	buffer[nb] = 0;
+//	    	shttpd_printf(arg,"%.1024s", buffer);
+//    	}
+//    	delete[] buffer;
+//    	fclose(fp);
+//		arg->flags |= SHTTPD_END_OF_OUTPUT;
+		
+		int state = (int) arg->state;
+	
+		if (state == 0) {
+			shttpd_printf(arg, "%s", "HTTP/1.1 200 OK\r\n\r\n");
+		} else {
+			fseek(fp,state,SEEK_SET);
+		}
+		char b;
+		//cerr << "\t" << arg->out.num_bytes << " " << arg->out.len << endl;
+		while (arg->out.num_bytes < arg->out.len && !feof(fp)) {
+			int nb = fread(&b,1,1,fp);
+			arg->out.buf[arg->out.num_bytes] = b;
+			arg->out.num_bytes++;
+			state++;
+		}
+		//cerr << "\t" << arg->out.num_bytes << " " << arg->out.len << endl;
+		if (feof(fp)) {
+			arg->flags |= SHTTPD_END_OF_OUTPUT;
+		}
+		arg->state = (void *) state;
+		fclose(fp);
     }
 }
 
