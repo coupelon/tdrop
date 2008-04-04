@@ -4,12 +4,10 @@ import java.util.Iterator;
 import java.util.Set;
 
 import com.google.gwt.core.client.EntryPoint;
-import com.google.gwt.user.client.HTTPRequest;
-import com.google.gwt.user.client.ResponseTextHandler;
+import com.google.gwt.http.client.*;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.ClickListener;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Tree;
 import com.google.gwt.user.client.ui.TreeItem;
@@ -21,23 +19,6 @@ import com.google.gwt.json.client.*;;
  * Entry point classes define <code>onModuleLoad()</code>.
  */
 public class WebInterface implements EntryPoint {
-	  /**
-	   * Class for handling the response text associated with a request for a JSON
-	   * object.
-	   * 
-	   */
-	  private class JSONResponseTextHandler implements ResponseTextHandler {
-	    public void onCompletion(String responseText) {
-	      try {
-	        JSONValue jsonValue = JSONParser.parse(responseText);
-	        displayJSONObject(jsonValue);
-	      } catch (JSONException e) {
-	        displayError(responseText);
-	      }
-	      searchButton.setText(SEARCH_BUTTON_DEFAULT_TEXT);
-	    }
-	  }
-
 	  /*
 	   * Class for handling the fetch button's click event.
 	   */
@@ -55,8 +36,8 @@ public class WebInterface implements EntryPoint {
 	   * http://api.search.yahoo.com/ImageSearchService/V1/imageSearch?appid=YahooDemo&query=potato&results=2&output=json
 	   * 
 	   */
-	  //private static final String DEFAULT_SEARCH_URL = "http://localhost:8080/request_tree";
-	  private static final String DEFAULT_SEARCH_URL = "search-results.js";
+	  private static final String DEFAULT_SEARCH_URL = "http://localhost:8080/request_tree";
+	  //private static final String DEFAULT_SEARCH_URL = "search-results.js";
 
 	  /*
 	   * Text displayed on the fetch button when we are in a default state.
@@ -137,11 +118,35 @@ public class WebInterface implements EntryPoint {
 	   */
 	  private void doFetchURL() {
 	    searchButton.setText(SEARCH_BUTTON_WAITING_TEXT);
-	    if (!HTTPRequest.asyncGet(DEFAULT_SEARCH_URL, new JSONResponseTextHandler())) {
-	      // Reset the caption.
-	      //
-	      searchButton.setText(SEARCH_BUTTON_DEFAULT_TEXT);
-	    }
+	    RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(DEFAULT_SEARCH_URL));
+
+	    
+	    try {
+	    	builder.sendRequest(null, new RequestCallback() {
+	    	    public void onError(Request request, Throwable exception) {
+	    	    	displayError("Couldn't connect to server (could be timeout, SOP violation, etc.)");     
+	    	    }
+
+	    	    public void onResponseReceived(Request request, Response response) {
+	    	      if (200 == response.getStatusCode()) {
+	    	    	  try {
+	    	  	        JSONValue jsonValue = JSONParser.parse(response.getText());
+	    	  	        displayJSONObject(jsonValue);
+	    	  	      } catch (JSONException e) {
+	    	  	        displayError(response.getText());
+	    	  	      }
+	    	  	      searchButton.setText(SEARCH_BUTTON_DEFAULT_TEXT);
+	    	          // Process the response in response.getText()
+	    	      } else {
+	    	    	    displayError(response.getStatusText());
+						// Handle the error.  Can get the status text from response.getStatusText()
+						searchButton.setText(SEARCH_BUTTON_DEFAULT_TEXT);
+	    	      }
+	    	    }       
+	    	  });
+	    	} catch (RequestException e) {
+	    	  // Couldn't connect to server        
+	    	}
 	  }
 
 	  /*
