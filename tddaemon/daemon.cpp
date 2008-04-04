@@ -15,11 +15,19 @@
 #include <string.h>
 #include <signal.h>
 
+#include <fstream>
+
 #include "shttpd.h"
 
 #include "nodeDoc.h"
 #include "xmlEngine.h"
 #include "selectFile.h"
+
+#define WEBINTERFACE_URI "/WebInterface/*"
+#define WEBINTERFACE_PATH "/home/olivier/workspace/tddaemonclient/www/com.teardrop.WebInterface/" 
+#define WEBINTERFACE_ROOT_SIZE 14
+
+using namespace std;
 
 /*
  * This callback function is attached to the "/" and "/abc.html" URIs,
@@ -127,9 +135,43 @@ show_404(struct shttpd_arg *arg)
 {
 	shttpd_printf(arg, "%s", "HTTP/1.1 200 OK\r\n");
 	shttpd_printf(arg, "%s", "Content-Type: text/plain\r\n\r\n");
-	shttpd_printf(arg, "%s", "Oops. File not found! ");
+	//shttpd_printf(arg, "%s", "Oops. File not found! ");
+	shttpd_printf(arg, "%s%s%s", "Oops. File", shttpd_get_env(arg, "REQUEST_URI") , " not found! ");
 	shttpd_printf(arg, "%s", "This is a custom error handler.");
 	arg->flags |= SHTTPD_END_OF_OUTPUT;
+}
+
+/*
+ * This callback function is used to show the web interface
+ */
+static void
+show_wi(struct shttpd_arg *arg)
+{
+	string filename = WEBINTERFACE_PATH + string(shttpd_get_env(arg, "REQUEST_URI")).erase(0,WEBINTERFACE_ROOT_SIZE);
+	FILE *fp = fopen(filename.c_str(),"rb");
+	cerr << filename << endl;
+    if (fp == NULL) {
+    	show_404(arg);
+    } else {
+    	shttpd_printf(arg, "%s", "HTTP/1.1 200 OK\r\n");
+//    	filename = filename.substr(filename.size()-4,4);
+//    	
+//    	if (filename == "html")
+//    		shttpd_printf(arg, "%s", "Content-Type: text/html\r\n\r\n");
+//    	else
+//    		shttpd_printf(arg, "%s", "Content-Type: text/plain\r\n\r\n");
+		shttpd_printf(arg, "%s", "\r\n");
+		
+    	char *buffer = new char[1025];
+    	while (!feof(fp)) {
+	    	int nb = fread(buffer,1,1024,fp);
+	    	buffer[nb] = 0;
+	    	shttpd_printf(arg,"%.1024s", buffer);
+    	}
+    	delete[] buffer;
+    	fclose(fp);
+		arg->flags |= SHTTPD_END_OF_OUTPUT;
+    }
 }
 
 int main(int argc, char *argv[])
@@ -157,6 +199,7 @@ int main(int argc, char *argv[])
 
 	shttpd_register_uri(ctx, "/", &show_index, (void *) &data);
 	shttpd_register_uri(ctx, "/request_tree", &show_tree, (void *) &data);
+	shttpd_register_uri(ctx, WEBINTERFACE_URI, &show_wi, NULL);
 	//shttpd_register_uri(ctx, "/search", &show_results, (void *) &data);
 
 	shttpd_handle_error(ctx, 404, show_404, NULL);
