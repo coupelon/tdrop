@@ -13,7 +13,9 @@ import com.google.gwt.user.client.ui.Widget;
 
 import com.google.gwt.json.client.*;
 
+//import com.gwtext.client.data.Node;
 import com.gwtext.client.widgets.tree.*;
+//import com.gwtext.client.widgets.tree.event.TreeNodeListenerAdapter;
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
@@ -49,6 +51,8 @@ public class WebInterface implements EntryPoint {
 	   */
 	  private static final String SEARCH_BUTTON_WAITING_TEXT = "Waiting for JSON Response...";
 
+	  private static final String ICON_PATH = "teardrop/";
+	  
 	  //private Tree jsonTree = new Tree();
 	  
 	  private TreePanel engTree = new TreePanel();
@@ -74,16 +78,29 @@ public class WebInterface implements EntryPoint {
 	    	if ((categArray = categ.isArray()) != null) {
       	      for (int i = 0; i < categArray.size(); ++i) {
       	    	TreeNode treeCat = new TreeNode(getJSONSetValue(categArray.get(i), "name"));
-      	    	treeCat.setIcon(getJSONSetValue(categArray.get(i), "icon"));
+//      	    	treeCat.addListener(new TreeNodeListenerAdapter() {
+//      	    		public void onCheckChanged(Node node, boolean checked) {
+//      	    		    TreeNode[] children = (TreeNode[]) node.getChildNodes();
+//      	    			for(int j = 0; j < children.length; ++j) {
+//      	    				children[j].setChecked(((TreeNode)node).getUI().isChecked());
+//      	    			}
+//      	    		}
+//      	    	});
+      	    	treeCat.setIcon(ICON_PATH + getJSONSetValue(categArray.get(i), "icon"));
       	    	treeCat.setChecked(false);
       	    	treeItem.appendChild(treeCat);
       	        JSONValue engin;
       	        if ((engin = getJSONSet(categArray.get(i),"engines")) != null) {
-      	        	JSONArray enginArray;
+	  	        	JSONArray enginArray;
 	  	        	if ((enginArray = engin.isArray()) != null) {
 	  	    	      for (int j = 0; j < enginArray.size(); ++j) {
-	  	    	    	TreeNode treeEng = new TreeNode(getJSONSetValue(enginArray.get(j),"title"));
-	  	    	    	treeEng.setIcon(getJSONSetValue(enginArray.get(j),"icon"));
+	  	    	    	TreeNode treeEng;
+	  	    	    	if (getJSONSetValue(enginArray.get(j),"title").equals(""))
+	  	    	    		treeEng = new TreeNode(getJSONSetValue(enginArray.get(j),"name"));
+	  	    	    	else 
+	  	    	    		treeEng = new TreeNode(getJSONSetValue(enginArray.get(j),"title"));
+	  	    	    	treeEng.setIcon(ICON_PATH + getJSONSetValue(enginArray.get(j),"icon"));
+	  	    	    	treeEng.setAttribute("name", getJSONSetValue(enginArray.get(j),"name"));
 	  	    	    	treeEng.setChecked(false);
 	  	    	    	treeCat.appendChild(treeEng);
 	  	    	      }
@@ -198,16 +215,17 @@ public class WebInterface implements EntryPoint {
 		engTree.setRootNode(aroot);
 		// Avoids showing an "empty" cell
 	    engTree.setVisible(false);
-	    
+	    engTree.setHeaderAsText(true);
+	    engTree.setTitle("Categories");
 	    engTree.setCollapsible(true);
 	    engTree.setHeight(400);  
 	    engTree.setWidth(200);  
 	    engTree.setAnimate(true);  
-	    engTree.setEnableDD(true);  
+	    engTree.setEnableDD(false);  
 	    engTree.setContainerScroll(true);  
 	    engTree.setAutoScroll(true);  
 	    engTree.setRootVisible(false);  
-	    engTree.setFrame(true);  
+	    engTree.setFrame(true);
 
 	    // Find out where the host page wants the button.
 	    //
