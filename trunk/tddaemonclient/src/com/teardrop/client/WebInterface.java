@@ -7,14 +7,13 @@ import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.http.client.*;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.RootPanel;
-import com.google.gwt.user.client.ui.Tree;
-import com.google.gwt.user.client.ui.TreeItem;
 import com.google.gwt.user.client.ui.Widget;
 
-import com.google.gwt.json.client.*;;
+import com.google.gwt.json.client.*;
+
+import com.gwtext.client.widgets.tree.*;
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
@@ -25,7 +24,7 @@ public class WebInterface implements EntryPoint {
 	   */
 	  private class SearchButtonClickListener implements ClickListener {
 	    public void onClick(Widget sender) {
-	      jsonTree.setVisible(false);
+	      engTree.setVisible(false);
 	      doFetchURL();
 	    }
 	  }
@@ -50,7 +49,9 @@ public class WebInterface implements EntryPoint {
 	   */
 	  private static final String SEARCH_BUTTON_WAITING_TEXT = "Waiting for JSON Response...";
 
-	  private Tree jsonTree = new Tree();
+	  //private Tree jsonTree = new Tree();
+	  
+	  private TreePanel engTree = new TreePanel();
 
 	  private Button searchButton = new Button();
 
@@ -66,21 +67,25 @@ public class WebInterface implements EntryPoint {
 	   * Add the object presented by the JSONValue as a children to the requested
 	   * TreeItem.
 	   */
-	  private void generateEngineTree(TreeItem treeItem, JSONValue jsonValue) {	    
+	  private void generateEngineTree(TreeNode treeItem, JSONValue jsonValue) {	    
 	    JSONValue categ;
 	    if ((categ = getJSONSet(jsonValue,"categories")) != null) {
 	    	JSONArray categArray;
 	    	if ((categArray = categ.isArray()) != null) {
       	      for (int i = 0; i < categArray.size(); ++i) {
-      	        TreeItem treeCat = treeItem.addItem(
-      	        		new CheckBox(getJSONSetValue(categArray.get(i), "name")));
+      	    	TreeNode treeCat = new TreeNode(getJSONSetValue(categArray.get(i), "name"));
+      	    	treeCat.setIcon(getJSONSetValue(categArray.get(i), "icon"));
+      	    	treeCat.setChecked(false);
+      	    	treeItem.appendChild(treeCat);
       	        JSONValue engin;
       	        if ((engin = getJSONSet(categArray.get(i),"engines")) != null) {
       	        	JSONArray enginArray;
 	  	        	if ((enginArray = engin.isArray()) != null) {
 	  	    	      for (int j = 0; j < enginArray.size(); ++j) {
-	  	    	    	treeCat.addItem(
-	  	    	    			new CheckBox(getJSONSetValue(enginArray.get(j),"title")));
+	  	    	    	TreeNode treeEng = new TreeNode(getJSONSetValue(enginArray.get(j),"title"));
+	  	    	    	treeEng.setIcon(getJSONSetValue(enginArray.get(j),"icon"));
+	  	    	    	treeEng.setChecked(false);
+	  	    	    	treeCat.appendChild(treeEng);
 	  	    	      }
 	  	    	    }
       	        }
@@ -119,24 +124,23 @@ public class WebInterface implements EntryPoint {
 	  }
 
 	  private void displayError(String responseText) {
-	    jsonTree.removeItems();
-	    jsonTree.setVisible(true);
-	    TreeItem treeItem = jsonTree.addItem("Failed to parse JSON response");
-	    treeItem.addItem(responseText);
-	    treeItem.setStyleName("JSON-JSONResponseObject");
-	    treeItem.setState(true);
+	    engTree.clear();
+	    engTree.setVisible(true);
+	    TreeNode treeItem = new TreeNode("Failed to parse JSON response"); 
+	    engTree.setRootNode(treeItem);
 	  }
 
 	  /*
 	   * Update the treeview of a JSON object.
 	   */
 	  private void displayJSONObject(JSONValue jsonValue) {
-	    jsonTree.removeItems();
-	    jsonTree.setVisible(true);
-	    TreeItem treeItem = jsonTree.addItem("JSON Response");
-	    generateEngineTree(treeItem, jsonValue);
-	    treeItem.setStyleName("JSON-JSONResponseObject");
-	    treeItem.setState(true);
+		engTree.setVisible(true);
+	    //jsonTree.removeItems();
+	    //jsonTree.setVisible(true);
+	    //TreeItem treeItem = jsonTree.addItem("JSON Response");
+	    generateEngineTree(engTree.getRootNode(), jsonValue);
+	    //treeItem.setStyleName("JSON-JSONResponseObject");
+	    //treeItem.setState(true);
 	  }
 
 	  /*
@@ -190,8 +194,20 @@ public class WebInterface implements EntryPoint {
 	    searchButton.setText(SEARCH_BUTTON_DEFAULT_TEXT);
 	    searchButton.addClickListener(new SearchButtonClickListener());
 
-	    // Avoids showing an "empty" cell
-	    jsonTree.setVisible(false);
+	    TreeNode aroot = new TreeNode("categories"); 
+		engTree.setRootNode(aroot);
+		// Avoids showing an "empty" cell
+	    engTree.setVisible(false);
+	    
+	    engTree.setCollapsible(true);
+	    engTree.setHeight(400);  
+	    engTree.setWidth(200);  
+	    engTree.setAnimate(true);  
+	    engTree.setEnableDD(true);  
+	    engTree.setContainerScroll(true);  
+	    engTree.setAutoScroll(true);  
+	    engTree.setRootVisible(false);  
+	    engTree.setFrame(true);  
 
 	    // Find out where the host page wants the button.
 	    //
@@ -212,6 +228,6 @@ public class WebInterface implements EntryPoint {
 	    // Add both widgets.
 	    //
 	    searchButtonSlot.add(searchButton);
-	    treeViewSlot.add(jsonTree);
+	    treeViewSlot.add(engTree);
 	  }
 }
