@@ -7,6 +7,7 @@ import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.http.client.*;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Tree;
@@ -36,8 +37,8 @@ public class WebInterface implements EntryPoint {
 	   * http://api.search.yahoo.com/ImageSearchService/V1/imageSearch?appid=YahooDemo&query=potato&results=2&output=json
 	   * 
 	   */
-	  private static final String DEFAULT_SEARCH_URL = "http://localhost:8080/request_tree";
-	  //private static final String DEFAULT_SEARCH_URL = "search-results.js";
+	  //private static final String DEFAULT_SEARCH_URL = "http://localhost:8080/request_tree";
+	  private static final String DEFAULT_SEARCH_URL = "search-results.js";
 
 	  /*
 	   * Text displayed on the fetch button when we are in a default state.
@@ -60,36 +61,61 @@ public class WebInterface implements EntryPoint {
 	  public void onModuleLoad() {
 	    initializeMainForm();
 	  }
-
+	  
 	  /*
 	   * Add the object presented by the JSONValue as a children to the requested
 	   * TreeItem.
 	   */
-	  private void addChildren(TreeItem treeItem, JSONValue jsonValue) {
-	    JSONArray jsonArray;
+	  private void generateEngineTree(TreeItem treeItem, JSONValue jsonValue) {	    
+	    JSONValue categ;
+	    if ((categ = getJSONSet(jsonValue,"categories")) != null) {
+	    	JSONArray categArray;
+	    	if ((categArray = categ.isArray()) != null) {
+      	      for (int i = 0; i < categArray.size(); ++i) {
+      	        TreeItem treeCat = treeItem.addItem(
+      	        		new CheckBox(getJSONSetValue(categArray.get(i), "name")));
+      	        JSONValue engin;
+      	        if ((engin = getJSONSet(categArray.get(i),"engines")) != null) {
+      	        	JSONArray enginArray;
+	  	        	if ((enginArray = engin.isArray()) != null) {
+	  	    	      for (int j = 0; j < enginArray.size(); ++j) {
+	  	    	    	treeCat.addItem(
+	  	    	    			new CheckBox(getJSONSetValue(enginArray.get(j),"title")));
+	  	    	      }
+	  	    	    }
+      	        }
+      	      }
+      	    }
+	    }
+	  }
+	  
+	  private String getJSONSetValue(JSONValue jsonValue, String name) {
 	    JSONObject jsonObject;
 	    JSONString jsonString;
-	    
-	    if ((jsonArray = jsonValue.isArray()) != null) {
-	      for (int i = 0; i < jsonArray.size(); ++i) {
-	        TreeItem child = treeItem.addItem(getChildText("["
-	            + Integer.toString(i) + "]"));
-	        addChildren(child, jsonArray.get(i));
-	      }
-	    } else if ((jsonObject = jsonValue.isObject()) != null) {
+		if ((jsonObject = jsonValue.isObject()) != null) {
 	      Set keys = jsonObject.keySet();
 	      for (Iterator iter = keys.iterator(); iter.hasNext();) {
 	        String key = (String) iter.next();
-	        TreeItem child = treeItem.addItem(getChildText(key));
-	        addChildren(child, jsonObject.get(key));
+	        if(key.equals(name))
+		        if ((jsonString = jsonObject.get(key).isString()) != null) {
+		  	      return jsonString.stringValue();
+		  	    }
 	      }
-	    } else if ((jsonString = jsonValue.isString()) != null) {
-	      // Use stringValue instead of toString() because we don't want escaping
-	      treeItem.addItem(jsonString.stringValue());
-	    } else {
-	      // JSONBoolean, JSONNumber, and JSONNull work well with toString().
-	      treeItem.addItem(getChildText(jsonValue.toString()));
 	    }
+		return null;
+	  }
+	  
+	  private JSONValue getJSONSet(JSONValue jsonValue, String name) {
+		JSONObject jsonObject;
+		if ((jsonObject = jsonValue.isObject()) != null) {
+	      Set keys = jsonObject.keySet();
+	      for (Iterator iter = keys.iterator(); iter.hasNext();) {
+	        String key = (String) iter.next();
+	        if(key.equals(name))
+	        	return jsonObject.get(key);
+	      }
+	    }
+		return null;
 	  }
 
 	  private void displayError(String responseText) {
@@ -108,7 +134,7 @@ public class WebInterface implements EntryPoint {
 	    jsonTree.removeItems();
 	    jsonTree.setVisible(true);
 	    TreeItem treeItem = jsonTree.addItem("JSON Response");
-	    addChildren(treeItem, jsonValue);
+	    generateEngineTree(treeItem, jsonValue);
 	    treeItem.setStyleName("JSON-JSONResponseObject");
 	    treeItem.setState(true);
 	  }
@@ -152,9 +178,9 @@ public class WebInterface implements EntryPoint {
 	  /*
 	   * Causes the text of child elements to wrap.
 	   */
-	  private String getChildText(String text) {
-	    return "<span style='white-space:normal'>" + text + "</span>";
-	  }
+//	  private String getChildText(String text) {
+//	    return "<span style='white-space:normal'>" + text + "</span>";
+//	  }
 
 	  /**
 	   * Initialize the main form's layout and content.
