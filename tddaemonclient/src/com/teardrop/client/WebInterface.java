@@ -3,6 +3,7 @@ package com.teardrop.client;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.RootPanel;
+import com.google.gwt.user.client.ui.TextBox;
 import com.gwtext.client.widgets.tree.*;
 import com.gwtext.client.widgets.Button;
 import com.gwtext.client.widgets.event.ButtonListenerAdapter;
@@ -13,12 +14,9 @@ import com.gwtext.client.core.EventObject;
  */
 public class WebInterface implements EntryPoint {
 	  private static final String SEARCH_BUTTON_DEFAULT_TEXT = "Search";
-	  private TreePanel engTree = new EngineTree();
-	  private Button searchButton = new Button(SEARCH_BUTTON_DEFAULT_TEXT,new ButtonListenerAdapter() {  
-	      public void onClick(Button button, EventObject e) {
-	    	  //Handle the button click
-		      }  
-		    });
+	  private EngineTree engTree = new EngineTree();
+	  private TextBox queryText = new TextBox();
+	  private QueryButton searchButton = new QueryButton(SEARCH_BUTTON_DEFAULT_TEXT,engTree,queryText);
 
 	  /**
 	   * Entry point for this simple application. Currently, we build the
@@ -50,9 +48,18 @@ public class WebInterface implements EntryPoint {
 	      Window.alert("Please define a container element whose id is 'tree'");
 	      return;
 	    }
+	    
+	    // Find out where the host page wants the query text box.
+	    //
+	    RootPanel queryTextSlot = RootPanel.get("engineTree");
+	    if (queryTextSlot == null) {
+	      Window.alert("Please define a container element whose id is 'query'");
+	      return;
+	    }
 
 	    // Add both widgets.
 	    searchButtonSlot.add(searchButton);
 	    treeViewSlot.add(engTree);
+	    queryTextSlot.add(queryText);
 	  }
 }
