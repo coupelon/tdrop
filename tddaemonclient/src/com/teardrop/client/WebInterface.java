@@ -4,10 +4,6 @@ import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TextBox;
-import com.gwtext.client.widgets.tree.*;
-import com.gwtext.client.widgets.Button;
-import com.gwtext.client.widgets.event.ButtonListenerAdapter;
-import com.gwtext.client.core.EventObject;
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
