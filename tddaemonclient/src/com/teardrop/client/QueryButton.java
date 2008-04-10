@@ -22,11 +22,13 @@ public class QueryButton extends Button {
 		
 		public void onClick(Button button, EventObject e) {
 			TreeNode[] checkedNode = engTree.getChecked();
-			String checkedNodeString = "engines=";
+			String checkedNodeString = "";
 			for(int i = 0; i < checkedNode.length; ++i) {
-				checkedNodeString += (i>0?",":"") + checkedNode[i].getAttribute("name");
+				if (checkedNode[i].getAttribute("name") != null) {
+					checkedNodeString += (checkedNodeString.equals("")?"":",") + checkedNode[i].getAttribute("name");
+				}
 			}
-			Window.alert("query=" + queryText.getText() + checkedNodeString);
+			Window.alert("query=" + queryText.getText() + "engines=" + checkedNodeString);
         }
 		
 	}
