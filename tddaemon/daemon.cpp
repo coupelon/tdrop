@@ -141,6 +141,54 @@ show_404(struct shttpd_arg *arg)
 	arg->flags |= SHTTPD_END_OF_OUTPUT;
 }
 
+static void query_process(struct shttpd_arg *arg) {
+	const char	*s;//, *path = "uploaded.txt";
+	struct state {
+		unsigned long int cl;		/* Content-Length	*/
+		size_t	nread;		/* Number of bytes read	*/
+		string	buffer;
+	} *state;
+
+	/* If the connection was broken prematurely, cleanup */
+	if (arg->flags & SHTTPD_CONNECTION_ERROR && arg->state) {
+		//(void) fclose(((struct state *) arg->state)->fp);
+		delete arg->state;
+	} else if ((s = shttpd_get_header(arg, "Content-Length")) == NULL) {
+		shttpd_printf(arg, "HTTP/1.0 411 Length Required\n\n");
+		arg->flags |= SHTTPD_END_OF_OUTPUT;
+	} else if (arg->state == NULL) {
+		/* New request. Allocate a state structure, and open a file */
+		arg->state = state = new (struct state);
+		state->cl = strtoul(s, NULL, 10);
+		state->buffer = "";
+		state->nread = 0;
+		shttpd_printf(arg, "HTTP/1.0 200 OK\n"
+			"Content-Type: text/plain\n\n");
+	} else {
+		arg->state = state = (struct state *) calloc(1,sizeof(struct state));
+
+		/*
+		 * Write the POST data to a file. We do not do any URL
+		 * decoding here. File will contain form-urlencoded stuff.
+		 */
+		state->buffer.append(arg->in.buf, arg->in.len);
+		//(void) fwrite(arg->in.buf, arg->in.len, 1, state->fp);
+		state->nread += arg->in.len;
+
+		/* Tell SHTTPD we have processed all data */
+		arg->in.num_bytes = arg->in.len;
+
+		/* Data stream finished? Close the file, and free the state */
+		if (state->nread >= state->cl) {
+			shttpd_printf(arg, "Written %d bytes: %s",
+			    state->nread, state->buffer.c_str());
+			//(void) fclose(state->fp);
+			delete state;
+			arg->flags |= SHTTPD_END_OF_OUTPUT;
+		}
+	}
+}
+
 /*
  * This callback function is used to show the web interface
  */
@@ -220,7 +268,8 @@ int main(int argc, char *argv[])
 	shttpd_set_option(ctx, "ports", "8080");
 
 	shttpd_register_uri(ctx, "/", &show_index, (void *) &data);
-	shttpd_register_uri(ctx, "/request_tree", &show_tree, (void *) &data);
+	shttpd_register_uri(ctx, "/services/request_tree", &show_tree, (void *) &data);
+	shttpd_register_uri(ctx, "/services/query_post", &query_process, (void *) &data);
 	shttpd_register_uri(ctx, WEBINTERFACE_URI, &show_wi, NULL);
 	//shttpd_register_uri(ctx, "/search", &show_results, (void *) &data);
 
