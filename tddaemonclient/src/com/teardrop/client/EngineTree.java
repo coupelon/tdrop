@@ -15,8 +15,11 @@ import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONParser;
 import com.google.gwt.json.client.JSONString;
 import com.google.gwt.json.client.JSONValue;
+import com.gwtext.client.data.Node;
 import com.gwtext.client.widgets.tree.TreeNode;
 import com.gwtext.client.widgets.tree.TreePanel;
+import com.gwtext.client.widgets.tree.event.TreeNodeListener;
+import com.gwtext.client.widgets.tree.event.TreeNodeListenerAdapter;
 
 public class EngineTree extends TreePanel {
 
@@ -24,6 +27,36 @@ public class EngineTree extends TreePanel {
 	//private static final String DEFAULT_SEARCH_URL = "search-results.js";
 	private static final String ICON_PATH = "teardrop/";
 	
+	//This is the listener for the categories checkboxes of the tree
+	private static final TreeNodeListener catListener = new TreeNodeListenerAdapter() {
+		public void onCheckChanged(Node node, boolean checked) {
+			for(int j = 0; j < node.getChildNodes().length; ++j) {
+				((TreeNode)node.getChildNodes()[j]).getUI().toggleCheck(checked);
+			}
+		}
+	};
+	
+	//This is the listener for the engines checkboxes of the tree
+	private static final TreeNodeListener engListener = new TreeNodeListenerAdapter() {
+		public void onCheckChanged(Node node, boolean checked) {
+			TreeNode parent = (TreeNode) node.getParentNode();
+			if (!checked) {
+				parent.getUI().toggleCheck(false);
+			} else  if (!parent.getUI().isChecked()) {
+				boolean notChecked = false;
+				for(int j = 0; j < parent.getChildNodes().length; ++j) {
+    				if (!((TreeNode)parent.getChildNodes()[j]).getUI().isChecked()) {
+    					notChecked = true;
+    					break;
+    				}
+    			}
+				if (!notChecked) {
+					//If every child is checked, we can toggle this node
+					parent.getUI().toggleCheck(true);
+				}
+			}
+		}
+	};
 	
 	public EngineTree() {
 		super();
@@ -59,6 +92,7 @@ public class EngineTree extends TreePanel {
     	    	TreeNode treeCat = new TreeNode(getJSONSetValue(categArray.get(i), "name"));
     	    	treeCat.setIcon(ICON_PATH + getJSONSetValue(categArray.get(i), "icon"));
     	    	treeCat.setChecked(false);
+    	    	treeCat.addListener(catListener);
     	    	treeItem.appendChild(treeCat);
     	        JSONValue engin;
     	        if ((engin = getJSONSet(categArray.get(i),"engines")) != null) {
@@ -73,6 +107,7 @@ public class EngineTree extends TreePanel {
 	  	    	    	treeEng.setIcon(ICON_PATH + getJSONSetValue(enginArray.get(j),"icon"));
 	  	    	    	treeEng.setAttribute("name", getJSONSetValue(enginArray.get(j),"name"));
 	  	    	    	treeEng.setChecked(false);
+	  	    	    	treeEng.addListener(engListener);
 	  	    	    	treeCat.appendChild(treeEng);
 	  	    	      }
 	  	    	    }
