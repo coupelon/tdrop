@@ -39,9 +39,9 @@ using namespace std;
 static void
 show_index(struct shttpd_arg *arg)
 {
-	int		*p = (int *) arg->user_data;	/* integer passed to us */
-	char		value[20];
-	const char	*host, *request_method, *query_string, *request_uri, *cookie_string;
+	//int		*p = (int *) arg->user_data;	/* integer passed to us */
+	//char		value[20];
+	const char	*request_method, *query_string, *request_uri, *cookie_string;//*host,;
 
 	request_method = shttpd_get_env(arg, "REQUEST_METHOD");
 	request_uri = shttpd_get_env(arg, "REQUEST_URI");
@@ -151,8 +151,7 @@ static void query_process(struct shttpd_arg *arg) {
 
 	/* If the connection was broken prematurely, cleanup */
 	if (arg->flags & SHTTPD_CONNECTION_ERROR && arg->state) {
-		//(void) fclose(((struct state *) arg->state)->fp);
-		delete arg->state;
+		delete (struct state *)arg->state;
 	} else if ((s = shttpd_get_header(arg, "Content-Length")) == NULL) {
 		shttpd_printf(arg, "HTTP/1.0 411 Length Required\n\n");
 		arg->flags |= SHTTPD_END_OF_OUTPUT;
@@ -165,14 +164,12 @@ static void query_process(struct shttpd_arg *arg) {
 		shttpd_printf(arg, "HTTP/1.0 200 OK\n"
 			"Content-Type: text/plain\n\n");
 	} else {
-		arg->state = state = (struct state *) calloc(1,sizeof(struct state));
-
+		state = (struct state *) arg->state;
 		/*
 		 * Write the POST data to a file. We do not do any URL
 		 * decoding here. File will contain form-urlencoded stuff.
 		 */
 		state->buffer.append(arg->in.buf, arg->in.len);
-		//(void) fwrite(arg->in.buf, arg->in.len, 1, state->fp);
 		state->nread += arg->in.len;
 
 		/* Tell SHTTPD we have processed all data */
@@ -182,7 +179,6 @@ static void query_process(struct shttpd_arg *arg) {
 		if (state->nread >= state->cl) {
 			shttpd_printf(arg, "Written %d bytes: %s",
 			    state->nread, state->buffer.c_str());
-			//(void) fclose(state->fp);
 			delete state;
 			arg->flags |= SHTTPD_END_OF_OUTPUT;
 		}
@@ -201,25 +197,6 @@ show_wi(struct shttpd_arg *arg)
     if (fp == NULL) {
     	show_404(arg);
     } else {
-//    	shttpd_printf(arg, "%s", "HTTP/1.1 200 OK\r\n");
-//    	filename = filename.substr(filename.size()-4,4);
-//    	
-//    	if (filename == "html")
-//    		shttpd_printf(arg, "%s", "Content-Type: text/html\r\n\r\n");
-//    	else
-//    		shttpd_printf(arg, "%s", "Content-Type: text/plain\r\n\r\n");
-//		shttpd_printf(arg, "%s", "\r\n");
-		
-//    	char *buffer = new char[1025];
-//    	while (!feof(fp)) {
-//	    	int nb = fread(buffer,1,1024,fp);
-//	    	buffer[nb] = 0;
-//	    	shttpd_printf(arg,"%.1024s", buffer);
-//    	}
-//    	delete[] buffer;
-//    	fclose(fp);
-//		arg->flags |= SHTTPD_END_OF_OUTPUT;
-		
 		int state = (int) arg->state;
 	
 		if (state == 0) {
@@ -228,14 +205,12 @@ show_wi(struct shttpd_arg *arg)
 			fseek(fp,state,SEEK_SET);
 		}
 		char b;
-		//cerr << "\t" << arg->out.num_bytes << " " << arg->out.len << endl;
 		while (arg->out.num_bytes < arg->out.len && !feof(fp)) {
-			int nb = fread(&b,1,1,fp);
+			fread(&b,1,1,fp);
 			arg->out.buf[arg->out.num_bytes] = b;
 			arg->out.num_bytes++;
 			state++;
 		}
-		//cerr << "\t" << arg->out.num_bytes << " " << arg->out.len << endl;
 		if (feof(fp)) {
 			arg->flags |= SHTTPD_END_OF_OUTPUT;
 		}
@@ -263,15 +238,12 @@ int main(int argc, char *argv[])
 	 * Start listening on ports 8080 and 8081
 	 */
 	ctx = shttpd_init();
-	//shttpd_set_option(ctx, "ssl_cert", "shttpd.pem");
-	//shttpd_set_option(ctx, "aliases", ALIAS_URI "=" ALIAS_DIR);
 	shttpd_set_option(ctx, "ports", "8080");
 
 	shttpd_register_uri(ctx, "/", &show_index, (void *) &data);
 	shttpd_register_uri(ctx, "/services/request_tree", &show_tree, (void *) &data);
 	shttpd_register_uri(ctx, "/services/query_post", &query_process, (void *) &data);
 	shttpd_register_uri(ctx, WEBINTERFACE_URI, &show_wi, NULL);
-	//shttpd_register_uri(ctx, "/search", &show_results, (void *) &data);
 
 	shttpd_handle_error(ctx, 404, show_404, NULL);
 
