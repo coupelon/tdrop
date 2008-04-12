@@ -63,7 +63,7 @@ void metaRank::toString(string page, string d) {
     cout << getString(page,d);
 }
 
-string metaRank::getString(string page, string d) {
+string metaRank::getString(string page, string delim_engs,string delim_res, string pre, string post, bool escape) {
 		string out = "";
     string p;   
     for (vector<row>::iterator lrit = ranked_results->getResults().begin(); ranked_results->getResults().end() != lrit; ++lrit) {
@@ -71,23 +71,28 @@ string metaRank::getString(string page, string d) {
         list<string> ls = lrit->getEngine();
         string engines = "";
         for(list<string>::iterator lsit = ls.begin(); lsit != ls.end(); ++lsit) {
-            if (engines != "") engines += d;
+            if (engines != "") engines += delim_engs;
             engines += *lsit;
         }  
         p = regExp::replaceAll(p,"\\x7bnum\\x7d",metaRank::intToString(lrit->getNum()));
         p = regExp::replaceAll(p,"\\x7bengines\\x7d",engines);
-        p = regExp::replaceAll(p,"\\\\n","\n");
-        p = regExp::replaceAll(p,"\\\\t","\t");
+        p = regExp::replaceAll(p,"\\\\n","\n"); // Replace \n by a line jump
+        p = regExp::replaceAll(p,"\\\\t","\t"); // Replace \t by a tab
 
         regExp r("\\x7b([^\\x7d]*)");  // Regexp : {[^}]*}
         
+        getHttp gh; //Used for escaping in HTML
+        
         for(r.newPage(p); !r.endOfMatch(); r.next()) {
             //cout << "_" << r.getMatch(1) << "_" << endl;
-            p = regExp::replaceAll(p,"\\x7b" + r.getMatch(1) + "\\x7d",lrit->getFields()[r.getMatch(1)]);
+            string field;
+            if (escape) field = gh.escape(lrit->getFields()[r.getMatch(1)]);
+            else field = lrit->getFields()[r.getMatch(1)];
+            p = regExp::replaceAll(p,"\\x7b" + r.getMatch(1) + "\\x7d",field);
         }
-        out += p;
+        out += ((out!="")?delim_res:"") + p;
     }
-    return out;
+    return pre + out + post;
 }
 
 vector<row> & metaRank::getResults() {
