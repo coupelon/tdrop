@@ -44,7 +44,17 @@ static string newQuery(string query,string engines,string limit) {
   metaRank mr(er,&tdp);
   mr.startParsing();
   mr.joinAll();
-  return mr.getString("{num}\t{engines}\n\tTitre: {title}\n\tAddress: {url}\nAbstract: {abstract}\n","/");
+  string pre = "{\"results\":[{";
+  string text = string("\"num\":\"{num}\",") +
+  							  "\"engines\":\"{engines}\"," +
+  							  "\"title\":\"{title}\"," +
+  							  "\"url\":\"{url}\"," +
+  							  "\"img\":\"{img}\"," +
+  							  "\"abstract\":\"{abstract}\"";
+  string post = "}]}";
+  string json = mr.getString(text,"/","},{",pre,post,true);
+  cerr << json << endl;
+  return json;
 }
 
 /*
