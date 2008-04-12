@@ -6,19 +6,22 @@ import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.RequestException;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.http.client.URL;
+import com.google.gwt.json.client.JSONArray;
 import com.google.gwt.json.client.JSONParser;
 import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.TextBox;
 import com.gwtext.client.core.EventObject;
 import com.gwtext.client.widgets.Button;
 import com.gwtext.client.widgets.CycleButton;
+import com.gwtext.client.widgets.Panel;
 import com.gwtext.client.widgets.event.ButtonListenerAdapter;
 import com.gwtext.client.widgets.tree.TreeNode;
 
 public class QueryButton extends Button {
-	public QueryButton(String text,EngineTree engTree, TextBox queryText, CycleButton limitButton) {
-		super(text, new OnClickAdapter(engTree, queryText,limitButton));
+	public QueryButton(String text,EngineTree engTree, TextBox queryText, CycleButton limitButton,Panel resultsPanel) {
+		super(text, new OnClickAdapter(engTree, queryText,limitButton,resultsPanel));
 	}
 		
 	private static class OnClickAdapter extends ButtonListenerAdapter {
@@ -26,10 +29,12 @@ public class QueryButton extends Button {
 		EngineTree engTree;
 		TextBox queryText;
 		CycleButton limitButton;
-		public OnClickAdapter(EngineTree engTree, TextBox queryText, CycleButton limitButton) {
+		Panel resultsPanel;
+		public OnClickAdapter(EngineTree engTree, TextBox queryText, CycleButton limitButton, Panel resultsPanel) {
 			this.engTree = engTree;
 			this.queryText = queryText;
 			this.limitButton = limitButton;
+			this.resultsPanel = resultsPanel;
 		}
 		
 		public void onClick(Button button, EventObject e) {
@@ -58,8 +63,8 @@ public class QueryButton extends Button {
 	
 		    	    public void onResponseReceived(Request request, Response response) {
 		    	      if (200 == response.getStatusCode()) {
-		    	  	      Window.alert(response.getText());
 		    	  	      JSONValue jsonValue = JSONParser.parse(response.getText());
+		    	  	      showResults(jsonValue);
 		    	      } else {
 		    	    	  Window.alert(response.getStatusText());
 		    	      }
@@ -70,5 +75,25 @@ public class QueryButton extends Button {
 		    	}
 		  }
 		
+		private void showResults(JSONValue jsonValue) {
+			JSONValue results;
+			resultsPanel.removeAll(true);
+		    if ((results = JSONFunctions.getJSONSet(jsonValue,"results")) != null) {
+		    	JSONArray resultsArray;
+		    	if ((resultsArray = results.isArray()) != null) {
+	    	      for (int i = 0; i < resultsArray.size(); ++i) {
+	    	    	Panel newPanel = new Panel();
+	    	    	newPanel.setAutoHeight(true);
+	    	    	newPanel.setPaddings(5);
+	    	    	newPanel.add(new HTML(URL.decodeComponent(JSONFunctions.getJSONSetValue(resultsArray.get(i), "title"))));
+	    	    	newPanel.add(new HTML(URL.decodeComponent(JSONFunctions.getJSONSetValue(resultsArray.get(i), "abstract"))));
+	    	    	newPanel.add(new HTML(URL.decodeComponent(JSONFunctions.getJSONSetValue(resultsArray.get(i), "img"))));
+	    	    	newPanel.add(new HTML(URL.decodeComponent(JSONFunctions.getJSONSetValue(resultsArray.get(i), "engines"))));
+	    	    	newPanel.add(new HTML(URL.decodeComponent(JSONFunctions.getJSONSetValue(resultsArray.get(i), "url"))));
+	    	    	resultsPanel.add(newPanel);
+	    	      }
+	    	    }
+		    }
+		}
 	}
 }
