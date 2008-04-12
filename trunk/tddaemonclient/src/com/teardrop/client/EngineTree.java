@@ -1,8 +1,5 @@
 package com.teardrop.client;
 
-import java.util.Iterator;
-import java.util.Set;
-
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
@@ -11,9 +8,7 @@ import com.google.gwt.http.client.Response;
 import com.google.gwt.http.client.URL;
 import com.google.gwt.json.client.JSONArray;
 import com.google.gwt.json.client.JSONException;
-import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONParser;
-import com.google.gwt.json.client.JSONString;
 import com.google.gwt.json.client.JSONValue;
 import com.gwtext.client.data.Node;
 import com.gwtext.client.widgets.tree.TreeNode;
@@ -85,27 +80,27 @@ public class EngineTree extends TreePanel {
 	   */
 	  private void generateEngineTree(TreeNode treeItem, JSONValue jsonValue) {	    
 	    JSONValue categ;
-	    if ((categ = getJSONSet(jsonValue,"categories")) != null) {
+	    if ((categ = JSONFunctions.getJSONSet(jsonValue,"categories")) != null) {
 	    	JSONArray categArray;
 	    	if ((categArray = categ.isArray()) != null) {
     	      for (int i = 0; i < categArray.size(); ++i) {
-    	    	TreeNode treeCat = new TreeNode(getJSONSetValue(categArray.get(i), "name"));
-    	    	treeCat.setIcon(ICON_PATH + getJSONSetValue(categArray.get(i), "icon"));
+    	    	TreeNode treeCat = new TreeNode(JSONFunctions.getJSONSetValue(categArray.get(i), "name"));
+    	    	treeCat.setIcon(ICON_PATH + JSONFunctions.getJSONSetValue(categArray.get(i), "icon"));
     	    	treeCat.setChecked(false);
     	    	treeCat.addListener(catListener);
     	    	treeItem.appendChild(treeCat);
     	        JSONValue engin;
-    	        if ((engin = getJSONSet(categArray.get(i),"engines")) != null) {
+    	        if ((engin = JSONFunctions.getJSONSet(categArray.get(i),"engines")) != null) {
 	  	        	JSONArray enginArray;
 	  	        	if ((enginArray = engin.isArray()) != null) {
 	  	    	      for (int j = 0; j < enginArray.size(); ++j) {
 	  	    	    	TreeNode treeEng;
-	  	    	    	if (getJSONSetValue(enginArray.get(j),"title").equals(""))
-	  	    	    		treeEng = new TreeNode(getJSONSetValue(enginArray.get(j),"name"));
+	  	    	    	if (JSONFunctions.getJSONSetValue(enginArray.get(j),"title").equals(""))
+	  	    	    		treeEng = new TreeNode(JSONFunctions.getJSONSetValue(enginArray.get(j),"name"));
 	  	    	    	else 
-	  	    	    		treeEng = new TreeNode(getJSONSetValue(enginArray.get(j),"title"));
-	  	    	    	treeEng.setIcon(ICON_PATH + getJSONSetValue(enginArray.get(j),"icon"));
-	  	    	    	treeEng.setAttribute("name", getJSONSetValue(enginArray.get(j),"name"));
+	  	    	    		treeEng = new TreeNode(JSONFunctions.getJSONSetValue(enginArray.get(j),"title"));
+	  	    	    	treeEng.setIcon(ICON_PATH + JSONFunctions.getJSONSetValue(enginArray.get(j),"icon"));
+	  	    	    	treeEng.setAttribute("name", JSONFunctions.getJSONSetValue(enginArray.get(j),"name"));
 	  	    	    	treeEng.setChecked(false);
 	  	    	    	treeEng.addListener(engListener);
 	  	    	    	treeCat.appendChild(treeEng);
@@ -115,35 +110,6 @@ public class EngineTree extends TreePanel {
     	      }
     	    }
 	    }
-	  }
-	  
-	  private String getJSONSetValue(JSONValue jsonValue, String name) {
-	    JSONObject jsonObject;
-	    JSONString jsonString;
-		if ((jsonObject = jsonValue.isObject()) != null) {
-	      Set keys = jsonObject.keySet();
-	      for (Iterator iter = keys.iterator(); iter.hasNext();) {
-	        String key = (String) iter.next();
-	        if(key.equals(name))
-		        if ((jsonString = jsonObject.get(key).isString()) != null) {
-		  	      return jsonString.stringValue();
-		  	    }
-	      }
-	    }
-		return null;
-	  }
-	  
-	  private JSONValue getJSONSet(JSONValue jsonValue, String name) {
-		JSONObject jsonObject;
-		if ((jsonObject = jsonValue.isObject()) != null) {
-	      Set keys = jsonObject.keySet();
-	      for (Iterator iter = keys.iterator(); iter.hasNext();) {
-	        String key = (String) iter.next();
-	        if(key.equals(name))
-	        	return jsonObject.get(key);
-	      }
-	    }
-		return null;
 	  }
 
 	  private void displayError(String responseText) {
