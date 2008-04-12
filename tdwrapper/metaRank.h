@@ -88,6 +88,7 @@ public:
     /** A more advanced method to display only required fields   
     */
     void toString(string, string);
+    string getString(string, string);
     
     /** Sort the given list of row in order of the given field
     */
