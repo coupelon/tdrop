@@ -5,6 +5,8 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.gwtext.client.widgets.CycleButton;
+import com.gwtext.client.widgets.Panel;
+import com.gwtext.client.widgets.layout.RowLayout;
 import com.gwtext.client.widgets.menu.CheckItem;
 
 /**
@@ -15,6 +17,7 @@ public class WebInterface implements EntryPoint {
 	  private EngineTree engTree = new EngineTree();
 	  private TextBox queryText = new TextBox();
 	  private CycleButton limitButton = new CycleButton();
+	  final Panel resultsPanel = new Panel();
 	  private QueryButton searchButton = new QueryButton(SEARCH_BUTTON_DEFAULT_TEXT,engTree,queryText,limitButton);
 
 	  /**
@@ -56,6 +59,15 @@ public class WebInterface implements EntryPoint {
 	      return;
 	    }
 	    
+//	  Find out where the host page wants the query text box.
+	    //
+	    RootPanel resultsPanelSlot = RootPanel.get("results");
+	    if (resultsPanel == null) {
+	      Window.alert("Please define a container element whose id is 'results'");
+	      return;
+	    }
+	    resultsPanel.setLayout(new RowLayout());
+	    
         // Find out where the host page wants the limit box.
 	    //
 	    RootPanel limitButtonSlot = RootPanel.get("limit");
@@ -76,5 +88,6 @@ public class WebInterface implements EntryPoint {
 	    treeViewSlot.add(engTree);
 	    queryTextSlot.add(queryText);
 	    limitButtonSlot.add(limitButton);
+	    resultsPanelSlot.add(resultsPanel);
 	  }
 }
