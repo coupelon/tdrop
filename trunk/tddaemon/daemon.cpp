@@ -22,12 +22,30 @@
 #include "nodeDoc.h"
 #include "xmlEngine.h"
 #include "selectFile.h"
+#include "regExp.h"
+#include "metaRank.h"
 
 #define WEBINTERFACE_URI "/WebInterface/*"
 #define WEBINTERFACE_PATH "/home/olivier/workspace/tddaemonclient/www/com.teardrop.WebInterface/" 
 #define WEBINTERFACE_ROOT_SIZE 14
 
 using namespace std;
+
+static string newQuery(string query,string engines,string limit) {
+	list<string> lse;
+	tdParam tdp;
+  engineResults *er = new engineResults();
+  er->setQuery(query);
+  er->setLimit(atol(limit.c_str()));
+  regExp r("([^,]*),");
+  for(r.newPage(engines); !r.endOfMatch(); r.next()) {
+    er->addEngine(r.getMatch(1));
+  }
+  metaRank mr(er,&tdp);
+  mr.startParsing();
+  mr.joinAll();
+  return mr.getString("{num}\t{engines}\n\tTitre: {title}\n\tAddress: {url}\nAbstract: {abstract}\n","/");
+}
 
 /*
  * This callback function is attached to the "/" and "/abc.html" URIs,
@@ -177,8 +195,21 @@ static void query_process(struct shttpd_arg *arg) {
 
 		/* Data stream finished? Close the file, and free the state */
 		if (state->nread >= state->cl) {
-			shttpd_printf(arg, "Written %d bytes: %s",
-			    state->nread, state->buffer.c_str());
+			regExp r("query=(.*);engines=([^;]*);limit=([1-9][0-9]{1,3})");
+			r.newPage(state->buffer);
+			if (!r.endOfMatch()) {
+				//r.next();
+        //shttpd_printf(arg, "Written %d bytes:\n%s\n%s\n%s",
+			  //  state->nread,r.getMatch(1).c_str(),r.getMatch(2).c_str(),r.getMatch(3).c_str());
+			  shttpd_printf(arg, "%s",
+			    newQuery(r.getMatch(1),r.getMatch(2),r.getMatch(3)).c_str());
+      } else {
+      	shttpd_printf(arg, "You should not try to hack that soft ;-)\n");
+			}
+      
+			
+			//shttpd_printf(arg, "Written %d bytes: %s",
+			//    state->nread, state->buffer.c_str());
 			delete state;
 			arg->flags |= SHTTPD_END_OF_OUTPUT;
 		}
