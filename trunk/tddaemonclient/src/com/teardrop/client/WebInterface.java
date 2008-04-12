@@ -15,7 +15,7 @@ public class WebInterface implements EntryPoint {
 	  private EngineTree engTree = new EngineTree();
 	  private TextBox queryText = new TextBox();
 	  private CycleButton limitButton = new CycleButton();
-	  private QueryButton searchButton = new QueryButton(SEARCH_BUTTON_DEFAULT_TEXT,engTree,queryText);
+	  private QueryButton searchButton = new QueryButton(SEARCH_BUTTON_DEFAULT_TEXT,engTree,queryText,limitButton);
 
 	  /**
 	   * Entry point for this simple application. Currently, we build the

@@ -10,21 +10,24 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.TextBox;
 import com.gwtext.client.core.EventObject;
 import com.gwtext.client.widgets.Button;
+import com.gwtext.client.widgets.CycleButton;
 import com.gwtext.client.widgets.event.ButtonListenerAdapter;
 import com.gwtext.client.widgets.tree.TreeNode;
 
 public class QueryButton extends Button {
-	public QueryButton(String text,EngineTree engTree, TextBox queryText) {
-		super(text, new OnClickAdapter(engTree, queryText));
+	public QueryButton(String text,EngineTree engTree, TextBox queryText, CycleButton limitButton) {
+		super(text, new OnClickAdapter(engTree, queryText,limitButton));
 	}
 		
 	private static class OnClickAdapter extends ButtonListenerAdapter {
 		private static final String DEFAULT_SEARCH_URL = "http://localhost:8080/services/query_post";
 		EngineTree engTree;
 		TextBox queryText;
-		public OnClickAdapter(EngineTree engTree, TextBox queryText) {
+		CycleButton limitButton;
+		public OnClickAdapter(EngineTree engTree, TextBox queryText, CycleButton limitButton) {
 			this.engTree = engTree;
 			this.queryText = queryText;
+			this.limitButton = limitButton;
 		}
 		
 		public void onClick(Button button, EventObject e) {
@@ -35,7 +38,8 @@ public class QueryButton extends Button {
 					checkedNodeString += (checkedNodeString.equals("")?"":",") + checkedNode[i].getAttribute("name");
 				}
 			}
-			doPostURL("query=" + queryText.getText() + ";engines=" + checkedNodeString);
+			doPostURL("query=" + queryText.getText() + ";engines=" + checkedNodeString + ";limit=10");
+			//limitButton.getActiveItem().getText();
         }
 		
 		/*
