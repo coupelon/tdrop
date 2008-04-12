@@ -37,10 +37,12 @@ static string newQuery(string query,string engines,string limit) {
   engineResults *er = new engineResults();
   er->setQuery(query);
   er->setLimit(atol(limit.c_str()));
-  regExp r("([^,]*),");
-  for(r.newPage(engines); !r.endOfMatch(); r.next()) {
-    er->addEngine(r.getMatch(1));
+  size_t pos;
+  while((pos = engines.find(","))!=string::npos) {
+  	er->addEngine(engines.substr(0,pos));
+  	engines = engines.substr(pos+1);
   }
+  er->addEngine(engines);
   metaRank mr(er,&tdp);
   mr.startParsing();
   mr.joinAll();
