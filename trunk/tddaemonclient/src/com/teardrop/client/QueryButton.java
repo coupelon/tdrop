@@ -6,6 +6,8 @@ import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.RequestException;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.http.client.URL;
+import com.google.gwt.json.client.JSONParser;
+import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.TextBox;
 import com.gwtext.client.core.EventObject;
@@ -57,6 +59,7 @@ public class QueryButton extends Button {
 		    	    public void onResponseReceived(Request request, Response response) {
 		    	      if (200 == response.getStatusCode()) {
 		    	  	      Window.alert(response.getText());
+		    	  	      JSONValue jsonValue = JSONParser.parse(response.getText());
 		    	      } else {
 		    	    	  Window.alert(response.getStatusText());
 		    	      }
