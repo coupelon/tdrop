@@ -52,9 +52,7 @@ static string newQuery(string query,string engines,string limit) {
   							  "\"img\":\"{img}\"," +
   							  "\"abstract\":\"{abstract}\"";
   string post = "}]}";
-  string json = mr.getString(text,"/","},{",pre,post,true);
-  cerr << json << endl;
-  return json;
+  return mr.getString(text,"/","},{",pre,post,true);
 }
 
 /*
