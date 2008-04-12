@@ -60,6 +60,11 @@ void metaRank::toString() {
 }
 
 void metaRank::toString(string page, string d) {
+    cout << getString(page,d);
+}
+
+string metaRank::getString(string page, string d) {
+		string out = "";
     string p;   
     for (vector<row>::iterator lrit = ranked_results->getResults().begin(); ranked_results->getResults().end() != lrit; ++lrit) {
         p = page;
@@ -80,8 +85,9 @@ void metaRank::toString(string page, string d) {
             //cout << "_" << r.getMatch(1) << "_" << endl;
             p = regExp::replaceAll(p,"\\x7b" + r.getMatch(1) + "\\x7d",lrit->getFields()[r.getMatch(1)]);
         }
-        cout << p;
+        out += p;
     }
+    return out;
 }
 
 vector<row> & metaRank::getResults() {
