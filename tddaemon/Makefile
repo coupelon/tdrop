@@ -4,8 +4,8 @@ HDRS=		defs.h llist.h shttpd.h std_includes.h io.h md5.h ssl.h \
 		compat_unix.h compat_win32.h compat_rtems.h config.h
 OBJS=		$(SRCS:%.c=%.o)
 PROG=		tddaemon
-CFLAGS= -I../tdcommon/ -I../tdcommon/xml/ `xml2-config --cflags`
-LIBS= -ldl `xml2-config --libs` `curl-config --libs` ../tdcommon/Debug/libtdcommon.so `pcre-config --libs`
+CFLAGS= -I../tdcommon/ -I../tdcommon/xml/ -I../tdwrapper/ -I../tdcommon/regexp/ `xml2-config --cflags`
+LIBS= -ldl -lpthread `xml2-config --libs` `curl-config --libs` ../tdcommon/Debug/libtdcommon.so ../tdwrapper/Debug/libtdwrapper.so `pcre-config --libs`
 
 # Possible flags: (in brackets are rough numbers for 'gcc -O2' on i386)
 # -DHAVE_MD5		- use system md5 library (-2kb)
