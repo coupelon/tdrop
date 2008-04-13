@@ -1,0 +1,81 @@
+<!--
+# Copyright (C) 2006 Olivier COUPELON
+
+# This file is part of Teardrop.
+#
+# Teardrop is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# Teardrop is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Teardrop; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+-->
+<engine xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="teardrop_1_0.xsd">
+	<name>Live Search France</name>
+  <separator value="+" />
+	<charset>UTF-8</charset>
+  <terms>http://msdn.microsoft.com/library/en-us/MSN_Search_Web_Service_SDK/HTML/MSNWebSearchSDKLicenseAgreement.asp</terms>
+	<header>Content-Type: text/xml</header>
+	<query method="POST">
+		<url>http://soap.search.msn.com/webservices.asmx</url>
+		<inputfield><![CDATA[<?xml version="1.0" encoding="utf-8"?><soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+		<soap:Body>
+			<Search xmlns="http://schemas.microsoft.com/MSNSearch/2005/09/fex">
+				<Request>
+					<AppID>5E022975752699420875FD2D5C3E9B067731EB8A</AppID>
+					<Query>%q</Query>
+					<CultureInfo>fr-FR</CultureInfo>
+					<SafeSearch>Off</SafeSearch>
+					<Flags>None</Flags>
+					<Requests>
+						<SourceRequest>
+							<Source>Web</Source>
+							<Offset>0</Offset>
+							<Count>10</Count>
+							<ResultFields>Title Description Url</ResultFields>
+						</SourceRequest>
+					</Requests>
+				</Request>
+			</Search>
+		</soap:Body>
+	</soap:Envelope>]]></inputfield>
+  </query>
+  <result>
+		<regexp>Title[^&gt;]*&gt;([^&lt;]*)&lt;.*?Description[^&gt;]*&gt;([^&lt;]*)&lt;.*?Url[^&gt;]*&gt;([^&lt;]*)&lt;</regexp>
+		<field num="3" comparable="yes" name="url" />
+		<field num="1" striphtml="yes" name="title" />
+		<field num="2" striphtml="yes" name="abstract" />
+  </result>
+	<nextinput method="POST">
+		<url>http://soap.search.msn.com/webservices.asmx</url>
+		<inputfield num="1" name=""><![CDATA[<?xml version="1.0" encoding="utf-8"?><soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+		<soap:Body>
+			<Search xmlns="http://schemas.microsoft.com/MSNSearch/2005/09/fex">
+				<Request>
+					<AppID>5E022975752699420875FD2D5C3E9B067731EB8A</AppID>
+					<Query>%q</Query>
+					<CultureInfo>en-US</CultureInfo>
+					<SafeSearch>Off</SafeSearch>
+					<Flags>None</Flags>
+					<Requests>
+						<SourceRequest>
+							<Source>Web</Source>
+							<Offset>%n</Offset>
+							<Count>10</Count>
+							<ResultFields>Title Description Url</ResultFields>
+						</SourceRequest>
+					</Requests>
+				</Request>
+			</Search>
+		</soap:Body>
+	</soap:Envelope>]]></inputfield>
+	</nextinput>
+</engine>

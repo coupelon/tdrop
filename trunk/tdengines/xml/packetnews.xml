@@ -1,0 +1,47 @@
+<!--
+# Copyright (C) 2007 Olivier COUPELON
+
+# This file is part of Teardrop.
+#
+# Teardrop is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# Teardrop is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Teardrop; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+-->
+<engine xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="teardrop_1_0.xsd">
+  <name>PacketNews</name>
+  <separator value="+" />
+  <charset>windows-1252</charset>
+  <terms>http://www.packetnews.com/index.php?goto=disclaimer</terms>
+  <query method="GET">
+    <url>http://www.packetnews.com/search.php</url>
+    <inputfield name="kw" value="%q" />
+  </query>
+  <result>
+  <regexp><![CDATA[<td\s+nowrap\s+width=115><font[^>]*>([^<]*)</font></td>\s*<td><font[^>]*>([^<]*)</font></td>\s*<td><font[^>]*>([^<]*)</font></td>\s*<td><font[^>]*>(.*?)</font></td>\s*<td><a\s+onClick="toclip\('([^']*)'\);"\s+href="([^"]*)[^>]*><font[^>]*>[^<]*</font></a></td>\s*<td><font[^>]*>([^<]*)</font></td>\s*<td><font[^>]*>([^<]*)</font></td>\s*<td><font[^>]*>(.*?)</font]]></regexp>
+  <field num="1" name="abstract">Bot: %s</field>
+  <field num="2" name="abstract">, Active: %s</field>
+  <field num="3" name="abstract">, Slots: %s</field>
+  <field num="4" striphtml="yes" name="abstract">, Queue: %s</field>
+  <field num="6" comparable="yes" name="url" />
+  <field num="5" comparable="yes" name="url">;%s</field>
+  <!--field num="7" name="abstract">, Pack: %s</field-->
+  <field num="7" name="abstract">, Gets: %s</field>    
+  <field num="8" name="abstract">, Size: %s</field>
+  <field num="9" striphtml="yes" name="title" />
+</result>
+  <nextinput method="GET">
+    <regexp><![CDATA["([^"]*)"\s+title="Next Page]]></regexp>
+    <inputfield escape="no" num="1" name="" value="http://www.packetnews.com%s" />
+  </nextinput>
+</engine>

@@ -1,0 +1,42 @@
+<!--
+# Copyright (C) 2006 Olivier COUPELON
+
+# This file is part of Teardrop.
+#
+# Teardrop is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# Teardrop is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Teardrop; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+-->
+<engine xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="teardrop_1_0.xsd">
+	<name>Rambler-FTP</name>
+  <separator value="+" />
+	<charset>windows-1251</charset>
+	<query method="GET">
+    <url>http://ftpsearch.rambler.ru/db/ftpsearch/search.html</url>
+    <inputfield name="words" value="%q" />
+  </query>
+  <result>
+		<regexp><![CDATA[<a\s+href="go.html\?href=([^"]*)">([^<]*)</a>.*?<td[^>]*>(.*?)</td>.*?<td[^>]*>(.*?)</td>.*?<td[^>]*>(.*?)</td>]]></regexp>
+		<field num="1" comparable="yes" name="url" />
+		<field num="2" name="title" />
+		<field num="3" striphtml="yes" name="abstract" />
+    <field num="4" striphtml="yes" name="size" />
+    <field num="5" striphtml="yes" name="date" />
+  </result>
+	<nextinput method="GET">
+    <regexp><![CDATA[<a\s+href="search.html\?([^"]*)"[^>]*>&gt;&gt;</a>]]></regexp>
+    <url>http://ftpsearch.rambler.ru/db/ftpsearch/search.html</url>
+    <inputfield num="1" escape="no" name="" value="%s" />
+  </nextinput>
+</engine>

@@ -1,0 +1,63 @@
+<!--
+# Copyright (C) 2006 Olivier COUPELON
+
+# This file is part of Teardrop.
+#
+# Teardrop is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# Teardrop is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Teardrop; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+-->
+<engine xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="teardrop_1_0.xsd">
+	<!-- Search Engine's information -->
+	<name>Napalm FTP Indexer</name>
+        <separator value=" " />
+	<terms>http://search.ftphost.net/indexer/terms_of_use.aspx</terms>
+	
+	<!-- This is used to retrieve the __VIEWSTATE_KEY value-->
+	<init method="GET">
+		<regexp>id="__VIEWSTATE_KEY"\s+value="([^"]*)"</regexp>
+		<url>http://search.ftphost.net/indexer/Search.aspx</url>
+	</init>
+	
+	<!-- First page's address to parse for results -->
+	<query method="POST">
+		<url>http://search.ftphost.net/Indexer/Search.aspx</url>
+		<inputfield num="1" name="__VIEWSTATE_KEY" value="%s" /><!-- %s is taken from the last regexp from init, num=1-->
+		<inputfield name="__VIEWSTATE" value="" />
+		<inputfield name="ctl00%24MainContent%24SearchKeywordTextBox" value="%q" />
+		<inputfield name="ctl00%24MainContent%24SearchTypeDropDownList" value="And" />
+		<inputfield name="ctl00%24MainContent%24SearchOrderDropDownList" value="DateDesc" />
+		<inputfield name="ctl00%24MainContent%24SearchFilesPerPageDropDownList" value="50" />
+		<inputfield name="ctl00%24MainContent%24SearchFilterDropDownList" value="NoFilter" />
+		<inputfield name="ctl00%24MainContent%24SearchButton" value="Search" />
+	</query>
+	
+  <!-- Tells how to parse each page to extract results -->
+  <result>
+    <regexp><![CDATA[<b>[^<]*</b>[^<]*<a\s+href="[^"]*">D</a>[^<]*<a\s+href="([^"]*)">([^>]*)</a>]]></regexp>
+    <field num="1" comparable="yes" name="url" />
+    <field num="2" striphtml="yes" name="title" />
+  </result>
+	 
+	<!-- How to obtain new results from current page -->
+	<nextinput method="POST">
+    <regexp>id="__VIEWSTATE_KEY"\s+value="([^"]*).*AboveNextPageLinkButton'</regexp>
+    <url>http://search.ftphost.net/Indexer/Search.aspx</url>
+		<inputfield name="__LASTFOCUS" value="" />
+		<inputfield name="__EVENTTARGET" value="ctl00%24MainContent%24BelowNextPageLinkButton" />
+		<inputfield name="__EVENTARGUMENT" value="" />
+		<inputfield num="1" name="__VIEWSTATE_KEY" value="%s" />
+		<inputfield num="1" name="__VIEWSTATE" value="ctl00%24MainContent%24ResultKeywordTextBox=%q" />
+  </nextinput>
+</engine>
