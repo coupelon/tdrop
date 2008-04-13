@@ -33,12 +33,14 @@
 #include <iostream>
 #include <vector>
 #include "row.h"
+#include "threads/threadPool.h"
 
 using namespace std;
 
 class engineResults {
 public:
 	engineResults() {
+		threadPool<engineResults>::lock(new_results);
 	  abort = false;
 	};
 	virtual ~engineResults() {};
@@ -54,12 +56,14 @@ public:
   
 	vector<row> & getResults();
 	void setResults(const vector<row> & r);
-	virtual void addRankedResults(const vector<row> & r, string engname);
+	virtual void addRankedResults(const vector<row> & r, string engname, string sname = "");
 	
 	int getEngineResults(const string & name);
 	void setAbort(bool val = true) { abort = val; }
 	bool *getAbort() { return &abort; }
 	void sortResults(string s, bool ascending = true);
+	bool waitForNewResults();
+	bool everyResultsReceived();
 	
 	void toString();
 protected:
@@ -69,6 +73,7 @@ protected:
 	string query;
 	vector<row> results;
 	bool abort;
+	threadPool<engineResults> new_results;
 };
 
 #endif

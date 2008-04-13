@@ -41,8 +41,8 @@ int engineResults::getEngineResults(const string & name) {
   return engines[name];
 }
 
-void engineResults::addRankedResults(const vector<row> & r,string engname) {
-  engines[engname] = r.size();
+void engineResults::addRankedResults(const vector<row> & r,string engname, string sname) {
+  engines[sname] = r.size();
 	//for each row in the input list
 	for(vector<row>::const_iterator input = r.begin(); input != r.end(); ++input) {
 		//If row is present in the original list
@@ -66,6 +66,7 @@ void engineResults::addRankedResults(const vector<row> & r,string engname) {
 	}
 	//Sort results by num
 	sortResults(ROW_NUMBER);
+	threadPool<engineResults>::unlock(new_results);
 }
 
 void engineResults::sortResults(string s, bool ascending) {
@@ -75,3 +76,15 @@ void engineResults::sortResults(string s, bool ascending) {
     sort(results.rbegin(), results.rend(), compareRow(s));
 }
 
+bool engineResults::waitForNewResults() {
+	if (everyResultsReceived()) return true;
+	threadPool<engineResults>::lock(new_results);
+	return false;
+}
+
+bool engineResults::everyResultsReceived() {
+	for(map<string,int>::iterator it = engines.begin(); it != engines.end(); ++it) {
+		if (it->second == -1) return false;
+	}
+	return true;
+}
