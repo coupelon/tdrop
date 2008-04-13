@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema id="Teardrop"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	   version="1.0"
+	   xml:lang="EN">
+  <xs:element name="regexp" type="xs:string">
+    <xs:annotation>
+      <xs:documentation>
+        The regexp element is a string containing a regular expression
+      </xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  
+  <xs:element name="url" type="xs:string">
+    <xs:annotation>
+      <xs:documentation>
+        This can be an url, of a part of it
+      </xs:documentation>
+    </xs:annotation>
+  </xs:element>
+
+  <xs:element name="inputfield">
+    <xs:annotation>
+      <xs:documentation>
+        This field represents the parameters of a query
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="xs:string">
+          <xs:attribute name="name" type="xs:string"/>
+          <xs:attribute name="value" type="xs:string"/>
+          <xs:attribute name="num" type="xs:integer"/>
+          <xs:attribute default="yes" name="escape" type="ynType"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:simpleType name="ynType">
+    <xs:annotation>
+      <xs:documentation>
+        yes/no type
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:NMTOKEN">
+      <xs:enumeration value="yes"/>
+      <xs:enumeration value="no"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="methodType">
+    <xs:annotation>
+      <xs:documentation>
+        GET/POST type
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:NMTOKEN">
+      <xs:enumeration value="GET"/>
+      <xs:enumeration value="POST"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:element name="engine">
+    <xs:annotation>
+      <xs:documentation>
+        This is the base of every engines. 
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+      
+        <xs:element name="name" type="xs:string">
+          <xs:annotation>
+            <xs:documentation>
+              The "name" element defines the human readable name of the engine
+            </xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        
+        <xs:element name="separator">
+          <xs:complexType>
+            <xs:attribute name="value" type="xs:string"/>
+          </xs:complexType>
+        </xs:element>
+        
+        <xs:element minOccurs="0" name="revision" type="xs:integer">
+          <xs:annotation>
+            <xs:documentation>
+              This optional element represents the version of the xml file
+            </xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        
+        <xs:element minOccurs="0" name="charset" type="xs:string">
+          <xs:annotation>
+            <xs:documentation>
+              The charset of the pages to parse. It is an optional yet important
+              field as some search engines won't provide this information to the
+              browser.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        
+        <xs:element minOccurs="0" name="updatable" type="xs:string">
+          <xs:annotation>
+            <xs:documentation>
+              This field, if set to yes, will prevent the engine to be automaticaly
+              updated. This will ensure that the self modified engines (such as Google
+              Api) dont get updated.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        
+        <xs:element minOccurs="0" name="terms" type="xs:anyURI">
+          <xs:annotation>
+            <xs:documentation>
+              If present, this field indicates the url to be followed in order to
+              get the search engine's terms of use (which might contain information
+              concerning the right to meta-search this engine).
+            </xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        
+        <xs:element minOccurs="0" maxOccurs="unbounded" name="header" type="xs:string">
+          <xs:annotation>
+            <xs:documentation>
+              With this, one could add several header which are required by the engine,
+              such as UserAgents, ContentType...
+            </xs:documentation>
+          </xs:annotation>
+        </xs:element>
+
+        <xs:element maxOccurs="unbounded" minOccurs="0" name="init">
+          <xs:annotation>
+            <xs:documentation>
+              With those fields, you can initialize a connection to a server. Some search
+              engines requires the browser to follow some redirections and/or to submit some
+              information before accepting queries.
+            </xs:documentation>
+          </xs:annotation>
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element minOccurs="0" ref="regexp"/>
+              <xs:element ref="url"/>
+              <xs:element maxOccurs="unbounded" minOccurs="0" ref="inputfield"/>
+            </xs:sequence>
+            <xs:attribute name="method" type="methodType"/>
+          </xs:complexType>
+        </xs:element>
+
+        <xs:element name="query">
+          <xs:annotation>
+            <xs:documentation>
+              This unique field should be use to specify the query giving the search results.
+              If any other operations is required before the query submission, please use "init"
+            </xs:documentation>
+          </xs:annotation>
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element ref="url"/>
+              <xs:element maxOccurs="unbounded" minOccurs="0" ref="inputfield"/>
+            </xs:sequence>
+            <xs:attribute name="method" type="methodType"/>
+          </xs:complexType>
+        </xs:element>
+
+        <xs:element name="result">
+          <xs:annotation>
+            <xs:documentation>
+              This is the model of the result page. With the regexp field, Teardrop
+              knows how to parse the results from the page. The "field" field tells
+              teardrop how to deal with each results found.
+            </xs:documentation>
+          </xs:annotation>
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element ref="regexp"/>
+              <xs:element maxOccurs="unbounded" name="field">
+                <xs:complexType>
+                  <xs:simpleContent>
+                    <xs:extension base="xs:string">
+                      <xs:attribute name="num" type="xs:integer"/>
+                      <xs:attribute default="no" name="striphtml" type="ynType"/>
+                      <xs:attribute default="yes" name="escape" type="ynType"/>
+                      <xs:attribute name="name" type="xs:string"/>
+                      <xs:attribute default="yes" name="comparable" type="ynType"/>
+                    </xs:extension>
+                  </xs:simpleContent>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+
+        <xs:element minOccurs="0" name="nextinput">
+          <xs:annotation>
+            <xs:documentation>
+              This part is required when there are more results to found in
+              a following page (a next page). The regexp, the url and the inputfield
+              are there to identify such pages, so that Teardrop can parse the newly
+              found page for results, then again looking for the next page as long as
+              there are some unvisited pages or enough results have been found.
+            </xs:documentation>
+          </xs:annotation>
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element minOccurs="0" ref="regexp"/>
+              <xs:element minOccurs="0" ref="url"/>
+              <xs:element maxOccurs="unbounded" ref="inputfield"/>
+            </xs:sequence>
+            <xs:attribute name="method" type="methodType"/>
+          </xs:complexType>
+        </xs:element>
+        
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

@@ -1,0 +1,47 @@
+<!--
+# Copyright (C) 2006 Olivier COUPELON
+
+# This file is part of Teardrop.
+#
+# Teardrop is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# Teardrop is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Teardrop; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+-->
+<engine xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="teardrop_1_0.xsd">
+	<!-- Search Engine's information -->
+	<name>isoHunt</name>
+  <separator value="+" />
+	<terms>http://www.isohunt.com/forum/viewtopic.php?t=74919</terms>
+
+	<query method="GET">
+		<url>http://isohunt.com/torrents/</url>
+		<inputfield name="ihq" value="%q" />
+	</query>
+	
+  <result>
+    <regexp><![CDATA[class="hlRow"\s+onClick="servOC[^,]*,\'([^\']*)[^>]*><td[^>]*>(.*?)</td><td[^>]*>(.*?)</td><td[^>]*>(.*?)</td><td[^>]*>(.*?)</td><td[^>]*>(.*?)</td><td[^>]*>(.*?)</td></tr>]]></regexp>
+    <field num="1" comparable="yes" name="url">http://www.isohunt.com%s</field>
+    <field num="2" striphtml="yes" name="abstract">Category: %s,</field>
+    <field num="3" striphtml="yes" name="abstract"> Age: %s,</field>
+    <field num="4" striphtml="yes" name="title" />
+    <field num="5" striphtml="yes" name="abstract"> Size: %s,</field>
+    <field num="6" striphtml="yes" name="abstract"> Seeders: %s,</field>
+    <field num="7" striphtml="yes" name="abstract"> Leakers: %s</field>
+  </result>
+
+	<nextinput method="GET">
+    <regexp><![CDATA[href="([^"]*)"\s+title="Next\s+page"]]></regexp>
+		<inputfield num="1" escape="no">http://www.isohunt.com%s</inputfield>
+  </nextinput>
+</engine>

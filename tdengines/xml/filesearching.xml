@@ -1,0 +1,41 @@
+<!--
+# Copyright (C) 2006 Olivier COUPELON
+
+# This file is part of Teardrop.
+#
+# Teardrop is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# Teardrop is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Teardrop; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+-->
+<engine xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="teardrop_1_0.xsd">
+  <name>FileSearching</name>
+  <separator value="+" />
+  <terms>http://www.filesearching.com/privacy.html</terms>
+  <query method="GET">
+    <url>http://www.filesearching.com/cgi-bin/s</url>
+    <inputfield name="q" value="%q" />
+    <inputfield name="m" value="50" />
+  </query>
+  <result>
+    <regexp>width=16 height=16>(.*?)(&lt;a href=/cgi-bin/s.*?)\n</regexp>
+    <field num="1" striphtml="yes" name="size" />
+    <field num="2" striphtml="yes" comparable="yes" name="url">ftp://%s</field>
+    <field num="2" striphtml="yes" name="title" />
+  </result>
+  <nextinput method="GET">
+    <regexp>&lt;a href=/cgi-bin/s\?([^&gt;]*)&gt;&lt;img src=/img/moreengl.gif</regexp>
+    <url>http://www.filesearching.com/cgi-bin/s</url>
+    <inputfield escape="no" num="1" name="" value="%s" />
+  </nextinput>
+</engine>
