@@ -25,8 +25,8 @@ public class QueryButton extends Button {
 	}
 		
 	private static class OnClickAdapter extends ButtonListenerAdapter {
-		private static final String DEFAULT_SEARCH_URL = "http://localhost:8080/services/query_post";
-		private static final String DEFAULT_NEXT_URL = "http://localhost:8080/services/get_next_results";
+		private static final String DEFAULT_SEARCH_URL = "/services/query_post";
+		private static final String DEFAULT_NEXT_URL = "/services/get_next_results";
 		EngineTree engTree;
 		TextBox queryText;
 		CycleButton limitButton;
