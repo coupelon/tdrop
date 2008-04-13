@@ -1,0 +1,80 @@
+<!--
+# Copyright (C) 2006 Olivier COUPELON
+
+# This file is part of Teardrop.
+#
+# Teardrop is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# Teardrop is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Teardrop; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+-->
+<engine xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="teardrop_1_0.xsd">
+	<name>Google API</name>
+  <separator value="+" />
+	<charset>UTF-8</charset>
+	<updatable>no</updatable>
+	<terms>http://www.google.com/apis/api_terms.html</terms>
+	<header>Content-Type: text/xml</header>
+	<header>SOAPAction: "unr:GoogleSearchAction"</header>
+	<query method="POST">
+		<url>http://api.google.com/search/beta2</url>
+		<inputfield><![CDATA[<?xml version='1.0' encoding='UTF-8'?>
+
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/1999/XMLSchema-instance" xmlns:xsd="http://www.w3.org/1999/XMLSchema">
+  <SOAP-ENV:Body>
+    <ns1:doGoogleSearch xmlns:ns1="urn:GoogleSearch" 
+         SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+      <key xsi:type="xsd:string">000000000000000000000000</key>
+      <q xsi:type="xsd:string">%q</q>
+      <start xsi:type="xsd:int">0</start>
+      <maxResults xsi:type="xsd:int">10</maxResults>
+      <filter xsi:type="xsd:boolean">false</filter>
+      <restrict xsi:type="xsd:string"></restrict>
+      <safeSearch xsi:type="xsd:boolean">false</safeSearch>
+      <lr xsi:type="xsd:string"></lr>
+      <ie xsi:type="xsd:string">UTF-8</ie>
+      <oe xsi:type="xsd:string">UTF-8</oe>
+    </ns1:doGoogleSearch>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>]]></inputfield>
+  </query>
+  <result>
+		<regexp>&lt;URL xsi:type="xsd:string"&gt;([^&lt;]*)&lt;/URL&gt;.*?&lt;snippet xsi:type="xsd:string"&gt;([^&lt;]*)&lt;/snippet&gt;.*?&lt;title xsi:type="xsd:string"&gt;([^&lt;]*)&lt;/title&gt;</regexp>
+		<field num="1" comparable="yes" name="url" />
+		<field num="3" striphtml="yes" name="title" />
+		<field num="2" striphtml="yes" name="abstract" />
+  </result>
+  <nextinput method="POST">
+		<regexp>&lt;endIndex xsi:type="xsd:int"&gt;([^&lt;]*)&lt;/endIndex&gt;</regexp>
+		<url>http://api.google.com/search/beta2</url>
+		<inputfield num="1" name=""><![CDATA[<?xml version='1.0' encoding='UTF-8'?>
+
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/1999/XMLSchema-instance" xmlns:xsd="http://www.w3.org/1999/XMLSchema">
+  <SOAP-ENV:Body>
+    <ns1:doGoogleSearch xmlns:ns1="urn:GoogleSearch" 
+         SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+      <key xsi:type="xsd:string">000000000000000000000000</key>
+      <q xsi:type="xsd:string">%q</q>
+      <start xsi:type="xsd:int">%s</start>
+      <maxResults xsi:type="xsd:int">10</maxResults>
+      <filter xsi:type="xsd:boolean">false</filter>
+      <restrict xsi:type="xsd:string"></restrict>
+      <safeSearch xsi:type="xsd:boolean">false</safeSearch>
+      <lr xsi:type="xsd:string"></lr>
+      <ie xsi:type="xsd:string">UTF-8</ie>
+      <oe xsi:type="xsd:string">UTF-8</oe>
+    </ns1:doGoogleSearch>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>]]></inputfield>
+  </nextinput>
+</engine>

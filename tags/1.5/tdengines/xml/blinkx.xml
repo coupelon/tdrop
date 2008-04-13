@@ -1,0 +1,54 @@
+<!--
+# Copyright (C) 2006 Olivier COUPELON
+
+# This file is part of Teardrop.
+#
+# Teardrop is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# Teardrop is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Teardrop; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+-->
+<engine xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="teardrop_1_0.xsd">
+	<name>Blinkx</name>
+  <separator value="+" />
+	<charset>UTF-8</charset>
+	<terms>http://www.blinkx.com/devnet/tnc</terms>
+	<query method="GET">
+		<url>http://usp1.blinkx.com/partnerapi/user/</url>
+		<inputfield name="text" value="%q" />
+    <!-- If you plan to use Blinkx extensively, please provide a personal uid -->
+		<inputfield name="uid" value="8a62c7" />
+    <inputfield name="AdultFilter" value="false" />
+    <inputfield name="AnyLanguage" value="true" />
+	</query>
+	<result>
+		<regexp><![CDATA[<autn:reference>([^<]*)</autn:reference>[^<]*<autn:title>([^<]*)</autn:title>[^<]*<autn:summary>([^<]*)</autn:summary>[^<]*<autn:content>[^<]*<DOCUMENT>[^<]*<CHANNEL>([^<]*)</CHANNEL>[^<]*<TYPE>([^<]*)</TYPE>[^<]*<DOMAIN>([^<]*)</DOMAIN><FOOTERIMAGE>[^<]*</FOOTERIMAGE>[^<]*<ALTIMAGE>[^<]*</ALTIMAGE>[^<]*<STATICPREVIEW>([^<]*)</STATICPREVIEW>[^<]*<IMAGE>[^<]*</IMAGE>[^<]*(<MEDIA_TYPE>[^<]*</MEDIA_TYPE>[^<]*|)<]]></regexp>
+		<field num="1" comparable="yes" name="url" />
+		<field num="2" striphtml="yes" name="title" />
+		<field num="3" striphtml="yes" name="abstract" />
+		<field num="4" striphtml="yes" name="abstract">(Channel: %s, </field>
+    <field num="5" striphtml="yes" name="abstract">Type: %s </field>
+    <field num="8" striphtml="yes" name="abstract">%s, </field>
+    <field num="6" striphtml="yes" name="abstract">Domain: %s)</field>
+    <field num="7" name="img" />
+	</result>
+	<nextinput method="GET">
+		<url>http://usp1.blinkx.com/partnerapi/user/</url>
+		<inputfield name="text" value="%q" />
+    <!-- If you plan to use Blinkx extensively, please provide a personal uid -->
+		<inputfield name="uid" value="8a62c7" />
+    <inputfield name="start" value="%m" />
+    <inputfield name="AdultFilter" value="false" />
+    <inputfield name="AnyLanguage" value="true" />
+	</nextinput>
+</engine>

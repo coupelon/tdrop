@@ -1,0 +1,4 @@
+#!/bin/sh
+APPDIR=`dirname $0`;
+java -Xmx128M -cp "$APPDIR/src:$APPDIR/bin:/home/olivier/tmp/gwt-linux-1.4.61/gwt-user.jar:/home/olivier/tmp/gwt-linux-1.4.61/gwt-dev-linux.jar:$APPDIR/src/com/teardrop/public/lib/gwtext.jar" com.google.gwt.dev.GWTCompiler -out "$APPDIR/www" "$@" com.teardrop.WebInterface;
+# -style DETAILED

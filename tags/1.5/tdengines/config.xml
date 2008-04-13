@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+<!--
+    # Copyright (C) 2006 Olivier COUPELON
+    
+    # This file is part of Teardrop.
+    #
+    # Teardrop is free software; you can redistribute it and/or modify
+    # it under the terms of the GNU General Public License as published by
+    # the Free Software Foundation; either version 2 of the License, or
+    # (at your option) any later version.
+    #
+    # Teardrop is distributed in the hope that it will be useful,
+    # but WITHOUT ANY WARRANTY; without even the implied warranty of
+    # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    # GNU General Public License for more details.
+    #
+    # You should have received a copy of the GNU General Public License
+    # along with Teardrop; if not, write to the Free Software
+    # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ -->
+<config>
+    <browser>firefox "%b"</browser>
+
+    <proxy-address></proxy-address>
+    <proxy-port>0</proxy-port>
+    <proxy-type>HTTP</proxy-type>
+    
+    <category name="English">
+        <engine name="alltheweb"/>
+        <engine name="dmoz"/>
+        <engine name="dogpile"/>
+        <engine name="livesearch"/>
+        <engine name="yahoo"/>
+    </category>
+    <category name="French">
+        <engine name="allthewebfr"/>
+        <engine name="livesearchfr"/>
+        <engine name="voilafr"/>
+        <engine name="yahoofr"/>
+    </category>
+    <category name="Files">
+        <engine name="filemirrors"/>
+        <engine name="filesearching"/>
+        <engine name="fileslt"/>
+        
+        <engine name="ftpindexer"/><engine name="filewatcher"/>
+        <engine name="napalm"/>
+        <engine name="yahoofiles"/>
+    </category>
+    <category name="Images">
+	<engine name="yahooimg"/>
+    </category>
+    <category name="IRC">
+	<engine name="packetnews"/>
+    </category>
+    <category name="Video">
+	<engine name="yahoovideo"/>
+    </category>
+    <category name="Agence">
+	<engine name="fnaim"/>
+    </category>
+<timeout>90</timeout><maxthread>20</maxthread></config>

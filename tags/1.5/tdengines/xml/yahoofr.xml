@@ -1,0 +1,47 @@
+<!--
+# Copyright (C) 2006 Olivier COUPELON
+
+# This file is part of Teardrop.
+#
+# Teardrop is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# Teardrop is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Teardrop; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+-->
+<engine xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="teardrop_1_0.xsd">
+	<name>Yahoo! France</name>
+  <separator value="+" />
+	<charset>UTF-8</charset>
+	<terms>http://developer.yahoo.com/terms/</terms>
+	<query method="GET">
+		<url>http://search.yahooapis.com/WebSearchService/V1/webSearch</url>
+		<inputfield name="appid" value="Teardrop" />
+		<inputfield name="query" value="%q" />
+		<inputfield name="results" value="10" />
+		<inputfield name="region" value="fr" />
+  </query>
+  <result>
+		<regexp><![CDATA[Title[^>]*>([^<]*)<.*?Summary[^>]*>([^<]*)<.*?Url[^>]*>([^<]*)<]]></regexp>
+		<field num="3" comparable="yes" name="url" />
+		<field num="1" striphtml="yes" name="title" />
+		<field num="2" striphtml="yes" name="abstract" />
+  </result>
+  <nextinput method="GET">
+		<url>http://search.yahooapis.com/WebSearchService/V1/webSearch</url>
+		<inputfield name="appid" value="Teardrop" />
+		<inputfield name="query" value="%q" />
+		<inputfield name="results" value="10" />
+		<inputfield name="start" value="%m" />
+		<inputfield name="region" value="fr" />
+	</nextinput>
+</engine>

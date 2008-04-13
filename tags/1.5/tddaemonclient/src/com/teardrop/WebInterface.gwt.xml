@@ -1,0 +1,18 @@
+<module>
+
+	<!-- Inherit the core Web Toolkit stuff.                  -->
+	<inherits name='com.google.gwt.user.User'/>
+	<inherits name='com.google.gwt.json.JSON'/>
+	<inherits name="com.google.gwt.http.HTTP" />
+	
+	<!-- Inherit the GWTExt Toolkit library configuration.	  -->
+	<inherits name='com.gwtext.GwtExt' />
+
+	<!-- Specify the app entry point class.                   -->
+	<entry-point class='com.teardrop.client.WebInterface'/>
+	
+	<stylesheet src="js/ext/resources/css/ext-all.css" />
+	<script src="js/ext/adapter/ext/ext-base.js" />
+	<script src="js/ext/ext-all.js" />
+  
+</module>

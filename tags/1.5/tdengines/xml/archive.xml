@@ -1,0 +1,40 @@
+<!--
+# Copyright (C) 2006 Olivier COUPELON
+
+# This file is part of Teardrop.
+#
+# Teardrop is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# Teardrop is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Teardrop; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+-->
+<engine xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="teardrop_1_0.xsd">
+	<name>Internet Archive</name>
+  <separator value="%20" />
+	<charset>UTF-8</charset>
+	<query method="GET">
+		<url>http://www.archive.org/search.php</url>
+		<inputfield name="query" value="%q" />
+		<inputfield name="" value="%20AND%20mediatype%3Atexts" />
+	 </query>
+	 <result>
+		<regexp><![CDATA[<a\s+class="titleLink"\s+href="([^"]*)">(.*?)</a>(.*?)<br\s*/>]]></regexp>
+		<field num="1" comparable="yes" name="url">http://www.archive.org%s</field>
+		<field num="2" striphtml="yes" name="title" />
+		<field num="3" striphtml="yes" name="abstract" />
+	 </result>
+	<nextinput method="GET">
+		<regexp><![CDATA[<a\s+href="([^"]*)">Next</a>]]></regexp>
+		<inputfield escape="no" num="1" name="">http://www.archive.org%s</inputfield>
+	</nextinput>
+</engine>

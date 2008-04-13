@@ -1,0 +1,44 @@
+<!--
+# Copyright (C) 2006 Olivier COUPELON
+
+# This file is part of Teardrop.
+#
+# Teardrop is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# Teardrop is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Teardrop; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+-->
+<engine xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="teardrop_1_0.xsd">
+	<name>SearchForVideo</name>
+  <separator value="+" />
+	<charset>UTF-8</charset>
+	<terms>http://www.fusamedia.com/</terms>
+	<query method="GET">
+		<url>http://www.searchforvideo.com/search.jsp</url>
+		<inputfield name="k" value="%q" />
+		<inputfield name="type" value="all" />
+    <inputfield name="videoDisplay" value="meta" />
+	</query>
+	<result>
+		<regexp><![CDATA[<li\s+class="metavideo">[^<]*<div\s+class="thumbwrap"><a[^>]*href="([^"]*)"[^>]*><img[^>]*src="([^"]*)"[^>]*></a></div>[^<]*<div\s+class="title"><a[^>]*>([^<]*)</a></div>[^<]*<div\s+class="source">([^<]*)</div>[^<]*<p\s+class="description" >([^<]*)]]></regexp>
+		<field num="1" comparable="yes" name="url" />
+    <field num="2" name="img" />
+		<field num="3" striphtml="yes" name="title" />
+		<field num="4" striphtml="yes" name="abstract" />
+		<field num="5" striphtml="yes" name="abstract">: %s</field>
+	</result>
+	<nextinput method="GET">
+		<regexp><![CDATA["link selected".*?class="link"\s+href="([^"]*)]]></regexp>
+		<inputfield escape="no" num="1" name="" value="http://www.searchforvideo.com/search.jsp%s" />
+	</nextinput>
+</engine>
