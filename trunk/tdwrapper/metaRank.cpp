@@ -126,3 +126,10 @@ void metaRank::sortResults(string s, bool ascending) {
     ranked_results->sortResults(s,ascending);
 }
 
+bool metaRank::waitForNewResults(){
+	if (ranked_results->waitForNewResults()) {
+		joinAll();
+		return true;
+	}
+	return false;
+}

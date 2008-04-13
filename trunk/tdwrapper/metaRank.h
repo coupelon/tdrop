@@ -103,6 +103,11 @@ public:
      */
     void sortResults(string s, bool ascending = true);
     
+    /** This method only returns when new results are available
+     * Returns true if every awaited results available
+     */
+    bool waitForNewResults();
+    
 private:
     threadPool<pageParser> threads;
     list<pageParser *> pplist;

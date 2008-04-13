@@ -133,7 +133,7 @@ void pageParser::doParse() {
 void pageParser::closeParse() {
 	if (getAbort()) return;
 	threadPool<pageParser>::lock(results_lock);
-	global_results->addRankedResults(results, eng->getName());
+	global_results->addRankedResults(results, eng->getName(),engname);
 	threadPool<pageParser>::unlock(results_lock);
 }
 
