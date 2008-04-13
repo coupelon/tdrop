@@ -27,8 +27,11 @@
 #include "UIDSession.h"
 
 #define WEBINTERFACE_URI "/WebInterface/*"
-#define WEBINTERFACE_PATH "/home/olivier/workspace/tddaemonclient/www/com.teardrop.WebInterface/" 
+#define WEBINTERFACE_PATH "/home/olivier/workspace/tddaemonclient/www/com.teardrop.WebInterface/"
 #define WEBINTERFACE_ROOT_SIZE 14
+#define WEBINTERFACE_ENGINES_ICONS_URI "/engines_icons/*"
+#define WEBINTERFACE_ENGINES_ICONS "/home/olivier/workspace/tdengines/icons/"
+#define WEBINTERFACE_ENGINES_ICONS_SIZE 15
 
 using namespace std;
 
@@ -123,41 +126,17 @@ get_next_results(struct shttpd_arg *arg) {
 static void
 show_index(struct shttpd_arg *arg)
 {
-	//int		*p = (int *) arg->user_data;	/* integer passed to us */
-	//char		value[20];
-	const char	*request_method, *query_string, *request_uri, *cookie_string;//*host,;
-
-	request_method = shttpd_get_env(arg, "REQUEST_METHOD");
-	request_uri = shttpd_get_env(arg, "REQUEST_URI");
-	query_string = shttpd_get_env(arg, "QUERY_STRING");
-	cookie_string = shttpd_get_header(arg, "Cookie");
-
-	cout << request_uri << endl;
-	
-	if(!cookie_string) {
-		shttpd_printf(arg, "%s", "HTTP/1.1 200 OK\r\n");
-		shttpd_printf(arg, "%s", "Set-Cookie: query=0192825;\r\n");
-	}
-
-
-	shttpd_printf(arg, "%s",
-		"HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n"
-		"<html><body><h1>");
-	if(cookie_string)
-		shttpd_printf(arg, "%s",cookie_string);
-	else
-		shttpd_printf(arg, "%s","YOU SHOULD HAVE A COOOKIIIE");
-	shttpd_printf(arg, "%s", "</h1></body></html>");
+	shttpd_printf(arg, "%s", "HTTP/1.1 301 Moved Permanently\r\n");
+	shttpd_printf(arg, "%s", "Location: /WebInterface/WebInterface.html\r\n");
 	arg->flags |= SHTTPD_END_OF_OUTPUT;
 }
+
 /*
  * This callback function is used to get the JSON of the engines tree
  */
 static void
 show_tree(struct shttpd_arg *arg)
 {
-	const char *request_uri = shttpd_get_env(arg, "REQUEST_URI");
-	cout << request_uri << endl;
 	shttpd_printf(arg, "%s", "HTTP/1.1 200 OK\r\n");
 	shttpd_printf(arg, "%s", "Content-Type: text/plain\r\n\r\n");
 	
@@ -172,7 +151,7 @@ show_tree(struct shttpd_arg *arg)
 			//Prints the category name
 			shttpd_printf(arg, "%s", "{\"name\":\"");
 			shttpd_printf(arg, "%s", ndCateg.getAttributeValueByName("name").c_str());
-			shttpd_printf(arg, "%s", "\",\"icon\":\"folder.jpg\",\"engines\":[");
+			shttpd_printf(arg, "%s", "\",\"icon\":\"folder.png\",\"engines\":[");
 			nodeDoc ndEngine(&xf,"engine",ndCateg);
 			while(ndEngine.isValid()) {
 				shttpd_printf(arg, "%s", "{\"name\":\"");
@@ -182,11 +161,12 @@ show_tree(struct shttpd_arg *arg)
 				//QIcon *ic;
 
 				shttpd_printf(arg, "%s", "\",\"icon\":\"");
-				if (selectFile::find(filename,".png",path)) {
+				/*if (selectFile::find(filename,".png",path)) {
 					shttpd_printf(arg, "%s", string(path + filename + ".png").c_str());
 				} else {
 					shttpd_printf(arg, "%s", string("xmag.png").c_str());
-				}
+				}*/
+				shttpd_printf(arg, "%s", string("/engines_icons/" + filename + ".png").c_str());
 				shttpd_printf(arg, "%s", "\",\"title\":\"");
 				
 				xmlEngine xe;
@@ -259,7 +239,7 @@ static void query_process(struct shttpd_arg *arg) {
 
 		/* Data stream finished? Close the file, and free the state */
 		if (state->nread >= state->cl) {
-			regExp r("query=(.*);engines=([^;]*);limit=([1-9][0-9]{1,3})");
+			regExp r("query=(.+);engines=([^;]+);limit=([1-9][0-9]{1,3})");
 			r.newPage(state->buffer);
 			if (!r.endOfMatch()) {
 				//r.next();
@@ -268,9 +248,9 @@ static void query_process(struct shttpd_arg *arg) {
 			  shttpd_printf(arg, "%s",
 			    newQuery(arg,r.getMatch(1),r.getMatch(2),r.getMatch(3)).c_str());
       } else {
-       shttpd_printf(arg, "HTTP/1.0 200 OK\n"
+        shttpd_printf(arg, "HTTP/1.0 200 OK\n"
 			                    "Content-Type: text/plain\n\n");
-      	shttpd_printf(arg, "You should not try to hack that soft ;-)\n");
+      	shttpd_printf(arg, "{\"results\":[{}]}");
 			}
       
 			
@@ -282,15 +262,10 @@ static void query_process(struct shttpd_arg *arg) {
 	}
 }
 
-/*
- * This callback function is used to show the web interface
- */
 static void
-show_wi(struct shttpd_arg *arg)
+show_file(struct shttpd_arg *arg,string filename)
 {
-	string filename = WEBINTERFACE_PATH + string(shttpd_get_env(arg, "REQUEST_URI")).erase(0,WEBINTERFACE_ROOT_SIZE);
 	FILE *fp = fopen(filename.c_str(),"rb");
-	cerr << filename << endl;
     if (fp == NULL) {
     	show_404(arg);
     } else {
@@ -316,9 +291,25 @@ show_wi(struct shttpd_arg *arg)
     }
 }
 
+static void
+show_engines_icons(struct shttpd_arg *arg) {
+	string filename = WEBINTERFACE_ENGINES_ICONS + string(shttpd_get_env(arg, "REQUEST_URI")).erase(0,WEBINTERFACE_ENGINES_ICONS_SIZE);
+	FILE *fp = fopen(filename.c_str(),"rb");
+	if (fp == NULL) filename = string(WEBINTERFACE_PATH) + "imgs/default_engine.png";
+	else fclose(fp);
+	show_file(arg, filename);
+}
+
+
+static void
+show_wi(struct shttpd_arg *arg)
+{
+	string filename = WEBINTERFACE_PATH + string(shttpd_get_env(arg, "REQUEST_URI")).erase(0,WEBINTERFACE_ROOT_SIZE);
+	show_file(arg, filename);
+}
+
 int main(int argc, char *argv[])
 {
-	int			data = 1234567;
 	struct shttpd_ctx	*ctx;
 	
 	/* Get rid of warnings */
@@ -340,10 +331,11 @@ int main(int argc, char *argv[])
 	ctx = shttpd_init();
 	shttpd_set_option(ctx, "ports", "8080");
 
-	shttpd_register_uri(ctx, "/", &show_index, (void *) &data);
-	shttpd_register_uri(ctx, "/services/request_tree", &show_tree, (void *) &data);
-	shttpd_register_uri(ctx, "/services/query_post", &query_process, (void *) &data);
-	shttpd_register_uri(ctx, "/services/get_next_results", &get_next_results, (void *) &data);
+	shttpd_register_uri(ctx, "/", &show_index, NULL);
+	shttpd_register_uri(ctx, "/services/request_tree", &show_tree, NULL);
+	shttpd_register_uri(ctx, "/services/query_post", &query_process, NULL);
+	shttpd_register_uri(ctx, "/services/get_next_results", &get_next_results, NULL);
+	shttpd_register_uri(ctx, WEBINTERFACE_ENGINES_ICONS_URI, &show_engines_icons, NULL);
 	shttpd_register_uri(ctx, WEBINTERFACE_URI, &show_wi, NULL);
 
 	shttpd_handle_error(ctx, 404, show_404, NULL);
