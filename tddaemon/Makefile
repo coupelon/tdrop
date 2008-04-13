@@ -35,17 +35,20 @@ all: linux
 
 .c.o:
 	$(CC) -c $(CFLAGS) $< -o $@
+	
+.cpp.o:
+	g++ -Wall -g -c $(CFLAGS) $< -o $@
 
 unix: $(OBJS)
 	$(AR) -r lib$(PROG).a $(OBJS) && ranlib lib$(PROG).a 
 	$(CC) $(CFLAGS) compat_unix.c daemon.c \
 		-o $(PROG) $(LIBS) -L. -l$(PROG)
 
-linux: $(OBJS)
+linux: $(OBJS) UIDSession.o
 	$(AR) -r lib$(PROG).a $(OBJS) && ranlib lib$(PROG).a
 	g++ -Wall -g -c daemon.cpp $(CFLAGS)
 	$(CC) $(CFLAGS) compat_unix.c daemon.o \
-		-o $(PROG) $(LIBS) -L. -l$(PROG)
+		-o $(PROG) UIDSession.o $(LIBS) -L. -l$(PROG)
 
 rtems:
 	$(CC) -c $(CFLAGS) -DEMBEDDED $(SRCS) compat_rtems.c

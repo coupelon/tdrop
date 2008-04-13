@@ -24,6 +24,7 @@
 #include "selectFile.h"
 #include "regExp.h"
 #include "metaRank.h"
+#include "UIDSession.h"
 
 #define WEBINTERFACE_URI "/WebInterface/*"
 #define WEBINTERFACE_PATH "/home/olivier/workspace/tddaemonclient/www/com.teardrop.WebInterface/" 
@@ -31,9 +32,42 @@
 
 using namespace std;
 
-static string newQuery(string query,string engines,string limit) {
+static map<string, metaRank*> globalSearches;
+static tdParam tdp;
+
+string createJSON(bool final, metaRank *mr) {
+	string pre;
+	if (final) {
+		pre = "{\"results\":[{";
+	} else {
+		pre = "{\"preresults\":[{";
+	}
+  string text = string("\"num\":\"{num}\",") +
+  							  "\"engines\":\"{engines}\"," +
+  							  "\"title\":\"{title}\"," +
+  							  "\"url\":\"{url}\"," +
+  							  "\"img\":\"{img}\"," +
+  							  "\"abstract\":\"{abstract}\"";
+  string post = "}]}";
+  return mr->getString(text,"/","},{",pre,post,true);
+}
+
+static string newQuery(struct shttpd_arg *arg, string query,string engines,string limit) {
+	const char *cookie_string = shttpd_get_header(arg, "Cookie");
+	if(cookie_string) {
+		regExp r("query=(.*)");
+		string cstring = cookie_string;
+	  r.newPage(cstring);
+		if (!r.endOfMatch()) {
+			//Stop the preceeding search
+			string newID(r.getMatch(1));
+			if (globalSearches.find(newID) != globalSearches.end())
+		  	globalSearches[newID]->stop();
+		}
+	}
+
 	list<string> lse;
-	tdParam tdp;
+	tdp.setEcho(false);
   engineResults *er = new engineResults();
   er->setQuery(query);
   er->setLimit(atol(limit.c_str()));
@@ -43,18 +77,40 @@ static string newQuery(string query,string engines,string limit) {
   	engines = engines.substr(pos+1);
   }
   er->addEngine(engines);
-  metaRank mr(er,&tdp);
-  mr.startParsing();
-  mr.joinAll();
-  string pre = "{\"results\":[{";
-  string text = string("\"num\":\"{num}\",") +
-  							  "\"engines\":\"{engines}\"," +
-  							  "\"title\":\"{title}\"," +
-  							  "\"url\":\"{url}\"," +
-  							  "\"img\":\"{img}\"," +
-  							  "\"abstract\":\"{abstract}\"";
-  string post = "}]}";
-  return mr.getString(text,"/","},{",pre,post,true);
+  string newID = UIDSession::getID();
+  shttpd_printf(arg, "HTTP/1.0 200 OK\n"
+										 "Content-Type: text/plain\r\n");
+  shttpd_printf(arg, "%s%s%s", "Set-Cookie: query=",
+  														 newID.c_str(),
+  														 ";\r\n\r\n");
+  globalSearches[newID] = new metaRank(er,&tdp);
+  globalSearches[newID]->startParsing();
+  return createJSON(globalSearches[newID]->waitForNewResults(),
+   					 globalSearches[newID]);
+}
+
+static void
+get_next_results(struct shttpd_arg *arg) {
+	shttpd_printf(arg, "%s", "HTTP/1.1 200 OK\r\n");
+  shttpd_printf(arg, "%s", "Content-Type: text/plain\r\n\r\n");
+	const char *cookie_string = shttpd_get_header(arg, "Cookie");
+	if(cookie_string) {
+		regExp r("query=(.*)");
+		string cstring = cookie_string;
+	  r.newPage(cstring);
+		if (!r.endOfMatch()) {
+			string newID(r.getMatch(1));
+		  shttpd_printf(arg, "%s",
+		    createJSON(globalSearches[newID]->waitForNewResults(),
+   					 globalSearches[newID]).c_str());
+   		arg->flags |= SHTTPD_END_OF_OUTPUT;
+   		return;
+    }
+	}	
+
+  shttpd_printf(arg, "%s", "You can't get next queries if you don't tell"
+  												 " Teardrop where their UID.");
+	arg->flags |= SHTTPD_END_OF_OUTPUT;
 }
 
 /*
@@ -189,8 +245,6 @@ static void query_process(struct shttpd_arg *arg) {
 		state->cl = strtoul(s, NULL, 10);
 		state->buffer = "";
 		state->nread = 0;
-		shttpd_printf(arg, "HTTP/1.0 200 OK\n"
-			"Content-Type: text/plain\n\n");
 	} else {
 		state = (struct state *) arg->state;
 		/*
@@ -212,8 +266,10 @@ static void query_process(struct shttpd_arg *arg) {
         //shttpd_printf(arg, "Written %d bytes:\n%s\n%s\n%s",
 			  //  state->nread,r.getMatch(1).c_str(),r.getMatch(2).c_str(),r.getMatch(3).c_str());
 			  shttpd_printf(arg, "%s",
-			    newQuery(r.getMatch(1),r.getMatch(2),r.getMatch(3)).c_str());
+			    newQuery(arg,r.getMatch(1),r.getMatch(2),r.getMatch(3)).c_str());
       } else {
+       shttpd_printf(arg, "HTTP/1.0 200 OK\n"
+			                    "Content-Type: text/plain\n\n");
       	shttpd_printf(arg, "You should not try to hack that soft ;-)\n");
 			}
       
@@ -271,6 +327,9 @@ int main(int argc, char *argv[])
 
 	signal(SIGPIPE, SIG_IGN);
 
+	//Initialize le random generator on startup
+	UIDSession::initRand();
+
 	/*
 	 * Initialize SHTTPD context.
 	 * Attach folder c:\ to the URL /my_c  (for windows), and
@@ -284,6 +343,7 @@ int main(int argc, char *argv[])
 	shttpd_register_uri(ctx, "/", &show_index, (void *) &data);
 	shttpd_register_uri(ctx, "/services/request_tree", &show_tree, (void *) &data);
 	shttpd_register_uri(ctx, "/services/query_post", &query_process, (void *) &data);
+	shttpd_register_uri(ctx, "/services/get_next_results", &get_next_results, (void *) &data);
 	shttpd_register_uri(ctx, WEBINTERFACE_URI, &show_wi, NULL);
 
 	shttpd_handle_error(ctx, 404, show_404, NULL);
