@@ -26,6 +26,7 @@ public class QueryButton extends Button {
 		
 	private static class OnClickAdapter extends ButtonListenerAdapter {
 		private static final String DEFAULT_SEARCH_URL = "http://localhost:8080/services/query_post";
+		private static final String DEFAULT_NEXT_URL = "http://localhost:8080/services/get_next_results";
 		EngineTree engTree;
 		TextBox queryText;
 		CycleButton limitButton;
@@ -45,15 +46,15 @@ public class QueryButton extends Button {
 					checkedNodeString += (checkedNodeString.equals("")?"":",") + checkedNode[i].getAttribute("name");
 				}
 			}
-			doPostURL("query=" + queryText.getText() + ";engines=" + checkedNodeString + ";limit=10");
+			doPostURL("query=" + queryText.getText() + ";engines=" + checkedNodeString + ";limit=10",DEFAULT_SEARCH_URL);
 			//limitButton.getActiveItem().getText();
         }
 		
 		/*
 		 * Fetch the requested URL.
 		 */
-		private void doPostURL(String post) {
-		    RequestBuilder builder = new RequestBuilder(RequestBuilder.POST, URL.encode(DEFAULT_SEARCH_URL));
+		private void doPostURL(String post, String url) {
+		    RequestBuilder builder = new RequestBuilder(RequestBuilder.POST, URL.encode(url));
 		    try {
 		    	builder.setHeader("Content-Length", String.valueOf(post.length()));
 		    	builder.sendRequest(post, new RequestCallback() {
@@ -78,7 +79,13 @@ public class QueryButton extends Button {
 		private void showResults(JSONValue jsonValue) {
 			JSONValue results;
 			resultsPanel.removeAll(true);
-		    if ((results = JSONFunctions.getJSONSet(jsonValue,"results")) != null) {
+			results = JSONFunctions.getJSONSet(jsonValue,"preresults");
+			if (results == null) {
+				results = JSONFunctions.getJSONSet(jsonValue,"results");
+			} else {
+				doPostURL("",DEFAULT_NEXT_URL);
+			}
+		    if (results != null) {
 		    	JSONArray resultsArray;
 		    	if ((resultsArray = results.isArray()) != null) {
 	    	      for (int i = 0; i < resultsArray.size(); ++i) {
