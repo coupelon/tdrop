@@ -20,7 +20,7 @@ public class EngineTree extends TreePanel {
 
 	private static final String DEFAULT_SEARCH_URL = "http://localhost:8080/services/request_tree";
 	//private static final String DEFAULT_SEARCH_URL = "search-results.js";
-	private static final String ICON_PATH = "teardrop/";
+	private static final String ICON_PATH = "imgs/";
 	
 	//This is the listener for the categories checkboxes of the tree
 	private static final TreeNodeListener catListener = new TreeNodeListenerAdapter() {
@@ -99,7 +99,7 @@ public class EngineTree extends TreePanel {
 	  	    	    		treeEng = new TreeNode(JSONFunctions.getJSONSetValue(enginArray.get(j),"name"));
 	  	    	    	else 
 	  	    	    		treeEng = new TreeNode(JSONFunctions.getJSONSetValue(enginArray.get(j),"title"));
-	  	    	    	treeEng.setIcon(ICON_PATH + JSONFunctions.getJSONSetValue(enginArray.get(j),"icon"));
+	  	    	    	treeEng.setIcon(JSONFunctions.getJSONSetValue(enginArray.get(j),"icon"));
 	  	    	    	treeEng.setAttribute("name", JSONFunctions.getJSONSetValue(enginArray.get(j),"name"));
 	  	    	    	treeEng.setChecked(false);
 	  	    	    	treeEng.addListener(engListener);
