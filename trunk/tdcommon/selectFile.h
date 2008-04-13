@@ -32,6 +32,10 @@
 #include <string>
 #include "debugmacro.h"
 
+#ifndef HOME_LINUX
+#define HOME_LINUX "~/.teardrop/"
+#endif
+
 using namespace std;
 
 class selectFile {
