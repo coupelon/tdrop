@@ -18,7 +18,7 @@ import com.gwtext.client.widgets.tree.event.TreeNodeListenerAdapter;
 
 public class EngineTree extends TreePanel {
 
-	private static final String DEFAULT_SEARCH_URL = "http://localhost:8080/services/request_tree";
+	private static final String DEFAULT_SEARCH_URL = "/services/request_tree";
 	//private static final String DEFAULT_SEARCH_URL = "search-results.js";
 	private static final String ICON_PATH = "imgs/";
 	
