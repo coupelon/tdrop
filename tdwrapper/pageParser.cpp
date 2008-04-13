@@ -130,10 +130,13 @@ void pageParser::doParse() {
   if (n) delete n;
 }
 
-void pageParser::closeParse() {
-	if (getAbort()) return;
+void pageParser::closeParse(bool validEngine) {
+	if (getAbort()) results.clear();
 	threadPool<pageParser>::lock(results_lock);
-	global_results->addRankedResults(results, eng->getName(),engname);
+	if (validEngine)
+		global_results->addRankedResults(results, eng->getName(),engname);
+	else
+		global_results->addRankedResults(results, "",engname);
 	threadPool<pageParser>::unlock(results_lock);
 }
 
@@ -143,10 +146,10 @@ void pageParser::startParsing() {
 	  if (initParse()) {
 	    doParse();
 	    closeParse();
-	  }
+	  } else closeParse(false);
   } catch (exception& e) {
       cerr << ">An exception was caught from Teardrop : " << e.what() << endl;
-      closeParse();
+      closeParse(false);
   }
 }
 

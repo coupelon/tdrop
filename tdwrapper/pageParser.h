@@ -61,7 +61,7 @@ private:
 
 	bool initParse();
 	void doParse();
-	void closeParse();
+	void closeParse(bool = true);
 	row generateRow(regExp &);
 	address getNextAddress();
 public:
