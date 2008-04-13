@@ -32,23 +32,11 @@ bool selectFile::find(string f, string e, string & path) {
     /*
     Then check the different home directory
     */
-    char *h;
-    string home;
-    if ((h = getenv("HOME")) != NULL) {
-        home = string(h) + "/";
-        if (fileexist(home + ".teardrop/" + f + e)) { path = home + "/.teardrop/"; return true; }
-        debug("couldn't find %s.teardrop/%s%s\n",home.c_str(),f.c_str(),e.c_str());
-    } 
-    /*Even if home was defined, under win32 it can still not be usable as the home
-    directory. For instance, if you have cygwin installed, home is defined to the 
-    cygwin's homes directory, instead of the ones in Document & Settings. So both
-    directory need to be tested.
-    */
-    if ((h = getenv("APPDATA")) != NULL) {
-        home = string(h) + "/";
-        if (fileexist(home + "Teardrop/" + f + e)) { path = home + "Teardrop/"; return true; }
-        debug("couldn't find %sTeardrop/%s%s\n",home.c_str(),f.c_str(),e.c_str());
-    }
+    string home = getHomeDirectory();
+    if (fileexist(home + f + e)) { path = home; return true; }
+    if (fileexist(home + "xml/" + f + e)) { path = home + "xml/"; return true; }
+    if (fileexist(home + "icons/" + f + e)) { path = home + "icons/"; return true; }
+    debug("couldn't find %s%s%s\n",home.c_str(),f.c_str(),e.c_str());
     
     /*
     If available, check the installation directory
@@ -81,8 +69,8 @@ string selectFile::getHomeDirectory() {
     if ((h = getenv("APPDATA")) != NULL) {
         return string(h) + "/Teardrop/";
     }
-    if ((h = getenv("HOME")) != NULL) {
-        return string(h) + "/.teardrop/";
-    }
-    return "";
+//    if ((h = getenv("HOME")) != NULL) {
+//        return string(h) + HOME_LINUX;
+//    }
+    return HOME_LINUX;
 }
