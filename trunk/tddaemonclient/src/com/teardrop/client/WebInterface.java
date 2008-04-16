@@ -1,11 +1,17 @@
 package com.teardrop.client;
 
 import com.google.gwt.core.client.EntryPoint;
-import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.RootPanel;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.TextBox;
+import com.gwtext.client.core.RegionPosition;
+import com.gwtext.client.widgets.BoxComponent;
 import com.gwtext.client.widgets.CycleButton;
 import com.gwtext.client.widgets.Panel;
+import com.gwtext.client.widgets.TabPanel;
+import com.gwtext.client.widgets.Viewport;
+import com.gwtext.client.widgets.layout.BorderLayout;
+import com.gwtext.client.widgets.layout.BorderLayoutData;
+import com.gwtext.client.widgets.layout.FitLayout;
 import com.gwtext.client.widgets.layout.RowLayout;
 import com.gwtext.client.widgets.menu.CheckItem;
 
@@ -32,49 +38,12 @@ public class WebInterface implements EntryPoint {
 	   * Initialize the main form's layout and content.
 	   */
 	  private void initializeMainForm() {
-	    searchButton.setStyleName("JSON-SearchButton");
 	    searchButton.setText(SEARCH_BUTTON_DEFAULT_TEXT);
 
-	    // Find out where the host page wants the button.
-	    //
-	    RootPanel searchButtonSlot = RootPanel.get("search");
-	    if (searchButtonSlot == null) {
-	      Window.alert("Please define a container element whose id is 'search'");
-	      return;
-	    }
-
-	    // Find out where the host page wants the tree view.
-	    //
-	    RootPanel treeViewSlot = RootPanel.get("engineTree");
-	    if (treeViewSlot == null) {
-	      Window.alert("Please define a container element whose id is 'tree'");
-	      return;
-	    }
 	    
-	    // Find out where the host page wants the query text box.
-	    //
-	    RootPanel queryTextSlot = RootPanel.get("engineTree");
-	    if (queryTextSlot == null) {
-	      Window.alert("Please define a container element whose id is 'query'");
-	      return;
-	    }
-	    
-//	  Find out where the host page wants the query text box.
-	    //
-	    RootPanel resultsPanelSlot = RootPanel.get("results");
-	    if (resultsPanel == null) {
-	      Window.alert("Please define a container element whose id is 'results'");
-	      return;
-	    }
 	    resultsPanel.setLayout(new RowLayout());
+	    resultsPanel.setAutoScroll(true);
 	    
-        // Find out where the host page wants the limit box.
-	    //
-	    RootPanel limitButtonSlot = RootPanel.get("limit");
-	    if (queryTextSlot == null) {
-	      Window.alert("Please define a container element whose id is 'limit'");
-	      return;
-	    }
 	    limitButton.setShowText(true);  
 	    limitButton.setPrependText("Results per engines: ");
 	    limitButton.addItem(new CheckItem("10",true));
@@ -83,11 +52,51 @@ public class WebInterface implements EntryPoint {
 	    limitButton.addItem(new CheckItem("100",false));
 	    limitButton.addItem(new CheckItem("500",false));
 
-	    // Add both widgets.
-	    searchButtonSlot.add(searchButton);
-	    treeViewSlot.add(engTree);
-	    queryTextSlot.add(queryText);
-	    limitButtonSlot.add(limitButton);
-	    resultsPanelSlot.add(resultsPanel);
+	    /**
+	     * The Layout. A border panel encloses the whole application
+	     */
+	    Panel panel = new Panel();  
+	    panel.setBorder(false);  
+	    panel.setPaddings(15);  
+	    panel.setLayout(new FitLayout());
+	    Panel borderPanel = new Panel();  
+	    borderPanel.setLayout(new BorderLayout());
+	    
+	    /**
+	     * The north panel is used to display the title and other future menus
+	     */
+	    BoxComponent northPanel = new BoxComponent();  
+	    northPanel.setEl(new HTML("<p>Teardrop, The personnal meta-search engine</p>").getElement());  
+	    northPanel.setHeight(32);  
+	    borderPanel.add(northPanel, new BorderLayoutData(RegionPosition.NORTH));
+	    
+	    /**
+	     * The west panel is used for the search parameters
+	     */
+	    Panel westPanel = new Panel();  
+	    westPanel.setTitle("Search Criterions");  
+	    westPanel.setCollapsible(true);  
+	    westPanel.setWidth(200);
+	    westPanel.add(queryText);
+	    westPanel.add(limitButton);
+	    westPanel.add(searchButton);
+	    westPanel.add(engTree);
+	    borderPanel.add(westPanel,new BorderLayoutData(RegionPosition.WEST));
+	    
+	    /**
+	     * The center panel contains the search results
+	     */
+	    
+	    TabPanel centerPanel = new TabPanel();  
+	    centerPanel.setDeferredRender(false);  
+	    centerPanel.setActiveTab(0);
+	    centerPanel.add(resultsPanel);
+	    borderPanel.add(centerPanel, new BorderLayoutData(RegionPosition.CENTER));
+	    
+	    /**
+	     * Render the objects
+	     */
+	    panel.add(borderPanel);
+	    new Viewport(panel);
 	  }
 }
