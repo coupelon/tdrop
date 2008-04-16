@@ -16,12 +16,14 @@ import com.gwtext.client.core.EventObject;
 import com.gwtext.client.widgets.Button;
 import com.gwtext.client.widgets.CycleButton;
 import com.gwtext.client.widgets.Panel;
+import com.gwtext.client.widgets.TabPanel;
 import com.gwtext.client.widgets.event.ButtonListenerAdapter;
+import com.gwtext.client.widgets.layout.RowLayout;
 import com.gwtext.client.widgets.tree.TreeNode;
 
 public class QueryButton extends Button {
-	public QueryButton(String text,EngineTree engTree, TextBox queryText, CycleButton limitButton,Panel resultsPanel) {
-		super(text, new OnClickAdapter(engTree, queryText,limitButton,resultsPanel));
+	public QueryButton(String text,EngineTree engTree, TextBox queryText, CycleButton limitButton,TabPanel centerPanel) {
+		super(text, new OnClickAdapter(engTree, queryText,limitButton,centerPanel));
 	}
 		
 	private static class OnClickAdapter extends ButtonListenerAdapter {
@@ -30,12 +32,13 @@ public class QueryButton extends Button {
 		EngineTree engTree;
 		TextBox queryText;
 		CycleButton limitButton;
+		TabPanel centerPanel;
 		Panel resultsPanel;
-		public OnClickAdapter(EngineTree engTree, TextBox queryText, CycleButton limitButton, Panel resultsPanel) {
+		public OnClickAdapter(EngineTree engTree, TextBox queryText, CycleButton limitButton, TabPanel centerPanel) {
 			this.engTree = engTree;
 			this.queryText = queryText;
 			this.limitButton = limitButton;
-			this.resultsPanel = resultsPanel;
+			this.centerPanel = centerPanel;
 		}
 		
 		public void onClick(Button button, EventObject e) {
@@ -46,8 +49,17 @@ public class QueryButton extends Button {
 					checkedNodeString += (checkedNodeString.equals("")?"":",") + checkedNode[i].getAttribute("name");
 				}
 			}
-			doPostURL("query=" + queryText.getText() + ";engines=" + checkedNodeString + ";limit=10",DEFAULT_SEARCH_URL);
-			//limitButton.getActiveItem().getText();
+			//Workaround to a bug:
+			String limit = limitButton.getText().substring(limitButton.getPrependText().length());
+			//String limit = limitButton.getActiveItem().getText()
+			doPostURL("query=" + queryText.getText() + ";engines=" + checkedNodeString + ";limit=" + limit,DEFAULT_SEARCH_URL);
+			
+			resultsPanel = new Panel();
+			resultsPanel.setLayout(new RowLayout());
+		    resultsPanel.setAutoScroll(true);
+		    resultsPanel.setTitle(queryText.getText());
+			centerPanel.add(resultsPanel);
+			centerPanel.activate(centerPanel.getItems().length-1);
         }
 		
 		/*

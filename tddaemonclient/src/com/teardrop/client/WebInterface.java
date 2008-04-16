@@ -12,7 +12,6 @@ import com.gwtext.client.widgets.Viewport;
 import com.gwtext.client.widgets.layout.BorderLayout;
 import com.gwtext.client.widgets.layout.BorderLayoutData;
 import com.gwtext.client.widgets.layout.FitLayout;
-import com.gwtext.client.widgets.layout.RowLayout;
 import com.gwtext.client.widgets.menu.CheckItem;
 
 /**
@@ -23,8 +22,8 @@ public class WebInterface implements EntryPoint {
 	  private EngineTree engTree = new EngineTree();
 	  private TextBox queryText = new TextBox();
 	  private CycleButton limitButton = new CycleButton();
-	  final Panel resultsPanel = new Panel();
-	  private QueryButton searchButton = new QueryButton(SEARCH_BUTTON_DEFAULT_TEXT,engTree,queryText,limitButton,resultsPanel);
+	  private TabPanel centerPanel = new TabPanel();
+	  private QueryButton searchButton = new QueryButton(SEARCH_BUTTON_DEFAULT_TEXT,engTree,queryText,limitButton,centerPanel);
 
 	  /**
 	   * Entry point for this simple application. Currently, we build the
@@ -39,11 +38,6 @@ public class WebInterface implements EntryPoint {
 	   */
 	  private void initializeMainForm() {
 	    searchButton.setText(SEARCH_BUTTON_DEFAULT_TEXT);
-
-	    
-	    resultsPanel.setLayout(new RowLayout());
-	    resultsPanel.setAutoScroll(true);
-	    resultsPanel.setTitle("Results");
 	    
 	    limitButton.setShowText(true);  
 	    limitButton.setPrependText("Results per engines: ");
@@ -89,10 +83,8 @@ public class WebInterface implements EntryPoint {
 	     * The center panel contains the search results
 	     */
 	    
-	    TabPanel centerPanel = new TabPanel();  
-	    centerPanel.setDeferredRender(false);  
-	    centerPanel.setActiveTab(0);
-	    centerPanel.add(resultsPanel);
+	    centerPanel.setDeferredRender(false);
+	    centerPanel.setEnableTabScroll(true);
 	    borderPanel.add(centerPanel, new BorderLayoutData(RegionPosition.CENTER));
 	    
 	    /**
