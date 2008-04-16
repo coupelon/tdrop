@@ -13,6 +13,7 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.TextBox;
 import com.gwtext.client.core.EventObject;
+import com.gwtext.client.data.Node;
 import com.gwtext.client.widgets.Button;
 import com.gwtext.client.widgets.CycleButton;
 import com.gwtext.client.widgets.Panel;
@@ -41,14 +42,32 @@ public class QueryButton extends Button {
 			this.centerPanel = centerPanel;
 		}
 		
-		public void onClick(Button button, EventObject e) {
-			TreeNode[] checkedNode = engTree.getChecked();
+		//To circumvent the three checks bug...
+		public String getChecked() {
 			String checkedNodeString = "";
-			for(int i = 0; i < checkedNode.length; ++i) {
-				if (checkedNode[i].getAttribute("name") != null) {
-					checkedNodeString += (checkedNodeString.equals("")?"":",") + checkedNode[i].getAttribute("name");
+			TreeNode n = engTree.getRootNode();
+			Node[] tnChild = n.getChildNodes();
+			for (int i = 0; i < tnChild.length; ++i) {
+				Node[] tnEng = tnChild[i].getChildNodes();
+				for (int j=0; j < tnEng.length; ++j) {
+					if (((TreeNode) tnEng[j]).getUI().isChecked())
+						checkedNodeString += (checkedNodeString.equals("")?"":",") + tnEng[j].getAttribute("name");
 				}
 			}
+			return checkedNodeString;
+		}
+		
+		public void onClick(Button button, EventObject e) {
+//			String checkedNodeString = "";
+//			TreeNode[] checkedNode = engTree.getChecked();
+//			for(int i = 0; i < checkedNode.length; ++i) {
+//				if (checkedNode[i].getAttribute("name") != null) {
+//					checkedNodeString += (checkedNodeString.equals("")?"":",") + checkedNode[i].getAttribute("name");
+//				}
+//			}
+			String checkedNodeString = getChecked();
+			Window.alert(checkedNodeString);
+			
 			//Workaround to a bug:
 			String limit = limitButton.getText().substring(limitButton.getPrependText().length());
 			//String limit = limitButton.getActiveItem().getText()
@@ -57,7 +76,8 @@ public class QueryButton extends Button {
 			resultsPanel = new Panel();
 			resultsPanel.setLayout(new RowLayout());
 		    resultsPanel.setAutoScroll(true);
-		    resultsPanel.setTitle(queryText.getText());
+		    resultsPanel.setTitle(URL.encodeComponent(queryText.getText()));
+		    resultsPanel.setClosable(true);
 			centerPanel.add(resultsPanel);
 			centerPanel.activate(centerPanel.getItems().length-1);
         }
