@@ -43,6 +43,7 @@ public class WebInterface implements EntryPoint {
 	    
 	    resultsPanel.setLayout(new RowLayout());
 	    resultsPanel.setAutoScroll(true);
+	    resultsPanel.setTitle("Results");
 	    
 	    limitButton.setShowText(true);  
 	    limitButton.setPrependText("Results per engines: ");
@@ -59,7 +60,8 @@ public class WebInterface implements EntryPoint {
 	    panel.setBorder(false);  
 	    panel.setPaddings(15);  
 	    panel.setLayout(new FitLayout());
-	    Panel borderPanel = new Panel();  
+	    Panel borderPanel = new Panel();
+	    borderPanel.setBorder(false);
 	    borderPanel.setLayout(new BorderLayout());
 	    
 	    /**
@@ -67,7 +69,7 @@ public class WebInterface implements EntryPoint {
 	     */
 	    BoxComponent northPanel = new BoxComponent();  
 	    northPanel.setEl(new HTML("<p>Teardrop, The personnal meta-search engine</p>").getElement());  
-	    northPanel.setHeight(32);  
+	    northPanel.setHeight(32);
 	    borderPanel.add(northPanel, new BorderLayoutData(RegionPosition.NORTH));
 	    
 	    /**
