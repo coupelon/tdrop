@@ -1,5 +1,7 @@
 package com.teardrop.client;
 
+import java.util.Date;
+
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
@@ -13,12 +15,15 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.TextBox;
 import com.gwtext.client.core.EventObject;
-import com.gwtext.client.data.Node;
-import com.gwtext.client.widgets.Button;
-import com.gwtext.client.widgets.CycleButton;
-import com.gwtext.client.widgets.Panel;
-import com.gwtext.client.widgets.TabPanel;
-import com.gwtext.client.widgets.event.ButtonListenerAdapter;
+import com.gwtext.client.core.SortDir;  
+import com.gwtext.client.core.TextAlign;  
+import com.gwtext.client.data.*;  
+import com.gwtext.client.util.DateUtil;  
+import com.gwtext.client.util.Format;  
+import com.gwtext.client.widgets.*;  
+import com.gwtext.client.widgets.event.ButtonListenerAdapter;  
+import com.gwtext.client.widgets.event.PanelListenerAdapter;  
+import com.gwtext.client.widgets.grid.*;
 import com.gwtext.client.widgets.layout.RowLayout;
 import com.gwtext.client.widgets.tree.TreeNode;
 
@@ -34,7 +39,8 @@ public class QueryButton extends Button {
 		TextBox queryText;
 		CycleButton limitButton;
 		TabPanel centerPanel;
-		Panel resultsPanel;
+		GridPanel resultsPanel = null;
+		boolean showPreview = true;
 		public OnClickAdapter(EngineTree engTree, TextBox queryText, CycleButton limitButton, TabPanel centerPanel) {
 			this.engTree = engTree;
 			this.queryText = queryText;
@@ -66,20 +72,13 @@ public class QueryButton extends Button {
 //				}
 //			}
 			String checkedNodeString = getChecked();
-			Window.alert(checkedNodeString);
 			
 			//Workaround to a bug:
 			String limit = limitButton.getText().substring(limitButton.getPrependText().length());
 			//String limit = limitButton.getActiveItem().getText()
+			resultsPanel = null;
 			doPostURL("query=" + queryText.getText() + ";engines=" + checkedNodeString + ";limit=" + limit,DEFAULT_SEARCH_URL);
 			
-			resultsPanel = new Panel();
-			resultsPanel.setLayout(new RowLayout());
-		    resultsPanel.setAutoScroll(true);
-		    resultsPanel.setTitle(URL.encodeComponent(queryText.getText()));
-		    resultsPanel.setClosable(true);
-			centerPanel.add(resultsPanel);
-			centerPanel.activate(centerPanel.getItems().length-1);
         }
 		
 		/*
@@ -96,43 +95,120 @@ public class QueryButton extends Button {
 	
 		    	    public void onResponseReceived(Request request, Response response) {
 		    	      if (200 == response.getStatusCode()) {
-		    	  	      JSONValue jsonValue = JSONParser.parse(response.getText());
-		    	  	      showResults(jsonValue);
+		    	    	  createGrid(response.getText());
 		    	      } else {
 		    	    	  Window.alert(response.getStatusText());
 		    	      }
-		    	    }       
+		    	    }
 		    	  });
 		    	} catch (RequestException e) {
 		    	  // Couldn't connect to server        
 		    	}
 		  }
 		
-		private void showResults(JSONValue jsonValue) {
-			JSONValue results;
-			resultsPanel.removeAll(true);
-			results = JSONFunctions.getJSONSet(jsonValue,"preresults");
-			if (results == null) {
-				results = JSONFunctions.getJSONSet(jsonValue,"results");
-			} else {
-				doPostURL("",DEFAULT_NEXT_URL);
+		private Renderer renderTitle = new Renderer() {  
+			public String render(Object value, CellMetadata cellMetadata, Record record,  
+								int rowIndex, int colNum, Store store) {  
+				return Format.format("<b><a href=\"{1}\"target=\"_blank\">{0}</a></b>",  
+						new String[]{URL.decodeComponent((String) value),  
+								URL.decodeComponent(record.getAsString("url"))  
+						});  
 			}
-		    if (results != null) {
-		    	JSONArray resultsArray;
-		    	if ((resultsArray = results.isArray()) != null) {
-	    	      for (int i = 0; i < resultsArray.size(); ++i) {
-	    	    	Panel newPanel = new Panel();
-	    	    	newPanel.setAutoHeight(true);
-	    	    	newPanel.setPaddings(5);
-	    	    	newPanel.add(new HTML(URL.decodeComponent(JSONFunctions.getJSONSetValue(resultsArray.get(i), "title"))));
-	    	    	newPanel.add(new HTML(URL.decodeComponent(JSONFunctions.getJSONSetValue(resultsArray.get(i), "abstract"))));
-	    	    	newPanel.add(new HTML(URL.decodeComponent(JSONFunctions.getJSONSetValue(resultsArray.get(i), "img"))));
-	    	    	newPanel.add(new HTML(URL.decodeComponent(JSONFunctions.getJSONSetValue(resultsArray.get(i), "engines"))));
-	    	    	newPanel.add(new HTML(URL.decodeComponent(JSONFunctions.getJSONSetValue(resultsArray.get(i), "url"))));
-	    	    	resultsPanel.add(newPanel);
-	    	      }
-	    	    }
-		    }
+		};
+		
+		private Renderer renderLast = new Renderer() {  
+			public String render(Object value, CellMetadata cellMetadata, Record record, int rowIndex,  
+									int colNum, Store store) {
+				return "";  
+			}  
+		};
+		
+		private void createGrid(String jsonString) {
+			final RecordDef recordDef = new RecordDef(new FieldDef[]{  
+					new StringFieldDef("url"),  
+					new StringFieldDef("title"),  
+					new StringFieldDef("abstract"),  
+					new StringFieldDef("img"),  
+					new StringFieldDef("engines")
+				});
+			JsonReader reader = new JsonReader(recordDef);
+				
+			JSONValue jsonValue = JSONParser.parse(jsonString);
+			if (JSONFunctions.getJSONSet(jsonValue,"preresults") != null) {
+				reader.setRoot("preresults");
+				doPostURL("",DEFAULT_NEXT_URL);
+			} else {
+				if (JSONFunctions.getJSONSet(jsonValue,"results") != null) {
+					reader.setRoot("results");
+				} else return;
+			}
+			final Store store = new Store(reader);
+			store.setReader(reader);
+			store.loadJsonData(jsonString, true);
+			store.setDefaultSort("title", SortDir.DESC); 
+			
+			ColumnConfig titleColumn = new ColumnConfig("Title", "title");  
+			titleColumn.setCss("white-space:normal;");  
+			titleColumn.setRenderer(renderLast);
+			titleColumn.setSortable(true);
+			
+			ColumnConfig imgColumn = new ColumnConfig("Images", "img", 100);  
+			imgColumn.setHidden(true);
+			imgColumn.setRenderer(renderLast);
+			ColumnConfig abstractColumn = new ColumnConfig("Abstract", "abstract", 70,true);  
+			abstractColumn.setAlign(TextAlign.RIGHT);
+			abstractColumn.setHidden(true);
+			abstractColumn.setRenderer(renderLast);
+			
+			ColumnConfig urlColumn = new ColumnConfig("Url", "url", 100, true, renderLast);  
+			
+			ColumnModel columnModel = new ColumnModel(new ColumnConfig[]{  
+					titleColumn,  
+					imgColumn,  
+					abstractColumn,  
+					urlColumn  
+			});
+			
+			columnModel.setDefaultSortable(true);
+			
+			if (resultsPanel == null) {
+				GridView view = new GridView() {  
+					public String getRowClass(Record record, int index, RowParams rowParams, Store store) {  
+						if (showPreview) {  
+							rowParams.setBody(Format.format("<b><a href=\"{2}\"target=\"_blank\">{0}</a></b><p>{1}</p><br /><p><a href=\"{2}\">{2}</a></p>",
+												new String[]{record.getAsString("title"),
+															 record.getAsString("abstract"),  
+															 record.getAsString("url"),
+															 record.getAsString("img")}));  
+								return "x-grid3-row-expanded";  
+						} else {  
+								return "x-grid3-row-collapsed";  
+						}  
+					}  
+				};  
+	
+				view.setForceFit(true);  
+				view.setEnableRowBody(true); 
+				
+				resultsPanel = new GridPanel();
+				resultsPanel.setTitle(URL.encodeComponent(queryText.getText()));
+				resultsPanel.setAutoWidth(true);
+				resultsPanel.setAutoHeight(true);
+				resultsPanel.setAutoScroll(true);
+				resultsPanel.setTrackMouseOver(true);  
+				resultsPanel.setLoadMask(false);
+				resultsPanel.setSelectionModel(new RowSelectionModel());  
+				resultsPanel.setFrame(false);
+				resultsPanel.setStripeRows(true);  
+				resultsPanel.setIconCls("grid-icon");
+				resultsPanel.setView(view);
+				resultsPanel.setStore(store);
+				resultsPanel.setColumnModel(columnModel);
+				centerPanel.add(resultsPanel);
+				centerPanel.activate(centerPanel.getItems().length-1);
+			} else {
+				resultsPanel.reconfigure(store, columnModel);
+			}
 		}
 	}
 }
