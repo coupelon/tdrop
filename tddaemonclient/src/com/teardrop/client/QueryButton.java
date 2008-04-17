@@ -79,38 +79,46 @@ public class QueryButton extends Button {
 			String limit = limitButton.getText().substring(limitButton.getPrependText().length());
 			//String limit = limitButton.getActiveItem().getText()
 			
-			ColumnConfig titleColumn = new ColumnConfig("Title", "title");  
+			ColumnConfig titleColumn = new ColumnConfig("Title", "title", 600);  
 			titleColumn.setCss("white-space:normal;");  
-			titleColumn.setRenderer(renderLast);
-			titleColumn.setSortable(true);
+			titleColumn.setRenderer(renderTitle);
 			
-			ColumnConfig imgColumn = new ColumnConfig("Images", "img", 100);  
+			ColumnConfig engColumn = new ColumnConfig("Engines", "engines");
+			engColumn.setRenderer(renderDefault);
+			
+			ColumnConfig imgColumn = new ColumnConfig("Images", "img");  
 			imgColumn.setHidden(true);
-			imgColumn.setRenderer(renderLast);
-			ColumnConfig abstractColumn = new ColumnConfig("Abstract", "abstract", 70,true);  
-			abstractColumn.setAlign(TextAlign.RIGHT);
-			abstractColumn.setHidden(true);
-			abstractColumn.setRenderer(renderLast);
+			imgColumn.setRenderer(renderDefault);
 			
-			ColumnConfig urlColumn = new ColumnConfig("Url", "url", 100, true, renderLast);  
+			ColumnConfig abstractColumn = new ColumnConfig("Abstract", "abstract");  
+			abstractColumn.setHidden(true);
+			abstractColumn.setRenderer(renderDefault);
+			
+			ColumnConfig urlColumn = new ColumnConfig("Url", "url");
+			urlColumn.setHidden(true);
+			urlColumn.setRenderer(renderDefault);
 			
 			ColumnModel columnModel = new ColumnModel(new ColumnConfig[]{  
-					titleColumn,  
+					titleColumn,
+					engColumn,
 					imgColumn,  
 					abstractColumn,  
 					urlColumn  
 			});
 			
 			columnModel.setDefaultSortable(true);
-			
+
 			GridView view = new GridView() {  
-				public String getRowClass(Record record, int index, RowParams rowParams, Store store) {  
-					if (showPreview) {  
-						rowParams.setBody(Format.format("<b><a href=\"{2}\"target=\"_blank\">{0}</a></b><p>{1}</p><br /><p><a href=\"{2}\">{2}</a></p>",
-											new String[]{record.getAsString("title"),
-														 record.getAsString("abstract"),  
-														 record.getAsString("url"),
-														 record.getAsString("img")}));  
+				public String getRowClass(Record record, int index, RowParams rowParams, Store store) {
+					if (showPreview) {
+//						String img = "";
+//						if (!record.getAsString("img").equals("")) {
+//							img = "<img src=\"" + URL.decodeComponent(record.getAsString("img")) + "\"/>";
+//						}
+//						rowParams.setBody(Format.format("{0}<br /><a href=\"{1}\">{1}</a></p>",
+//											new String[]{URL.decodeComponent(record.getAsString("abstract")),  
+//														 URL.decodeComponent(record.getAsString("url"))}));
+						rowParams.setBody(URL.decodeComponent(record.getAsString("abstract")));
 							return "x-grid3-row-expanded";  
 					} else {  
 							return "x-grid3-row-collapsed";  
@@ -119,7 +127,8 @@ public class QueryButton extends Button {
 			};  
 
 			view.setForceFit(true);  
-			view.setEnableRowBody(true); 
+			view.setAutoFill(true);
+			view.setEnableRowBody(true);
 			
 			final RecordDef recordDef = new RecordDef(new FieldDef[]{  
 					new StringFieldDef("url"),  
@@ -142,7 +151,7 @@ public class QueryButton extends Button {
 			resultsPanel.setSelectionModel(new RowSelectionModel());  
 			resultsPanel.setFrame(false);
 			resultsPanel.setStripeRows(true);  
-			resultsPanel.setIconCls("grid-icon");
+			//resultsPanel.setIconCls("grid-icon");
 			resultsPanel.setView(view);
 			resultsPanel.setStore(store);
 			resultsPanel.setColumnModel(columnModel);
@@ -167,7 +176,7 @@ public class QueryButton extends Button {
 	
 		    	    public void onResponseReceived(Request request, Response response) {
 		    	      if (200 == response.getStatusCode()) {
-		    	    	  createGrid(response.getText());
+		    	    	  updateGrid(response.getText());
 		    	      } else {
 		    	    	  Window.alert(response.getStatusText());
 		    	      }
@@ -188,14 +197,14 @@ public class QueryButton extends Button {
 			}
 		};
 		
-		private Renderer renderLast = new Renderer() {  
-			public String render(Object value, CellMetadata cellMetadata, Record record, int rowIndex,  
-									int colNum, Store store) {
-				return "";  
-			}  
+		private Renderer renderDefault = new Renderer() {  
+			public String render(Object value, CellMetadata cellMetadata, Record record,  
+								int rowIndex, int colNum, Store store) {  
+				return URL.decodeComponent((String) value);
+			}
 		};
 		
-		private void createGrid(String jsonString) {			
+		private void updateGrid(String jsonString) {			
 			JSONValue jsonValue = JSONParser.parse(jsonString);
 			if (JSONFunctions.getJSONSet(jsonValue,"preresults") != null) {
 				reader.setRoot("preresults");
