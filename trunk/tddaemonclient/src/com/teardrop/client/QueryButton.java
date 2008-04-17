@@ -200,6 +200,7 @@ public class QueryButton extends Button {
 		private Renderer renderDefault = new Renderer() {  
 			public String render(Object value, CellMetadata cellMetadata, Record record,  
 								int rowIndex, int colNum, Store store) {  
+				if (value == null) return ""; 
 				return URL.decodeComponent((String) value);
 			}
 		};
