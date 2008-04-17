@@ -41,6 +41,8 @@ public class QueryButton extends Button {
 		TabPanel centerPanel;
 		GridPanel resultsPanel = null;
 		boolean showPreview = true;
+		Store store;
+		JsonReader reader;
 		public OnClickAdapter(EngineTree engTree, TextBox queryText, CycleButton limitButton, TabPanel centerPanel) {
 			this.engTree = engTree;
 			this.queryText = queryText;
@@ -76,7 +78,77 @@ public class QueryButton extends Button {
 			//Workaround to a bug:
 			String limit = limitButton.getText().substring(limitButton.getPrependText().length());
 			//String limit = limitButton.getActiveItem().getText()
-			resultsPanel = null;
+			
+			ColumnConfig titleColumn = new ColumnConfig("Title", "title");  
+			titleColumn.setCss("white-space:normal;");  
+			titleColumn.setRenderer(renderLast);
+			titleColumn.setSortable(true);
+			
+			ColumnConfig imgColumn = new ColumnConfig("Images", "img", 100);  
+			imgColumn.setHidden(true);
+			imgColumn.setRenderer(renderLast);
+			ColumnConfig abstractColumn = new ColumnConfig("Abstract", "abstract", 70,true);  
+			abstractColumn.setAlign(TextAlign.RIGHT);
+			abstractColumn.setHidden(true);
+			abstractColumn.setRenderer(renderLast);
+			
+			ColumnConfig urlColumn = new ColumnConfig("Url", "url", 100, true, renderLast);  
+			
+			ColumnModel columnModel = new ColumnModel(new ColumnConfig[]{  
+					titleColumn,  
+					imgColumn,  
+					abstractColumn,  
+					urlColumn  
+			});
+			
+			columnModel.setDefaultSortable(true);
+			
+			GridView view = new GridView() {  
+				public String getRowClass(Record record, int index, RowParams rowParams, Store store) {  
+					if (showPreview) {  
+						rowParams.setBody(Format.format("<b><a href=\"{2}\"target=\"_blank\">{0}</a></b><p>{1}</p><br /><p><a href=\"{2}\">{2}</a></p>",
+											new String[]{record.getAsString("title"),
+														 record.getAsString("abstract"),  
+														 record.getAsString("url"),
+														 record.getAsString("img")}));  
+							return "x-grid3-row-expanded";  
+					} else {  
+							return "x-grid3-row-collapsed";  
+					}  
+				}  
+			};  
+
+			view.setForceFit(true);  
+			view.setEnableRowBody(true); 
+			
+			final RecordDef recordDef = new RecordDef(new FieldDef[]{  
+					new StringFieldDef("url"),  
+					new StringFieldDef("title"),  
+					new StringFieldDef("abstract"),  
+					new StringFieldDef("img"),  
+					new StringFieldDef("engines")
+				});
+			reader = new JsonReader(recordDef);
+			store = new Store(reader);
+			store.setDefaultSort("title", SortDir.DESC); 
+			
+			resultsPanel = new GridPanel();
+			resultsPanel.setTitle(URL.encodeComponent(queryText.getText()));
+			resultsPanel.setAutoWidth(true);
+			resultsPanel.setAutoHeight(true);
+			resultsPanel.setAutoScroll(true);
+			resultsPanel.setTrackMouseOver(true);  
+			resultsPanel.setLoadMask(false);
+			resultsPanel.setSelectionModel(new RowSelectionModel());  
+			resultsPanel.setFrame(false);
+			resultsPanel.setStripeRows(true);  
+			resultsPanel.setIconCls("grid-icon");
+			resultsPanel.setView(view);
+			resultsPanel.setStore(store);
+			resultsPanel.setColumnModel(columnModel);
+			centerPanel.add(resultsPanel);
+			centerPanel.activate(centerPanel.getItems().length-1);
+			
 			doPostURL("query=" + queryText.getText() + ";engines=" + checkedNodeString + ";limit=" + limit,DEFAULT_SEARCH_URL);
 			
         }
@@ -123,16 +195,7 @@ public class QueryButton extends Button {
 			}  
 		};
 		
-		private void createGrid(String jsonString) {
-			final RecordDef recordDef = new RecordDef(new FieldDef[]{  
-					new StringFieldDef("url"),  
-					new StringFieldDef("title"),  
-					new StringFieldDef("abstract"),  
-					new StringFieldDef("img"),  
-					new StringFieldDef("engines")
-				});
-			JsonReader reader = new JsonReader(recordDef);
-				
+		private void createGrid(String jsonString) {			
 			JSONValue jsonValue = JSONParser.parse(jsonString);
 			if (JSONFunctions.getJSONSet(jsonValue,"preresults") != null) {
 				reader.setRoot("preresults");
@@ -142,73 +205,9 @@ public class QueryButton extends Button {
 					reader.setRoot("results");
 				} else return;
 			}
-			final Store store = new Store(reader);
-			store.setReader(reader);
+			
 			store.loadJsonData(jsonString, true);
-			store.setDefaultSort("title", SortDir.DESC); 
-			
-			ColumnConfig titleColumn = new ColumnConfig("Title", "title");  
-			titleColumn.setCss("white-space:normal;");  
-			titleColumn.setRenderer(renderLast);
-			titleColumn.setSortable(true);
-			
-			ColumnConfig imgColumn = new ColumnConfig("Images", "img", 100);  
-			imgColumn.setHidden(true);
-			imgColumn.setRenderer(renderLast);
-			ColumnConfig abstractColumn = new ColumnConfig("Abstract", "abstract", 70,true);  
-			abstractColumn.setAlign(TextAlign.RIGHT);
-			abstractColumn.setHidden(true);
-			abstractColumn.setRenderer(renderLast);
-			
-			ColumnConfig urlColumn = new ColumnConfig("Url", "url", 100, true, renderLast);  
-			
-			ColumnModel columnModel = new ColumnModel(new ColumnConfig[]{  
-					titleColumn,  
-					imgColumn,  
-					abstractColumn,  
-					urlColumn  
-			});
-			
-			columnModel.setDefaultSortable(true);
-			
-			if (resultsPanel == null) {
-				GridView view = new GridView() {  
-					public String getRowClass(Record record, int index, RowParams rowParams, Store store) {  
-						if (showPreview) {  
-							rowParams.setBody(Format.format("<b><a href=\"{2}\"target=\"_blank\">{0}</a></b><p>{1}</p><br /><p><a href=\"{2}\">{2}</a></p>",
-												new String[]{record.getAsString("title"),
-															 record.getAsString("abstract"),  
-															 record.getAsString("url"),
-															 record.getAsString("img")}));  
-								return "x-grid3-row-expanded";  
-						} else {  
-								return "x-grid3-row-collapsed";  
-						}  
-					}  
-				};  
-	
-				view.setForceFit(true);  
-				view.setEnableRowBody(true); 
-				
-				resultsPanel = new GridPanel();
-				resultsPanel.setTitle(URL.encodeComponent(queryText.getText()));
-				resultsPanel.setAutoWidth(true);
-				resultsPanel.setAutoHeight(true);
-				resultsPanel.setAutoScroll(true);
-				resultsPanel.setTrackMouseOver(true);  
-				resultsPanel.setLoadMask(false);
-				resultsPanel.setSelectionModel(new RowSelectionModel());  
-				resultsPanel.setFrame(false);
-				resultsPanel.setStripeRows(true);  
-				resultsPanel.setIconCls("grid-icon");
-				resultsPanel.setView(view);
-				resultsPanel.setStore(store);
-				resultsPanel.setColumnModel(columnModel);
-				centerPanel.add(resultsPanel);
-				centerPanel.activate(centerPanel.getItems().length-1);
-			} else {
-				resultsPanel.reconfigure(store, columnModel);
-			}
+			resultsPanel.getView().refresh();
 		}
 	}
 }
