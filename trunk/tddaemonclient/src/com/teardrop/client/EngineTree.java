@@ -29,6 +29,11 @@ public class EngineTree extends TreePanel {
 				((TreeNode)node.getChildNodes()[j]).getUI().toggleCheck(checked);
 			}
 		}
+		public void onExpand(Node node) {
+			for(int j = 0; j < node.getChildNodes().length; ++j) {
+				((TreeNode)node.getChildNodes()[j]).getUI().toggleCheck(((TreeNode)node).getUI().isChecked());
+			}
+		}
 	};
 	
 	//This is the listener for the engines checkboxes of the tree
