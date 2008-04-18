@@ -82,6 +82,7 @@ public class QueryButton extends Button {
 			ColumnConfig titleColumn = new ColumnConfig("Title", "title", 600);  
 			titleColumn.setCss("white-space:normal;");  
 			titleColumn.setRenderer(renderTitle);
+			titleColumn.setSortable(true);
 			
 			ColumnConfig engColumn = new ColumnConfig("Engines", "engines");
 			engColumn.setRenderer(renderDefault);
@@ -135,18 +136,12 @@ public class QueryButton extends Button {
 			
 			resultsPanel = new GridPanel();
 			resultsPanel.setTitle(URL.encodeComponent(queryText.getText()));
-			resultsPanel.setAutoWidth(true);
-			resultsPanel.setAutoHeight(true);
-			resultsPanel.setTrackMouseOver(true);  
-			resultsPanel.setLoadMask(false);
-			resultsPanel.setSelectionModel(new RowSelectionModel());  
-			resultsPanel.setFrame(false);
-			resultsPanel.setStripeRows(true);
+			resultsPanel.setTrackMouseOver(true);
+			resultsPanel.setSelectionModel(new RowSelectionModel());
 			resultsPanel.setView(view);
 			resultsPanel.setStore(store);
 			resultsPanel.setColumnModel(columnModel);
 			resultsPanel.setClosable(true);
-			resultsPanel.setAutoScroll(true);
 			centerPanel.add(resultsPanel);
 			centerPanel.activate(centerPanel.getItems().length-1);
 			
