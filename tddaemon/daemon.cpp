@@ -41,9 +41,9 @@ static tdParam tdp;
 string createJSON(bool final, metaRank *mr) {
 	string pre;
 	if (final) {
-		pre = "{\"results\":[{";
+		pre = "{\"final\":\"true\",\"results\":[{";
 	} else {
-		pre = "{\"preresults\":[{";
+		pre = "{\"final\":\"false\",\"results\":[{";
 	}
   string text = string("\"num\":\"{num}\",") +
   							  "\"engines\":\"{engines}\"," +
