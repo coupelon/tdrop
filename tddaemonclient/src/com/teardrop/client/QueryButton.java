@@ -50,7 +50,7 @@ public class QueryButton extends Button {
 			for (int i = 0; i < tnChild.length; ++i) {
 				Node[] tnEng = tnChild[i].getChildNodes();
 				for (int j=0; j < tnEng.length; ++j) {
-					if (((TreeNode) tnEng[j]).getUI().isChecked())
+					if (((TreeNode) tnEng[j]).getUI().isChecked() || ((TreeNode) tnChild[i]).getUI().isChecked())
 						checkedNodeString += (checkedNodeString.equals("")?"":",") + tnEng[j].getAttribute("name");
 				}
 			}
