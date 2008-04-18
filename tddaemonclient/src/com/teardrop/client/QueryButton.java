@@ -1,30 +1,22 @@
 package com.teardrop.client;
 
-import java.util.Date;
-
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.RequestException;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.http.client.URL;
-import com.google.gwt.json.client.JSONArray;
 import com.google.gwt.json.client.JSONParser;
 import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.TextBox;
 import com.gwtext.client.core.EventObject;
-import com.gwtext.client.core.SortDir;  
-import com.gwtext.client.core.TextAlign;  
+import com.gwtext.client.core.SortDir;
 import com.gwtext.client.data.*;  
-import com.gwtext.client.util.DateUtil;  
 import com.gwtext.client.util.Format;  
 import com.gwtext.client.widgets.*;  
-import com.gwtext.client.widgets.event.ButtonListenerAdapter;  
-import com.gwtext.client.widgets.event.PanelListenerAdapter;  
+import com.gwtext.client.widgets.event.ButtonListenerAdapter;
 import com.gwtext.client.widgets.grid.*;
-import com.gwtext.client.widgets.layout.RowLayout;
 import com.gwtext.client.widgets.tree.TreeNode;
 
 public class QueryButton extends Button {
@@ -64,6 +56,14 @@ public class QueryButton extends Button {
 			}
 			return checkedNodeString;
 		}
+		
+		private final RecordDef recordDef = new RecordDef(new FieldDef[]{  
+				new StringFieldDef("url"),  
+				new StringFieldDef("title"),  
+				new StringFieldDef("abstract"),  
+				new StringFieldDef("img"),  
+				new StringFieldDef("engines")
+			});
 		
 		public void onClick(Button button, EventObject e) {
 //			String checkedNodeString = "";
@@ -111,17 +111,15 @@ public class QueryButton extends Button {
 			GridView view = new GridView() {  
 				public String getRowClass(Record record, int index, RowParams rowParams, Store store) {
 					if (showPreview) {
-//						String img = "";
-//						if (!record.getAsString("img").equals("")) {
-//							img = "<img src=\"" + URL.decodeComponent(record.getAsString("img")) + "\"/>";
-//						}
-//						rowParams.setBody(Format.format("{0}<br /><a href=\"{1}\">{1}</a></p>",
-//											new String[]{URL.decodeComponent(record.getAsString("abstract")),  
-//														 URL.decodeComponent(record.getAsString("url"))}));
-						rowParams.setBody(URL.decodeComponent(record.getAsString("abstract")));
-							return "x-grid3-row-expanded";  
+						String img = getDecodedRecord(record,"img");
+						if (!img.equals("")) {
+							rowParams.setBody("<img width=\"40\" height =\"30\" src=\"" + img + "\" />" + getDecodedRecord(record,"abstract"));
+						} else {
+							rowParams.setBody(getDecodedRecord(record,"abstract"));
+						}
+						return "x-grid3-row-expanded";  
 					} else {  
-							return "x-grid3-row-collapsed";  
+						return "x-grid3-row-collapsed";  
 					}  
 				}  
 			};  
@@ -130,14 +128,8 @@ public class QueryButton extends Button {
 			view.setAutoFill(true);
 			view.setEnableRowBody(true);
 			
-			final RecordDef recordDef = new RecordDef(new FieldDef[]{  
-					new StringFieldDef("url"),  
-					new StringFieldDef("title"),  
-					new StringFieldDef("abstract"),  
-					new StringFieldDef("img"),  
-					new StringFieldDef("engines")
-				});
 			reader = new JsonReader(recordDef);
+			reader.setRoot("results");
 			store = new Store(reader);
 			store.setDefaultSort("title", SortDir.DESC); 
 			
@@ -145,16 +137,16 @@ public class QueryButton extends Button {
 			resultsPanel.setTitle(URL.encodeComponent(queryText.getText()));
 			resultsPanel.setAutoWidth(true);
 			resultsPanel.setAutoHeight(true);
-			resultsPanel.setAutoScroll(true);
 			resultsPanel.setTrackMouseOver(true);  
 			resultsPanel.setLoadMask(false);
 			resultsPanel.setSelectionModel(new RowSelectionModel());  
 			resultsPanel.setFrame(false);
-			resultsPanel.setStripeRows(true);  
-			//resultsPanel.setIconCls("grid-icon");
+			resultsPanel.setStripeRows(true);
 			resultsPanel.setView(view);
 			resultsPanel.setStore(store);
 			resultsPanel.setColumnModel(columnModel);
+			resultsPanel.setClosable(true);
+			resultsPanel.setAutoScroll(true);
 			centerPanel.add(resultsPanel);
 			centerPanel.activate(centerPanel.getItems().length-1);
 			
@@ -189,10 +181,11 @@ public class QueryButton extends Button {
 		
 		private Renderer renderTitle = new Renderer() {  
 			public String render(Object value, CellMetadata cellMetadata, Record record,  
-								int rowIndex, int colNum, Store store) {  
+								int rowIndex, int colNum, Store store) {
+				
 				return Format.format("<b><a href=\"{1}\"target=\"_blank\">{0}</a></b>",  
-						new String[]{URL.decodeComponent((String) value),  
-								URL.decodeComponent(record.getAsString("url"))  
+						new String[]{getDecodedRecord(record,"title"),  
+						getDecodedRecord(record,"url")  
 						});  
 			}
 		};
@@ -205,18 +198,18 @@ public class QueryButton extends Button {
 			}
 		};
 		
-		private void updateGrid(String jsonString) {			
+		private String getDecodedRecord(Record r,String name) {
+			if (r.getAsString(name) == null) return "";
+			return URL.decodeComponent(r.getAsString(name));
+		}
+		
+		private void updateGrid(String jsonString) {
 			JSONValue jsonValue = JSONParser.parse(jsonString);
-			if (JSONFunctions.getJSONSet(jsonValue,"preresults") != null) {
-				reader.setRoot("preresults");
+			if (JSONFunctions.getJSONSetValue(jsonValue,"final").equals("false")) {
 				doPostURL("",DEFAULT_NEXT_URL);
-			} else {
-				if (JSONFunctions.getJSONSet(jsonValue,"results") != null) {
-					reader.setRoot("results");
-				} else return;
 			}
 			
-			store.loadJsonData(jsonString, true);
+			store.loadJsonData(jsonString, false);
 			resultsPanel.getView().refresh();
 		}
 	}
