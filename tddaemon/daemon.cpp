@@ -45,15 +45,34 @@ string createJSON(bool final, metaRank *mr) {
 	string pre;
 	if (final) {
 		cerr << "Info: final" << endl;
-		string print = "{num}\t{engines}\n\tTitre: {title}\n\tAddress: {url}\nAbstract: {abstract}\n";
-    string delim = "/";
-    mr->toString(print,delim);
-		pre = "{\"final\":\"true\",\"results\":[{";
+		//string print = "{num}\t{engines}\n\tTitre: {title}\n\tAddress: {url}\nAbstract: {abstract}\n";
+    //string delim = "/";
+    //mr->toString(print,delim);
+		pre = "{\"final\":\"true\",";
 	} else {
 		cerr << "Info: not final" << endl;
-		pre = "{\"final\":\"false\",\"results\":[{";
+		pre = "{\"final\":\"false\",";
 	}
-  string text = string("\"num\":\"{num}\",") +
+	map<string,int> *map_engines = mr->getEngineResults();
+	if (map_engines) {
+		pre += "\"engines\":[";
+		char number[11];
+		for(map<string,int>::iterator me_it = map_engines->begin();
+			  me_it != map_engines->end(); ++me_it) {
+			  sprintf(number,"%i",me_it->second);
+			  pre += (me_it == map_engines->begin())?"":",";
+			  pre += "{\"name\":\"";
+				pre += me_it->first;
+				pre += "\",\"cpt\":";
+			  pre += number;
+			  pre += "}";
+	  }
+	  pre += "],";
+	}
+	
+	pre += "\"results\":[{";
+	
+  string text = string("\"num\":{num},") +
   							  "\"engines\":\"{engines}\"," +
   							  "\"title\":\"{title}\"," +
   							  "\"url\":\"{url}\"," +
@@ -245,15 +264,13 @@ static void query_process(struct shttpd_arg *arg) {
 					r.newPage(state->buffer);
 					if (!r.endOfMatch()) {
 				    state->buffer = newQuery(arg,r.getMatch(1),r.getMatch(2),r.getMatch(3));
-				    cerr << "Info: query=" << r.getMatch(1) << endl;
-				    cerr << "\tengines=" << r.getMatch(2) << endl;
-				    cerr << "\tlimit=" << r.getMatch(3) << endl;
 		      } else {
 		        state->buffer = "{\"results\":[{}]}";
 					}
 				} else if (uri == REQUEST_TREE) {
 					state->buffer = show_tree();
 				}
+				cerr << state->buffer << endl;
 			}
 			while (arg->out.num_bytes < arg->out.len && state->count < state->buffer.length()) {
 				arg->out.buf[arg->out.num_bytes] = state->buffer[state->count];
