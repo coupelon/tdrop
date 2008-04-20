@@ -121,6 +121,12 @@ int metaRank::getEngineResults(const string & name) {
   return 0;
 }
 
+map<string,int> *metaRank::getEngineResults() {
+	if (ranked_results != NULL)
+  	return &(ranked_results->getEngineResults());
+  return NULL;
+}
+
 void metaRank::sortResults(string s, bool ascending) {
   if (ranked_results != NULL)
     ranked_results->sortResults(s,ascending);
