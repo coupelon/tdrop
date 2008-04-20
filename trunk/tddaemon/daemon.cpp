@@ -32,6 +32,9 @@
 #define WEBINTERFACE_ENGINES_ICONS_URI "/engines_icons/*"
 #define WEBINTERFACE_ENGINES_ICONS "/home/olivier/workspace/tdengines/icons/"
 #define WEBINTERFACE_ENGINES_ICONS_SIZE 15
+#define NEXT_RESULTS "/services/get_next_results"
+#define QUERY_POST "/services/query_post"
+#define REQUEST_TREE "/services/request_tree"
 
 using namespace std;
 
@@ -41,8 +44,13 @@ static tdParam tdp;
 string createJSON(bool final, metaRank *mr) {
 	string pre;
 	if (final) {
+		cerr << "Info: final" << endl;
+		string print = "{num}\t{engines}\n\tTitre: {title}\n\tAddress: {url}\nAbstract: {abstract}\n";
+    string delim = "/";
+    mr->toString(print,delim);
 		pre = "{\"final\":\"true\",\"results\":[{";
 	} else {
+		cerr << "Info: not final" << endl;
 		pre = "{\"final\":\"false\",\"results\":[{";
 	}
   string text = string("\"num\":\"{num}\",") +
@@ -92,10 +100,8 @@ static string newQuery(struct shttpd_arg *arg, string query,string engines,strin
    					 globalSearches[newID]);
 }
 
-static void
+static string
 get_next_results(struct shttpd_arg *arg) {
-	shttpd_printf(arg, "%s", "HTTP/1.1 200 OK\r\n");
-  shttpd_printf(arg, "%s", "Content-Type: text/plain\r\n\r\n");
 	const char *cookie_string = shttpd_get_header(arg, "Cookie");
 	if(cookie_string) {
 		regExp r("query=(.*)");
@@ -103,17 +109,11 @@ get_next_results(struct shttpd_arg *arg) {
 	  r.newPage(cstring);
 		if (!r.endOfMatch()) {
 			string newID(r.getMatch(1));
-		  shttpd_printf(arg, "%s",
-		    createJSON(globalSearches[newID]->waitForNewResults(),
-   					 globalSearches[newID]).c_str());
-   		arg->flags |= SHTTPD_END_OF_OUTPUT;
-   		return;
+		  return createJSON(globalSearches[newID]->waitForNewResults(),
+   					 globalSearches[newID]);
     }
 	}	
-
-  shttpd_printf(arg, "%s", "You can't get next queries if you don't tell"
-  												 " Teardrop where their UID.");
-	arg->flags |= SHTTPD_END_OF_OUTPUT;
+  return "";
 }
 
 /*
@@ -134,61 +134,53 @@ show_index(struct shttpd_arg *arg)
 /*
  * This callback function is used to get the JSON of the engines tree
  */
-static void
-show_tree(struct shttpd_arg *arg)
+static string
+show_tree()
 {
-	shttpd_printf(arg, "%s", "HTTP/1.1 200 OK\r\n");
-	shttpd_printf(arg, "%s", "Content-Type: text/plain\r\n\r\n");
-	
 	xmlFile xf;
 	string config_path;
+	string output = "";
 	
 	if (selectFile::find("config",".xml",config_path) && xf.openFile(config_path + "config.xml")) {
 		
 		nodeDoc ndCateg(&xf,"category");
-		shttpd_printf(arg, "%s", "{\"categories\":[");
+		output += "{\"categories\":[";
 		while(ndCateg.isValid()) {
 			//Prints the category name
-			shttpd_printf(arg, "%s", "{\"name\":\"");
-			shttpd_printf(arg, "%s", ndCateg.getAttributeValueByName("name").c_str());
-			shttpd_printf(arg, "%s", "\",\"icon\":\"folder.png\",\"engines\":[");
+			output += "{\"name\":\"";
+			output += ndCateg.getAttributeValueByName("name");
+			output += "\",\"icon\":\"folder.png\",\"engines\":[";
 			nodeDoc ndEngine(&xf,"engine",ndCateg);
 			while(ndEngine.isValid()) {
-				shttpd_printf(arg, "%s", "{\"name\":\"");
-				shttpd_printf(arg, "%s", ndEngine.getAttributeValueByName("name").c_str());
+				output += "{\"name\":\"";
+				output += ndEngine.getAttributeValueByName("name");
 				string filename = ndEngine.getAttributeValueByName("name");
 				string path;
-				//QIcon *ic;
 
-				shttpd_printf(arg, "%s", "\",\"icon\":\"");
-				/*if (selectFile::find(filename,".png",path)) {
-					shttpd_printf(arg, "%s", string(path + filename + ".png").c_str());
-				} else {
-					shttpd_printf(arg, "%s", string("xmag.png").c_str());
-				}*/
-				shttpd_printf(arg, "%s", string("/engines_icons/" + filename + ".png").c_str());
-				shttpd_printf(arg, "%s", "\",\"title\":\"");
+				output += "\",\"icon\":\"";
+				output += "/engines_icons/" + filename + ".png";
+				output += "\",\"title\":\"";
 				
 				xmlEngine xe;
 				if (selectFile::find(filename,".xml",path) && xe.openEngine(filename)) {
-					shttpd_printf(arg, "%s", xe.getName().c_str());
+					output += xe.getName();
 				} else {
 					// The file we a looking for was not found.
 					//cerr << "The file " << filename << ".xml was not found." << endl;
 				}
-				shttpd_printf(arg, "%s", "\"}");
+				output += "\"}";
 				ndEngine.next();
-				if (ndEngine.isValid()) shttpd_printf(arg, "%s", ",");
+				if (ndEngine.isValid()) output += ",";
 			}
-			shttpd_printf(arg, "%s", "]}");
+			output += "]}";
 			ndCateg.next();
-			if (ndCateg.isValid()) shttpd_printf(arg, "%s", ",");
+			if (ndCateg.isValid()) output += ",";
 		}
-		shttpd_printf(arg, "%s", "]}");
+		output += "]}";
 	} else {
-		shttpd_printf(arg, "%s", "Teardrop configuration file could not be found.");
+		output += "Teardrop configuration file could not be found.";
 	}
-	arg->flags |= SHTTPD_END_OF_OUTPUT;
+	return output;
 }
 
 /*
@@ -211,20 +203,26 @@ static void query_process(struct shttpd_arg *arg) {
 		unsigned long int cl;		/* Content-Length	*/
 		size_t	nread;		/* Number of bytes read	*/
 		string	buffer;
+		size_t count;
 	} *state;
+	string uri = shttpd_get_env(arg, "REQUEST_URI");
 
 	/* If the connection was broken prematurely, cleanup */
 	if (arg->flags & SHTTPD_CONNECTION_ERROR && arg->state) {
 		delete (struct state *)arg->state;
-	} else if ((s = shttpd_get_header(arg, "Content-Length")) == NULL) {
+	} else if (uri == QUERY_POST && (s = shttpd_get_header(arg, "Content-Length")) == NULL) {
 		shttpd_printf(arg, "HTTP/1.0 411 Length Required\n\n");
 		arg->flags |= SHTTPD_END_OF_OUTPUT;
 	} else if (arg->state == NULL) {
-		/* New request. Allocate a state structure, and open a file */
+		/* New request. Allocate a state structure */
 		arg->state = state = new (struct state);
-		state->cl = strtoul(s, NULL, 10);
+		if (uri == QUERY_POST)
+			state->cl = strtoul(s, NULL, 10);
+		else
+			state->cl = 0;
 		state->buffer = "";
 		state->nread = 0;
+		state->count = 0;
 	} else {
 		state = (struct state *) arg->state;
 		/*
@@ -239,26 +237,34 @@ static void query_process(struct shttpd_arg *arg) {
 
 		/* Data stream finished? Close the file, and free the state */
 		if (state->nread >= state->cl) {
-			regExp r("query=(.+);engines=([^;]+);limit=([1-9][0-9]{1,3})");
-			r.newPage(state->buffer);
-			if (!r.endOfMatch()) {
-				//r.next();
-        //shttpd_printf(arg, "Written %d bytes:\n%s\n%s\n%s",
-			  //  state->nread,r.getMatch(1).c_str(),r.getMatch(2).c_str(),r.getMatch(3).c_str());
-			  shttpd_printf(arg, "%s",
-			    newQuery(arg,r.getMatch(1),r.getMatch(2),r.getMatch(3)).c_str());
-      } else {
-        shttpd_printf(arg, "HTTP/1.0 200 OK\n"
-			                    "Content-Type: text/plain\n\n");
-      	shttpd_printf(arg, "{\"results\":[{}]}");
+			if (state->count == 0) {
+				if (uri == NEXT_RESULTS) {
+					state->buffer = get_next_results(arg);
+				} else if (uri == QUERY_POST) {
+					regExp r("query=(.+);engines=([^;]+);limit=([1-9][0-9]{1,3})");
+					r.newPage(state->buffer);
+					if (!r.endOfMatch()) {
+				    state->buffer = newQuery(arg,r.getMatch(1),r.getMatch(2),r.getMatch(3));
+				    cerr << "Info: query=" << r.getMatch(1) << endl;
+				    cerr << "\tengines=" << r.getMatch(2) << endl;
+				    cerr << "\tlimit=" << r.getMatch(3) << endl;
+		      } else {
+		        state->buffer = "{\"results\":[{}]}";
+					}
+				} else if (uri == REQUEST_TREE) {
+					state->buffer = show_tree();
+				}
 			}
-      
-			
-			//shttpd_printf(arg, "Written %d bytes: %s",
-			//    state->nread, state->buffer.c_str());
-			delete state;
-			arg->flags |= SHTTPD_END_OF_OUTPUT;
-		}
+			while (arg->out.num_bytes < arg->out.len && state->count < state->buffer.length()) {
+				arg->out.buf[arg->out.num_bytes] = state->buffer[state->count];
+				arg->out.num_bytes++;
+				state->count++;
+			}
+			if (state->count >= state->buffer.length()) {
+				arg->flags |= SHTTPD_END_OF_OUTPUT;
+				delete (struct state *) arg->state;
+			}
+	  }
 	}
 }
 
@@ -323,7 +329,7 @@ int main(int argc, char *argv[])
 
 	/*
 	 * Initialize SHTTPD context.
-	 * Attach folder c:\ to the URL /my_c  (for windows), and
+	 * Aget_next_resultsttach folder c:\ to the URL /my_c  (for windows), and
 	 * /etc/ to URL /my_etc (for UNIX). These are Apache-like aliases.
 	 * Set WWW root to current directory.
 	 * Start listening on ports 8080 and 8081
@@ -332,9 +338,9 @@ int main(int argc, char *argv[])
 	shttpd_set_option(ctx, "ports", "8080");
 
 	shttpd_register_uri(ctx, "/", &show_index, NULL);
-	shttpd_register_uri(ctx, "/services/request_tree", &show_tree, NULL);
-	shttpd_register_uri(ctx, "/services/query_post", &query_process, NULL);
-	shttpd_register_uri(ctx, "/services/get_next_results", &get_next_results, NULL);
+	shttpd_register_uri(ctx, REQUEST_TREE, &query_process, NULL);
+	shttpd_register_uri(ctx, QUERY_POST, &query_process, NULL);
+	shttpd_register_uri(ctx, NEXT_RESULTS, &query_process, NULL);
 	shttpd_register_uri(ctx, WEBINTERFACE_ENGINES_ICONS_URI, &show_engines_icons, NULL);
 	shttpd_register_uri(ctx, WEBINTERFACE_URI, &show_wi, NULL);
 
