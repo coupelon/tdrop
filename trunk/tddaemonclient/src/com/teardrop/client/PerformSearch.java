@@ -11,6 +11,7 @@ import com.google.gwt.user.client.ui.TextBox;
 import com.gwtext.client.core.EventObject;
 import com.gwtext.client.core.SortDir;
 import com.gwtext.client.data.FieldDef;
+import com.gwtext.client.data.IntegerFieldDef;
 import com.gwtext.client.data.JsonReader;
 import com.gwtext.client.data.Node;
 import com.gwtext.client.data.Record;
@@ -47,17 +48,21 @@ public class PerformSearch {
 	GridPanel resultsPanel;
 	Panel progressPanel;
 	boolean showDetails = true;
-	Store store;
-	JsonReader reader;
+	Store resultsStore;
+	Store enginesStore;
 	String checkedNodeString;
 	
-	private final RecordDef recordDef = new RecordDef(new FieldDef[]{
-			new StringFieldDef("num"),
+	private final RecordDef recordResultsDef = new RecordDef(new FieldDef[]{
+			new IntegerFieldDef("num"),
 			new StringFieldDef("url"),  
 			new StringFieldDef("title"),  
 			new StringFieldDef("abstract"),  
 			new StringFieldDef("img"),  
 			new StringFieldDef("engines")
+		});
+	private final RecordDef recordEnginesDef = new RecordDef(new FieldDef[]{
+			new IntegerFieldDef("cpt"),
+			new StringFieldDef("name"),  
 		});
 	
 	public PerformSearch(EngineTree engTree, TextBox queryText, CycleButton limitButton, TabPanel centerPanel, Panel progressPanel) {
@@ -66,6 +71,7 @@ public class PerformSearch {
 		this.limitButton = limitButton;
 		this.centerPanel = centerPanel;
 		this.progressPanel = progressPanel;
+		
 //		String checkedNodeString = "";
 //		TreeNode[] checkedNode = engTree.getChecked();
 //		for(int i = 0; i < checkedNode.length; ++i) {
@@ -85,8 +91,7 @@ public class PerformSearch {
 		//String limit = limitButton.getActiveItem().getText()
 		
 		
-		ColumnConfig numColumn = new ColumnConfig("#", "num",15);
-		numColumn.setRenderer(renderDefault);
+		ColumnConfig numColumn = new ColumnConfig("#", "num",16);
 		numColumn.setHidden(true);
 		numColumn.setSortable(true);
 		
@@ -141,17 +146,21 @@ public class PerformSearch {
 		view.setAutoFill(true);
 		view.setEnableRowBody(true);
 		
-		reader = new JsonReader(recordDef);
-		reader.setRoot("results");
-		store = new Store(reader);
-		store.setDefaultSort("num", SortDir.ASC); 
+		JsonReader resultsReader = new JsonReader(recordResultsDef);
+		resultsReader.setRoot("results");
+		resultsStore = new Store(resultsReader);
+		resultsStore.setDefaultSort("num", SortDir.ASC);
+		
+		JsonReader enginesReader = new JsonReader(recordEnginesDef);
+		enginesReader.setRoot("engines");
+		enginesStore = new Store(enginesReader);
 		
 		resultsPanel = new GridPanel();
 		resultsPanel.setTitle(URL.encodeComponent(queryText.getText()));
 		resultsPanel.setTrackMouseOver(true);
 		resultsPanel.setSelectionModel(new RowSelectionModel());
 		resultsPanel.setView(view);
-		resultsPanel.setStore(store);
+		resultsPanel.setStore(resultsStore);
 		resultsPanel.setColumnModel(columnModel);
 		resultsPanel.setClosable(true);
 		resultsPanel.setAutoExpandColumn("Title");
@@ -163,7 +172,7 @@ public class PerformSearch {
 				MessageBox.show(new MessageBoxConfig() {  
 					{  
 						setTitle("Search Information");  
-						setMsg("<b>Results number</b>: " + store.getCount() + "<br />" +
+						setMsg("<b>Results number</b>: " + resultsStore.getCount() + "<br />" +
 							   "<b>Engines:</b>: " + checkedNodeString);  
 						setWidth(300);  
 						setButtons(MessageBox.OK);
@@ -186,10 +195,10 @@ public class PerformSearch {
 		});
 		toggleDetails.setTooltip("Toggle between simple and detailed view");
 		
-		toolbar.addFill();  
+		toolbar.addFill();
 		toolbar.addButton(moreInfo);
 		toolbar.addButton(toggleDetails);
-		resultsPanel.setBottomToolbar(toolbar); 
+		resultsPanel.setBottomToolbar(toolbar);
 		
 		centerPanel.add(resultsPanel);
 		centerPanel.activate(centerPanel.getItems().length-1);
@@ -214,7 +223,7 @@ public class PerformSearch {
 	    	      if (200 == response.getStatusCode()) {
 	    	    	  updateGrid(response.getText());
 	    	      } else {
-	    	    	  Window.alert(response.getStatusText());
+	    	    	  Window.alert("Incorrect status: " + response.getStatusText());
 	    	      }
 	    	    }
 	    	  });
@@ -248,15 +257,19 @@ public class PerformSearch {
 	}
 	
 	private void updateGrid(String jsonString) {
+		//Window.alert(jsonString);
 		if (jsonString.startsWith("{\"final\":\"false\"")) {
 			doPostURL("",DEFAULT_NEXT_URL);
 		}
 		try  {
-		//progressPanel.setContentEl(new HTML(jsonString).getElement());
-		store.loadJsonData(jsonString, false);
+		resultsStore.loadJsonData(jsonString, false);
+		enginesStore.loadJsonData(jsonString, false);
 		resultsPanel.getView().refresh();
 		} catch (Exception e) {
-			Window.alert(e.getMessage());
+			Window.alert("updateGrid: an error was catched: " + e.getMessage());
+		}
+		for (int i = 0; i < enginesStore.getCount(); ++i) {
+			//Window.alert(enginesStore.getAt(i).getAsString("name"));
 		}
 	}
 	
