@@ -98,6 +98,10 @@ public:
      */
     int getEngineResults(const string & name);
     
+    /** Retunrs a pointer to the results number map
+     */
+    map<string,int> *getEngineResults();
+    
     
     /** Sort the results by the given column (s), in the given order (ascending)
      */
