@@ -22,7 +22,6 @@ public class QueryButton extends Button {
 			this.queryText = queryText;
 			this.limitButton = limitButton;
 			this.centerPanel = centerPanel;
-			this.progressPanel = progressPanel;
 		}
 		
 		public void onClick(Button button, EventObject e) {

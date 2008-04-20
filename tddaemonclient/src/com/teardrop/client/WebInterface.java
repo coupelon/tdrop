@@ -22,7 +22,7 @@ public class WebInterface implements EntryPoint {
 	  private TextBox queryText = new TextBox();
 	  private CycleButton limitButton = new CycleButton();
 	  private TabPanel centerPanel = new TabPanel();
-	  private Panel progressPanel = new Panel();
+	  private Panel progressPanel = new TabPanel();
 	  private QueryButton searchButton = new QueryButton(SEARCH_BUTTON_DEFAULT_TEXT,engTree,queryText,limitButton,centerPanel,progressPanel);
 
 	  /**
@@ -46,6 +46,11 @@ public class WebInterface implements EntryPoint {
 	    limitButton.addItem(new CheckItem("50",false));
 	    limitButton.addItem(new CheckItem("100",false));
 	    limitButton.addItem(new CheckItem("500",false));
+	    
+	    progressPanel.setTitle("Progression");
+	    progressPanel.setCollapsible(true);
+	    progressPanel.setCollapsed(true);
+	    progressPanel.setPaddings(5);
 
 	    /**
 	     * The Layout. A border panel encloses the whole application
@@ -90,6 +95,7 @@ public class WebInterface implements EntryPoint {
 	    centerPanel.add(defaultCenterPanel);
 	    centerPanel.setDeferredRender(false);
 	    centerPanel.setEnableTabScroll(true);
+	    centerPanel.setId("centerpanel");
 	    borderPanel.add(centerPanel, new BorderLayoutData(RegionPosition.CENTER));
 	    
 	    /**
