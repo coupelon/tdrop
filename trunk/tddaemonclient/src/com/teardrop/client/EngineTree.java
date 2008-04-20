@@ -67,8 +67,6 @@ public class EngineTree extends TreePanel {
 	    setHeaderAsText(true);
 	    setTitle("Categories");
 	    setCollapsible(true);
-	    setHeight(400);  
-	    setWidth(200);  
 	    setAnimate(true);  
 	    setEnableDD(false);  
 	    setContainerScroll(true);  

@@ -1,10 +1,8 @@
 package com.teardrop.client;
 
 import com.google.gwt.core.client.EntryPoint;
-import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.TextBox;
 import com.gwtext.client.core.RegionPosition;
-import com.gwtext.client.widgets.BoxComponent;
 import com.gwtext.client.widgets.CycleButton;
 import com.gwtext.client.widgets.Panel;
 import com.gwtext.client.widgets.TabPanel;
@@ -12,6 +10,7 @@ import com.gwtext.client.widgets.Viewport;
 import com.gwtext.client.widgets.layout.BorderLayout;
 import com.gwtext.client.widgets.layout.BorderLayoutData;
 import com.gwtext.client.widgets.layout.FitLayout;
+import com.gwtext.client.widgets.layout.VerticalLayout;
 import com.gwtext.client.widgets.menu.CheckItem;
 
 /**
@@ -23,7 +22,8 @@ public class WebInterface implements EntryPoint {
 	  private TextBox queryText = new TextBox();
 	  private CycleButton limitButton = new CycleButton();
 	  private TabPanel centerPanel = new TabPanel();
-	  private QueryButton searchButton = new QueryButton(SEARCH_BUTTON_DEFAULT_TEXT,engTree,queryText,limitButton,centerPanel);
+	  private Panel progressPanel = new Panel();
+	  private QueryButton searchButton = new QueryButton(SEARCH_BUTTON_DEFAULT_TEXT,engTree,queryText,limitButton,centerPanel,progressPanel);
 
 	  /**
 	   * Entry point for this simple application. Currently, we build the
@@ -52,7 +52,7 @@ public class WebInterface implements EntryPoint {
 	     */
 	    Panel panel = new Panel();  
 	    panel.setBorder(false);  
-	    panel.setPaddings(15);  
+	    panel.setPaddings(10);  
 	    panel.setLayout(new FitLayout());
 	    Panel borderPanel = new Panel();
 	    borderPanel.setBorder(false);
@@ -61,15 +61,17 @@ public class WebInterface implements EntryPoint {
 	    /**
 	     * The north panel is used to display the title and other future menus
 	     */
-	    BoxComponent northPanel = new BoxComponent();  
-	    northPanel.setEl(new HTML("<p>Teardrop, The personnal meta-search engine</p>").getElement());  
+	    Panel northPanel = new Panel("", "<p>Teardrop, The personnal meta-search engine</p>");
 	    northPanel.setHeight(32);
+	    northPanel.setBodyBorder(false);
+	    northPanel.setHeader(false);
 	    borderPanel.add(northPanel, new BorderLayoutData(RegionPosition.NORTH));
 	    
 	    /**
 	     * The west panel is used for the search parameters
 	     */
-	    Panel westPanel = new Panel();  
+	    Panel westPanel = new Panel();
+	    westPanel.setLayout(new VerticalLayout(5));
 	    westPanel.setTitle("Search Criterions");  
 	    westPanel.setCollapsible(true);  
 	    westPanel.setWidth(200);
@@ -77,12 +79,15 @@ public class WebInterface implements EntryPoint {
 	    westPanel.add(limitButton);
 	    westPanel.add(searchButton);
 	    westPanel.add(engTree);
+	    westPanel.add(progressPanel);
 	    borderPanel.add(westPanel,new BorderLayoutData(RegionPosition.WEST));
 	    
 	    /**
 	     * The center panel contains the search results
 	     */
-	    
+	    Panel defaultCenterPanel = new Panel("Teardrop", "Welcome to Teardrop");
+	    defaultCenterPanel.setLayout(new FitLayout());
+	    centerPanel.add(defaultCenterPanel);
 	    centerPanel.setDeferredRender(false);
 	    centerPanel.setEnableTabScroll(true);
 	    borderPanel.add(centerPanel, new BorderLayoutData(RegionPosition.CENTER));
