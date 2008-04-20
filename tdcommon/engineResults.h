@@ -59,6 +59,7 @@ public:
 	virtual void addRankedResults(const vector<row> & r, string engname, string sname = "");
 	
 	int getEngineResults(const string & name);
+	map<string,int> & getEngineResults();
 	void setAbort(bool val = true) { abort = val; }
 	bool *getAbort() { return &abort; }
 	void sortResults(string s, bool ascending = true);
