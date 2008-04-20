@@ -41,6 +41,10 @@ int engineResults::getEngineResults(const string & name) {
   return engines[name];
 }
 
+map<string,int> & engineResults::getEngineResults() {
+  return engines;
+}
+
 void engineResults::addRankedResults(const vector<row> & r,string engname, string sname) {
   engines[sname] = r.size();
 	//for each row in the input list
