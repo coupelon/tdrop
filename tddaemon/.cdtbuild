@@ -8,6 +8,7 @@
 <tool id="cdt.managedbuild.tool.gnu.cpp.compiler.so.debug.175707006" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.so.debug">
 <option id="gnu.cpp.compiler.option.include.paths.407219888" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
 <listOptionValue builtIn="false" value="&quot;${workspace_loc:/tdcommon}&quot;"/>
+<listOptionValue builtIn="false" value="/usr/include/libxml2"/>
 <listOptionValue builtIn="false" value="&quot;${workspace_loc:/tdwrapper}&quot;"/>
 <listOptionValue builtIn="false" value="&quot;${workspace_loc:/tdcommon/regexp}&quot;"/>
 <listOptionValue builtIn="false" value="&quot;${workspace_loc:/tdcommon/xml}&quot;"/>
@@ -15,7 +16,14 @@
 </tool>
 <tool id="cdt.managedbuild.tool.gnu.c.compiler.so.debug.1133125532" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.so.debug"/>
 <tool id="cdt.managedbuild.tool.gnu.c.linker.so.debug.1009046332" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.so.debug"/>
-<tool id="cdt.managedbuild.tool.gnu.cpp.linker.so.debug.555097726" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.so.debug"/>
+<tool id="cdt.managedbuild.tool.gnu.cpp.linker.so.debug.555097726" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.so.debug">
+<option id="gnu.cpp.link.option.libs.1997438265" superClass="gnu.cpp.link.option.libs" valueType="libs">
+<listOptionValue builtIn="false" value="shttpd"/>
+</option>
+<option id="gnu.cpp.link.option.paths.2077421080" superClass="gnu.cpp.link.option.paths" valueType="stringList">
+<listOptionValue builtIn="false" value="&quot;${workspace_loc:/shttpd}&quot;"/>
+</option>
+</tool>
 <tool id="cdt.managedbuild.tool.gnu.assembler.so.debug.745486931" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.so.debug"/>
 <macros/>
 </toolChain>
