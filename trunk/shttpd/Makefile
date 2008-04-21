@@ -3,7 +3,7 @@ SRCS=		string.c shttpd.c log.c auth.c md5.c cgi.c config.c io_ssi.c \
 HDRS=		defs.h llist.h shttpd.h std_includes.h io.h md5.h ssl.h \
 		compat_unix.h compat_win32.h compat_rtems.h config.h
 OBJS=		$(SRCS:%.c=%.o)
-PROG=		tddaemon
+PROG=		shttpd
 CFLAGS= -I../tdcommon/ -I../tdcommon/xml/ -I../tdwrapper/ -I../tdcommon/regexp/ `xml2-config --cflags`
 LIBS= -ldl -lpthread `xml2-config --libs` `curl-config --libs` ../tdcommon/Debug/libtdcommon.so ../tdwrapper/Debug/libtdwrapper.so `pcre-config --libs`
 
@@ -44,9 +44,8 @@ unix: $(OBJS)
 	$(CC) $(CFLAGS) compat_unix.c daemon.c \
 		-o $(PROG) $(LIBS) -L. -l$(PROG)
 
-linux: $(OBJS) compat_unix.c
-	$(AR) -r lib$(PROG).a $(OBJS) && ranlib lib$(PROG).a
-	g++ -Wall -g -c daemon.cpp $(CFLAGS)
+linux: $(OBJS) compat_unix.o
+	$(AR) -r lib$(PROG).a $(OBJS) compat_unix.o && ranlib lib$(PROG).a
 
 rtems:
 	$(CC) -c $(CFLAGS) -DEMBEDDED $(SRCS) compat_rtems.c
