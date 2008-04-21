@@ -8,6 +8,8 @@
 <tool id="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.147612182" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug">
 <option id="gnu.cpp.compiler.option.include.paths.1374416202" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
 <listOptionValue builtIn="false" value="&quot;${workspace_loc:/tdcommon}&quot;"/>
+<listOptionValue builtIn="false" value="&quot;${workspace_loc:/tdcommon/regexp}&quot;"/>
+<listOptionValue builtIn="false" value="&quot;${workspace_loc:/tdcommon/xml}&quot;"/>
 <listOptionValue builtIn="false" value="&quot;${workspace_loc:/tddaemon}&quot;"/>
 <listOptionValue builtIn="false" value="/usr/include/libxml2"/>
 <listOptionValue builtIn="false" value="&quot;${workspace_loc:/tdresults}&quot;"/>

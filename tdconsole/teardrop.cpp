@@ -157,7 +157,8 @@ int main(int argc, char *argv[]) {
         tdp.setProxy(proxy_address,proxy_port,proxy_type);
         
         if (daemonize) {
-        	TdDaemon::launchDaemon(&tdp);
+        	TdDaemon daemon;
+        	daemon.launchDaemon(&tdp);
         } else {
 	        metaRank mr(er,&tdp);
 	        mr.startParsing();
