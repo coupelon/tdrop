@@ -35,7 +35,7 @@ using namespace std;
 class TdDaemon {
 
 public:
-	static int launchDaemon(tdParam *tdp);
+	int launchDaemon(tdParam *tdp);
 	
 private:
 	static string createJSON(bool final, metaRank *mr);
@@ -51,8 +51,8 @@ private:
 	
 	
 	//The map that will hold sessions
-    static map<string, metaRank*> globalSearches;
-    //The teardrop parameters
+  static map<string, metaRank*> globalSearches;
+  //The teardrop parameters
 	static tdParam *tdp;
 };
 
