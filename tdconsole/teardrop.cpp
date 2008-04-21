@@ -30,6 +30,7 @@
 #include "metaRank.h"
 #include "openSave.h"
 #include "tdParam.h"
+#include "tddaemon.h"
 
 #include <getopt.h>
 
@@ -62,6 +63,7 @@ int main(int argc, char *argv[]) {
     bool format_flag = false;
     string limit = "-1";
     bool echo_flag = false;
+    bool daemonize = false;
     string print = "{num}\t{engines}\n\tTitre: {title}\n\tAddress: {url}\nAbstract: {abstract}\n";
     string delim = "/";
     tdParam tdp;
@@ -87,7 +89,7 @@ int main(int argc, char *argv[]) {
     while (1) {
         /* getopt_long stores the option index here. */
         int option_index = 0;
-        c = getopt_long (argc, argv, "f:o:i:p:l:q:ea:t:y:",
+        c = getopt_long (argc, argv, "f:o:i:p:l:q:da:t:y:D",
                         long_options, &option_index);
         /* Detect the end of the options. */
         if (c == -1)
@@ -124,6 +126,9 @@ int main(int argc, char *argv[]) {
             case 'y':
                 proxy_type = optarg;
                 break;
+            case 'D':
+            	daemonize = true;
+            	break;
             case 'i':
                 {//Parsing options
                 regExp r("([0-9a-zA-Z_]*)=([0-9a-zA-Z_]*)");
@@ -150,18 +155,23 @@ int main(int argc, char *argv[]) {
         
         tdp.setEcho(echo_flag);
         tdp.setProxy(proxy_address,proxy_port,proxy_type);
-        metaRank mr(er,&tdp);
-        mr.startParsing();
-        mr.joinAll();
-        //mr.startRanking();
-        if (output_flag) {
-            if (format == "tdp" )
-                openSave::xmlSave(output, query, lse, limit, mr.getResults());
-            else if (format == "html")
-                openSave::htmlExport(output, query, lse, limit, mr.getResults());
-            else if (format == "csv")
-                openSave::csvExport(output, mr.getResults());
-        } else mr.toString(print,delim);
+        
+        if (daemonize) {
+        	TdDaemon::launchDaemon(&tdp);
+        } else {
+	        metaRank mr(er,&tdp);
+	        mr.startParsing();
+	        mr.joinAll();
+	        //mr.startRanking();
+	        if (output_flag) {
+	            if (format == "tdp" )
+	                openSave::xmlSave(output, query, lse, limit, mr.getResults());
+	            else if (format == "html")
+	                openSave::htmlExport(output, query, lse, limit, mr.getResults());
+	            else if (format == "csv")
+	                openSave::csvExport(output, mr.getResults());
+	        } else mr.toString(print,delim);
+        }
     } else {
       showHelp();
       delete er;
