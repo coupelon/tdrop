@@ -1,5 +1,8 @@
 #include "tddaemon.h"
 
+map<string, metaRank*> *TdDaemon::globalSearches = NULL;
+tdParam *TdDaemon::tdp = NULL;
+
 string TdDaemon::createJSON(bool final, metaRank *mr) {
 	string pre;
 	if (final) {
@@ -45,8 +48,8 @@ string TdDaemon::newQuery(struct shttpd_arg *arg, string query,string engines,st
 		if (!r.endOfMatch()) {
 			//Stop the preceeding search
 			string newID(r.getMatch(1));
-			if (globalSearches.find(newID) != globalSearches.end())
-		  	globalSearches[newID]->stop();
+			if (globalSearches->find(newID) != globalSearches->end())
+		  	(*globalSearches)[newID]->stop();
 		}
 	}
 
@@ -66,10 +69,10 @@ string TdDaemon::newQuery(struct shttpd_arg *arg, string query,string engines,st
   shttpd_printf(arg, "%s%s%s", "Set-Cookie: query=",
   														 newID.c_str(),
   														 ";\r\n\r\n");
-  globalSearches[newID] = new metaRank(er,tdp);
-  globalSearches[newID]->startParsing();
-  return createJSON(globalSearches[newID]->waitForNewResults(),
-   					 globalSearches[newID]);
+  (*globalSearches)[newID] = new metaRank(er,tdp);
+  (*globalSearches)[newID]->startParsing();
+  return createJSON((*globalSearches)[newID]->waitForNewResults(),
+   					 (*globalSearches)[newID]);
 }
 
 string TdDaemon::get_next_results(struct shttpd_arg *arg) {
@@ -80,8 +83,8 @@ string TdDaemon::get_next_results(struct shttpd_arg *arg) {
 	  r.newPage(cstring);
 		if (!r.endOfMatch()) {
 			string newID(r.getMatch(1));
-		  return createJSON(globalSearches[newID]->waitForNewResults(),
-   					 globalSearches[newID]);
+		  return createJSON((*globalSearches)[newID]->waitForNewResults(),
+   					 (*globalSearches)[newID]);
     }
 	}	
   return "";
@@ -275,6 +278,7 @@ int TdDaemon::launchDaemon(tdParam *t) {
 	struct shttpd_ctx	*ctx;
 	
 	tdp = t;
+	globalSearches = new map<string, metaRank*>();
 
 	signal(SIGPIPE, SIG_IGN);
 
