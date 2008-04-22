@@ -5,6 +5,8 @@
 #include <QMenu>
 #include <QApplication>
 
+#include "daemonThread.h"
+
 class Systray : public QSystemTrayIcon
 {
     Q_OBJECT
@@ -14,8 +16,9 @@ public:
 
 private:
     void createTrayIcon();
-
+    
     QMenu *trayIconMenu;
+    tdParam tdp;
 };
 
 #endif

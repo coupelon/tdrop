@@ -1,10 +1,7 @@
-HEADERS       = systray.h
-SOURCES       = main.cpp \
-                systray.cpp
+HEADERS       = systray.h daemonThread.h 
+SOURCES       = main.cpp systray.cpp daemonThread.cpp
 RESOURCES     = systray.qrc
-
-# install
-#target.path = $$[QT_INSTALL_EXAMPLES]/desktop/systray
-#sources.files = $$SOURCES $$HEADERS $$RESOURCES $$FORMS systray.pro resources
-#sources.path = $$[QT_INSTALL_EXAMPLES]/desktop/systray
-#INSTALLS += target sources
+INCLUDEPATH   = ../tddaemon ../tdcommon ../tdcommon/xml ../tdcommon/regexp ../tdwrapper 
+QMAKE_CXXFLAGS  = $$system(xml2-config --cflags)
+LIBS          = ../tdcommon/Debug/libtdcommon.so ../tddaemon/Debug/libtddaemon.so ../tdwrapper/Debug/libtdwrapper.so \
+		$$system(xml2-config --libs) $$system(curl-config --libs)  $$system(pcre-config --libs)
