@@ -18,6 +18,7 @@
 <option id="gnu.c.compiler.option.preprocessor.def.symbols.1671774369" superClass="gnu.c.compiler.option.preprocessor.def.symbols" valueType="definedSymbols">
 <listOptionValue builtIn="false" value=""/>
 </option>
+<option id="gnu.c.compiler.option.include.paths.1524122605" superClass="gnu.c.compiler.option.include.paths" valueType="includePath"/>
 </tool>
 <tool id="cdt.managedbuild.tool.gnu.c.linker.so.debug.1317049736" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.so.debug"/>
 <tool id="cdt.managedbuild.tool.gnu.cpp.linker.so.debug.176658743" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.so.debug">
