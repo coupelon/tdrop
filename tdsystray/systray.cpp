@@ -2,6 +2,8 @@
 
 Systray::Systray() {
     createTrayIcon();
+    tdp.setEcho(false);
+    (new daemonThread(&tdp))->start();
 }
 
 void Systray::createTrayIcon() {
