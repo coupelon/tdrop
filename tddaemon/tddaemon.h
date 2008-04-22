@@ -49,10 +49,9 @@ private:
 	static void show_engines_icons(struct shttpd_arg *arg);
 	static void show_wi(struct shttpd_arg *arg);
 	
-	
 	//The map that will hold sessions
-  static map<string, metaRank*> globalSearches;
-  //The teardrop parameters
+	static map<string, metaRank*> *globalSearches;
+	//The teardrop parameters
 	static tdParam *tdp;
 };
 
