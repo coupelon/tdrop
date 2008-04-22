@@ -144,7 +144,7 @@ int main(int argc, char *argv[]) {
         }
     }
     
-    if (optind < argc && query_flag && ((output_flag && format_flag)||(!output_flag && !format_flag)))
+    if ((optind < argc && query_flag && ((output_flag && format_flag)||(!output_flag && !format_flag))) || daemonize)
     {
         list<string> lse;
         er->setQuery(query);
