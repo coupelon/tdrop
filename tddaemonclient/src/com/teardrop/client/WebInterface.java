@@ -1,16 +1,17 @@
 package com.teardrop.client;
 
 import com.google.gwt.core.client.EntryPoint;
-import com.google.gwt.user.client.ui.TextBox;
 import com.gwtext.client.core.RegionPosition;
 import com.gwtext.client.widgets.CycleButton;
 import com.gwtext.client.widgets.Panel;
 import com.gwtext.client.widgets.TabPanel;
 import com.gwtext.client.widgets.Viewport;
+import com.gwtext.client.widgets.form.FormPanel;
+import com.gwtext.client.widgets.form.TextField;
 import com.gwtext.client.widgets.layout.BorderLayout;
 import com.gwtext.client.widgets.layout.BorderLayoutData;
 import com.gwtext.client.widgets.layout.FitLayout;
-import com.gwtext.client.widgets.layout.VerticalLayout;
+import com.gwtext.client.widgets.layout.RowLayout;
 import com.gwtext.client.widgets.menu.CheckItem;
 
 /**
@@ -19,11 +20,10 @@ import com.gwtext.client.widgets.menu.CheckItem;
 public class WebInterface implements EntryPoint {
 	  private static final String SEARCH_BUTTON_DEFAULT_TEXT = "Search";
 	  private EngineTree engTree = new EngineTree();
-	  private TextBox queryText = new TextBox();
+	  private TextField queryText = new TextField("");
 	  private CycleButton limitButton = new CycleButton();
 	  private TabPanel centerPanel = new TabPanel();
-	  private Panel progressPanel = new TabPanel();
-	  private QueryButton searchButton = new QueryButton(SEARCH_BUTTON_DEFAULT_TEXT,engTree,queryText,limitButton,centerPanel,progressPanel);
+	  private QueryButton searchButton = new QueryButton(SEARCH_BUTTON_DEFAULT_TEXT,engTree,queryText,limitButton,centerPanel);
 
 	  /**
 	   * Entry point for this simple application. Currently, we build the
@@ -36,32 +36,19 @@ public class WebInterface implements EntryPoint {
 	  /**
 	   * Initialize the main form's layout and content.
 	   */
-	  private void initializeMainForm() {
-	    searchButton.setText(SEARCH_BUTTON_DEFAULT_TEXT);
-	    
-	    limitButton.setShowText(true);  
-	    limitButton.setPrependText("Results per engines: ");
-	    limitButton.addItem(new CheckItem("10",true));
-	    limitButton.addItem(new CheckItem("20",false));
-	    limitButton.addItem(new CheckItem("50",false));
-	    limitButton.addItem(new CheckItem("100",false));
-	    limitButton.addItem(new CheckItem("500",false));
-	    
-	    progressPanel.setTitle("Progression");
-	    progressPanel.setCollapsible(true);
-	    progressPanel.setCollapsed(true);
-	    progressPanel.setPaddings(5);
+	  private void initializeMainForm() {    
 
 	    /**
 	     * The Layout. A border panel encloses the whole application
 	     */
 	    Panel panel = new Panel();  
 	    panel.setBorder(false);  
-	    panel.setPaddings(10);  
+	    panel.setPaddings(10);
 	    panel.setLayout(new FitLayout());
 	    Panel borderPanel = new Panel();
 	    borderPanel.setBorder(false);
 	    borderPanel.setLayout(new BorderLayout());
+	    borderPanel.setPaddings(5);
 	    
 	    /**
 	     * The north panel is used to display the title and other future menus
@@ -73,18 +60,44 @@ public class WebInterface implements EntryPoint {
 	    borderPanel.add(northPanel, new BorderLayoutData(RegionPosition.NORTH));
 	    
 	    /**
+	     * The panel for the search criterions
+	     */
+	    searchButton.setText(SEARCH_BUTTON_DEFAULT_TEXT);
+	    searchButton.setTabIndex(2);
+	    
+	    limitButton.setShowText(true);  
+	    limitButton.setPrependText("Results per engines: ");
+	    limitButton.addItem(new CheckItem("10",true));
+	    limitButton.addItem(new CheckItem("20",false));
+	    limitButton.addItem(new CheckItem("50",false));
+	    limitButton.addItem(new CheckItem("100",false));
+	    limitButton.addItem(new CheckItem("500",false));
+	    limitButton.setTabIndex(1);
+	    
+	    queryText.setHideLabel(true);
+	    //queryText.setWidth(limitButton.getOffsetWidth());
+	    queryText.setTabIndex(0);
+	    
+	    FormPanel criterPanel = new FormPanel();
+	    criterPanel.setLayout(new RowLayout());
+	    criterPanel.setPaddings(5);
+	    criterPanel.setMargins(0, 0, 0, 10);
+	    criterPanel.setTitle("Search Criterions");
+	    criterPanel.add(queryText);
+	    criterPanel.add(limitButton);
+	    criterPanel.add(searchButton);
+	    criterPanel.setCollapsible(true);
+	    
+	    /**
 	     * The west panel is used for the search parameters
 	     */
 	    Panel westPanel = new Panel();
-	    westPanel.setLayout(new VerticalLayout(5));
-	    westPanel.setTitle("Search Criterions");  
-	    westPanel.setCollapsible(true);  
-	    westPanel.setWidth(200);
-	    westPanel.add(queryText);
-	    westPanel.add(limitButton);
-	    westPanel.add(searchButton);
+	    westPanel.setWidth(185);
+	    westPanel.setBodyBorder(false);
+	    westPanel.setPaddings(0, 0, 10, 0);
+	    westPanel.add(criterPanel);
 	    westPanel.add(engTree);
-	    westPanel.add(progressPanel);
+	    westPanel.setAutoScroll(true);
 	    borderPanel.add(westPanel,new BorderLayoutData(RegionPosition.WEST));
 	    
 	    /**

@@ -7,7 +7,6 @@ import com.google.gwt.http.client.RequestException;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.http.client.URL;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.TextBox;
 import com.gwtext.client.core.EventObject;
 import com.gwtext.client.core.SortDir;
 import com.gwtext.client.data.FieldDef;
@@ -23,11 +22,12 @@ import com.gwtext.client.widgets.Button;
 import com.gwtext.client.widgets.CycleButton;
 import com.gwtext.client.widgets.MessageBox;
 import com.gwtext.client.widgets.MessageBoxConfig;
-import com.gwtext.client.widgets.Panel;
+import com.gwtext.client.widgets.ProgressBar;
 import com.gwtext.client.widgets.TabPanel;
 import com.gwtext.client.widgets.Toolbar;
 import com.gwtext.client.widgets.ToolbarButton;
 import com.gwtext.client.widgets.event.ButtonListenerAdapter;
+import com.gwtext.client.widgets.form.TextField;
 import com.gwtext.client.widgets.grid.CellMetadata;
 import com.gwtext.client.widgets.grid.ColumnConfig;
 import com.gwtext.client.widgets.grid.ColumnModel;
@@ -42,15 +42,16 @@ public class PerformSearch {
 	private static final String DEFAULT_SEARCH_URL = "/services/query_post";
 	private static final String DEFAULT_NEXT_URL = "/services/get_next_results";
 	EngineTree engTree;
-	TextBox queryText;
+	TextField queryText;
 	CycleButton limitButton;
 	TabPanel centerPanel;
 	GridPanel resultsPanel;
-	Panel progressPanel;
+	ProgressBar pBar;
 	boolean showDetails = true;
 	Store resultsStore;
 	Store enginesStore;
 	String checkedNodeString;
+	float numberOfEngines = 0;
 	
 	private final RecordDef recordResultsDef = new RecordDef(new FieldDef[]{
 			new IntegerFieldDef("num"),
@@ -65,12 +66,11 @@ public class PerformSearch {
 			new StringFieldDef("name"),  
 		});
 	
-	public PerformSearch(EngineTree engTree, TextBox queryText, CycleButton limitButton, TabPanel centerPanel, Panel progressPanel) {
+	public PerformSearch(EngineTree engTree, TextField queryText, CycleButton limitButton, TabPanel centerPanel) {
 		this.engTree = engTree;
 		this.queryText = queryText;
 		this.limitButton = limitButton;
 		this.centerPanel = centerPanel;
-		this.progressPanel = progressPanel;
 		
 //		String checkedNodeString = "";
 //		TreeNode[] checkedNode = engTree.getChecked();
@@ -195,9 +195,14 @@ public class PerformSearch {
 		});
 		toggleDetails.setTooltip("Toggle between simple and detailed view");
 		
+		pBar = new ProgressBar();
+		pBar.setWidth(300);
+		pBar.setText("Searching...");
+		
 		toolbar.addFill();
 		toolbar.addButton(moreInfo);
 		toolbar.addButton(toggleDetails);
+		toolbar.addElement(pBar.getElement());
 		resultsPanel.setBottomToolbar(toolbar);
 		
 		centerPanel.add(resultsPanel);
@@ -268,12 +273,23 @@ public class PerformSearch {
 		} catch (Exception e) {
 			Window.alert("updateGrid: an error was catched: " + e.getMessage());
 		}
-		for (int i = 0; i < enginesStore.getCount(); ++i) {
-			//Window.alert(enginesStore.getAt(i).getAsString("name"));
-		}
+		updateProgress();
 	}
 	
-	//To circumvent the three checks bug...
+	private void updateProgress() {
+		int count = 0;
+		float results = 0;
+		for (int i = 0; i < enginesStore.getCount(); ++i) {
+			if (enginesStore.getAt(i).getAsInteger("cpt") != -1) {
+				count++;
+				results += enginesStore.getAt(i).getAsInteger("cpt");
+			}
+		}
+		pBar.setValue(count/numberOfEngines);
+		pBar.setText(results + " Results (" + count + "/" + numberOfEngines + ")");
+	}
+	
+	//To circumvent the tree checks bug...
 	public String getChecked() {
 		String checkedNodeString = "";
 		TreeNode n = engTree.getRootNode();
@@ -281,8 +297,10 @@ public class PerformSearch {
 		for (int i = 0; i < tnChild.length; ++i) {
 			Node[] tnEng = tnChild[i].getChildNodes();
 			for (int j=0; j < tnEng.length; ++j) {
-				if (((TreeNode) tnEng[j]).getUI().isChecked() || ((TreeNode) tnChild[i]).getUI().isChecked())
+				if (((TreeNode) tnEng[j]).getUI().isChecked() || ((TreeNode) tnChild[i]).getUI().isChecked()) {
 					checkedNodeString += (checkedNodeString.equals("")?"":",") + tnEng[j].getAttribute("name");
+					numberOfEngines++;
+				}
 			}
 		}
 		return checkedNodeString;

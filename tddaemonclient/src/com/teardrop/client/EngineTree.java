@@ -71,10 +71,10 @@ public class EngineTree extends TreePanel {
 	    setEnableDD(false);  
 	    setContainerScroll(true);  
 	    setAutoScroll(true);  
-	    setRootVisible(false);  
-	    setFrame(true);
+	    setRootVisible(false);
 	    doFetchURL();
 	    setVisible(true);
+	    setPaddings(5);
 	}
 
 	/*
