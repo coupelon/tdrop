@@ -105,6 +105,7 @@ void tdParam::getInitValues() {
     {
       curl_timeout = atol(n->getNodeValue().c_str());
     }
+    delete n;
   }
 }
 

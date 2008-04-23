@@ -35,6 +35,7 @@ xmlEngine::~xmlEngine() {
 	if (init) delete init;
 	if (query) delete query;
 	if (header) delete header;
+	if (result) delete result;
 	delete xml;
 }
 
@@ -304,11 +305,13 @@ address xmlEngine::getQueryAddress(engineResults *res, regExp *r) {
 }
 
 string xmlEngine::getResultFieldName() {
+	if (!result) return "";
 	nodeDoc n = *result;
     return n.getAttributeValueByName("name");
 }
 
 int xmlEngine::getResultFieldNumber() {
+	if (!result) return 0;
 	nodeDoc n = *result;
     string v = n.getAttributeValueByName("num");
     if (v != "") return atoi(v.c_str());
@@ -316,25 +319,30 @@ int xmlEngine::getResultFieldNumber() {
 }
 
 bool xmlEngine::getResultFieldComparable() {
+	if (!result) return false;
 	nodeDoc n = *result;
     return (n.getAttributeValueByName("comparable") == "yes");
 }
 
 bool xmlEngine::getResultFieldStripHTML() {
+	if (!result) return false;
 	nodeDoc n = *result;
     return (n.getAttributeValueByName("striphtml") == "yes");
 }
 
 bool xmlEngine::getResultFieldEscape() {
+	if (!result) return false;
 	nodeDoc n = *result;
     return (n.getAttributeValueByName("escape") == "yes");
 }
 
 string xmlEngine::getResultFieldValue() {
+	if (!result) return "";
     return result->getNodeValue();
 }
 
 void xmlEngine::initResultField() {
+	if (result) delete result;
     result = NULL;   
 }
 

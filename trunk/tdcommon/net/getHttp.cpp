@@ -240,7 +240,7 @@ string getHttp::charsetConvert(string s, string from_charset, string to_charset)
     size_t size1 = s.size();
     
     char *buf1 = new char[size1];
-    //char *buf1cop = buf1;
+    char *buf1cop = buf1;
     strncpy(buf1,s.c_str(),size1 );
     
     size_t size2 = (size1+1)*2;
@@ -262,12 +262,16 @@ string getHttp::charsetConvert(string s, string from_charset, string to_charset)
     #endif
     
     iconv_close(trans);
+    delete buf1cop;
+    string output(buf2cop);
+    delete buf2cop;
+    //if (buf2) delete buf2;
     if (res == (size_t) -1) {
         debug("A conversion error occured, from %s to %s ",from_charset.c_str(),to_charset.c_str());
         return s;
         
     }
-    return buf2cop;
+    return output;
 }
 
 string getHttp::getCharset(string ch) {
@@ -288,13 +292,18 @@ string getHttp::getCharset(string ch) {
 }
 
 string getHttp::escape(const string & s) {
-    return curl_escape(s.c_str(),s.size());
-    //return curl_easy_escape(curl,s.c_str(),s.size());
+    char *outc = curl_easy_escape(curl,s.c_str(),s.size());
+    string output(outc);
+    curl_free(outc);
+    return output;
 }
 
 string getHttp::unescape(const string & s) {
-    return curl_unescape(s.c_str(),s.size());
-    //return curl_easy_unescape(curl,s.c_str(),s.size());
+	int num;
+    char *outc = curl_easy_unescape(curl,s.c_str(),s.size(),&num);
+    string output(outc,num);
+    curl_free(outc);
+    return output;
 }
 
 string getHttp::moreUnescape(string s, string to_charset) {
