@@ -98,7 +98,7 @@ void pageParser::doParse() {
 		address ad = getNextAddress();
 		if (ad.isEmpty()) { 
 			debug("Can't find enough results");
-			return;
+			break;
 		}
 		string page = gh.getPage(ad,eng->getCharset());
     //pthread_testcancel();
@@ -106,7 +106,7 @@ void pageParser::doParse() {
     if (tdp->getEcho()) cout << ">" << ad << endl;
 		if (page == "") { 
 			debug("Invalid url : %s",getFullUrl().c_str());
-			return;
+			break;
 		}
 
     if (tdp->getEcho()) cout << "<<<<<<" << endl << page << ">>>>>>" << endl;
@@ -128,6 +128,7 @@ void pageParser::doParse() {
     } else if (hasNext) pages.push_back(eng->getNextInputAddress(global_results,NULL,results.size()));
 	}
   if (n) delete n;
+  if (r) delete r;
 }
 
 void pageParser::closeParse(bool validEngine) {
