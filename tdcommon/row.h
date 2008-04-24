@@ -1,4 +1,4 @@
-/** 
+/*
 Copyright 2008 Olivier COUPELON
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License.
 You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
@@ -17,32 +17,77 @@ See the License for the specific language governing permissions and limitations 
 
 using namespace std;
 
-//Name of the fake field corresponding to the number, for row comparison 
+///Name of the fake field corresponding to the number, for row comparison 
 #define ROW_NUMBER "number"
 
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
 struct compstr {
     bool operator()(const string s1, const string s2) const
     {
         return s1 < s2;
     }
 };
+#endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
 class row {
 public:
+	/**
+	 * Creates a new row
+	 * @param n The row number (Defaults to 0)
+	 */
   row(int n = 0);
-  row(int, string);
+  
+  /**
+	 * Creates a new row
+	 * @param n The row number (Defaults to 0)
+	 * @param e The engine that retrieved that row
+	 */
+  row(int n, string e);
+  
+  /**
+   * Add a field (i.e. a column) to that row
+   * @param n the field name
+   * @param f the field value
+   */
+  void addField(string f, string n);
+  
+  /**
+   * Set a field as comparable
+   * @param c The field name 
+   */
+  void addComparable(string c);
+  
+  /**
+   * Add an engine to that row
+   * @param e The engine name 
+   */
+  void addEngine(string e);
+  
+  /**
+   * Add a list of engines to that row
+   * @param e The engines name list 
+   */
+  void addEngine(list<string> e);
+  
+  /**
+   * Retrieve the engine list in a comma separated string of engines names
+   * @param max The maximun number of engines to retrieve
+   * @return A comma separated list of engines
+   */
+  string getEngineList(int max = -1) const;
+  
+  /**
+   * Output that row as a string to stdout 
+   */
+  void toString(bool n = true);
+  
   int getNum() const;
   void setNum(int);
   list<string> getEngine() const;
-  void addField(string, string);
-  void addComparable(string);
-  void addEngine(string);
-  void addEngine(list<string>);
   map<string, string, compstr> & getFields();
   string getField(string s) const;
-  void toString(bool n = true);
+  
   bool operator==(const row &) const;
-  string getEngineList(int max = -1) const;
 
 private:
   int num;

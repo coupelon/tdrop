@@ -1,4 +1,4 @@
-/** 
+/*
 Copyright 2008 Olivier COUPELON
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License.
 You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
@@ -22,27 +22,36 @@ public:
   xmlFile();
   ~xmlFile();
 
-  /** This method tries to open the given file
-  Returns true in case of success */
+  /**
+   * This method tries to open the given file
+   * @return true in case of success
+   */
   bool openFile(string);
+  
+  /**
+   * Closes the file
+   */
   void close();
 
-public:
-
-  /** Saves the XML doc to the specified file */
+  /**
+   * Saves the XML doc to the specified file
+   * @return true if saving succeeded
+   */
   bool saveDocTo(string &);
-  
-
-
-  string filename;
-  xmlDoc *doc;
-  xmlNode *root_element;
   
   /** Convert an integer to a string */
   static string itoa(int);
 
   /** Convert a long to a string */
   static string ltoa(long);
+  
+  string & getFilename();
+  xmlNode *getRootElement();
+  
+private:
+  string filename;
+  xmlDoc *doc;
+  xmlNode *root_element;
 };
 
 #endif

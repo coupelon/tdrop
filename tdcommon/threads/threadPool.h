@@ -1,4 +1,4 @@
-/** 
+/*
 Copyright 2008 Olivier COUPELON
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License.
 You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
@@ -16,12 +16,20 @@ See the License for the specific language governing permissions and limitations 
 
 using namespace std;
 
+/// Maximum defaultnumber of threads
 #define THMAX 16
 
+/**
+ * This class is a Thread pool. It can manage the creation and
+ * work of a given amount of threads, making sure that at most
+ * a certain number of threads are executed at the same time.
+ */
 template <typename T>
 class threadPool {
     public:
-        
+        /**
+         * This structure holds the parameters that a thread can be passed
+         */
         struct threadArgs {
             void *methodToLaunch;
             bool isFinished;
@@ -29,6 +37,11 @@ class threadPool {
             threadPool<T> *pParent;
         };
         
+        /**
+         * Creates a new threadPool.
+         * @param detached If true the threads are created detached, meaning that they can't be joined
+         * @param mt The maximum number of threads
+         */
         threadPool(bool detached = false, int mt = THMAX){
             tpMaxThread = mt;
             tpNbThread = 0;
@@ -52,6 +65,11 @@ class threadPool {
             }
         }
         
+        /**
+         * Creates a new thread in the pool. That thread must be a function
+         * or seem to be, so if we give an object in argument, it must implement
+         * the operator()(). 
+         */
         void createThread(void * pp){
             pthread_t *newThread = new pthread_t();
             
@@ -71,7 +89,10 @@ class threadPool {
             threadPool::unlock(this);
         }
         
-        /* Should be called only when every thread that should have been launched are */
+        /*
+         * This should be called only when every wanted thread
+         * were added to the pool
+         */
         bool isAlive() {
             if (tpWaitingLine.size() > 0) return true;
             for(int i = 0; i < tpThreadList.size(); ++i) {
@@ -80,6 +101,10 @@ class threadPool {
             return false;
         }
         
+        /**
+         * This method returns the number of threads that
+         * have already returned. 
+         */
         int howManyFinished() {
             int count = 0;
             for(int i = 0; i < tpThreadList.size(); ++i) {
@@ -88,38 +113,51 @@ class threadPool {
             return count;
         }
         
+        /**
+         * Joins every pending threads. When returning,
+         * every threads should be finished
+         */
         void joinAll(){
             while (tpWaitingLine.size() > 0) sched_yield();
             for(unsigned int i = 0; i < tpThreadList.size(); ++i) {
                 pthread_join(*tpThreadList[i]->tdPointer, NULL);
             }
             tpNbThread = 0;
-        }
+        }        
         
-        void cancelAll() {
-            for(int i = 0; i < tpThreadList.size(); ++i) {
-                pthread_cancel(*tpThreadList[i]->tdPointer);
-                tpThreadList[i]->isFinished = true;
-            }
-            tpNbThread = 0;
-        }
-        
+        /**
+         * Lock the threadPool mutex given in parameter
+         */
         static void lock(threadPool *tp){
             pthread_mutex_lock( &tp->mtex );
         }
         
+        /**
+         * Lock the threadPool mutex given in parameter
+         */
         static void lock(threadPool & tp){
             pthread_mutex_lock( &tp.mtex );
         }
         
+        /**
+         * Unlock the threadPool mutex given in parameter
+         */
         static void unlock(threadPool *tp){
             pthread_mutex_unlock( &tp->mtex );
         }
         
+        /**
+         * Unlock the threadPool mutex given in parameter
+         */
         static void unlock(threadPool & tp){
             pthread_mutex_unlock( &tp.mtex );
         }
         
+        /**
+         * Sets the maximum number of threads can be
+         * concurrently running
+         * @param mt The maximum number of threads.
+         */
         void setMaxThread(int mt = THMAX) {
             tpMaxThread = mt;
         }

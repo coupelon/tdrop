@@ -1,4 +1,4 @@
-/** 
+/*
 Copyright 2008 Olivier COUPELON
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License.
 You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
@@ -23,17 +23,43 @@ class tdParam {
 public:
     tdParam();
     
-    void setEcho(bool);
-    void setProxy(string,string,string);
+    /**
+     * This method sets Teardrop to echo every pages that it retrieves from the web
+     * useful for creating new engines.
+     * @param e Set to true to activate echoing
+     */
+    void setEcho(bool e);
+    
+    /**
+     * @param a address of the proxy server
+     * @param p port number of the proxy server
+     * @param t type of proxy ("SOCKS5" or "HTTP")
+     */
+    void setProxy(string a,string p,string t);
     
     bool getEcho();
     string getProxyAddress();
     long getProxyPort();
     long getProxyType();
+    
+    /**
+     * Sets the timeout of pages
+     * @param t The timeout in seconds 
+     */
     void setTimeout(string t);
     long getTimeout() const;
     string getBrowser();
+    
+    /**
+     * Sets the browser command line to execute
+     * @param b The command line to launch the browser
+     */
     void setBrowser(string b);
+    
+    /**
+     * Write down the configuration modifications to teh Teardrop's
+     * configuration file.
+     */
     void commit();
 private:
     bool echopages;
