@@ -1,4 +1,4 @@
-/** 
+/*
 Copyright 2008 Olivier COUPELON
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License.
 You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
@@ -282,7 +282,7 @@ void TdDaemon::show_wi(struct shttpd_arg *arg) {
 	show_file(arg, filename);
 }
 
-int TdDaemon::launchDaemon(tdParam *t) {
+void TdDaemon::launchDaemon(tdParam *t) {
 	struct shttpd_ctx	*ctx;
 	
 	tdp = t;
@@ -318,6 +318,4 @@ int TdDaemon::launchDaemon(tdParam *t) {
 
 	/* Probably unreached, because we will be killed by a signal */
 	shttpd_fini(ctx);
-
-	return (EXIT_SUCCESS);
 }
