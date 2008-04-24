@@ -1,4 +1,4 @@
-/** 
+/*
 Copyright 2008 Olivier COUPELON
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License.
 You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
@@ -24,22 +24,25 @@ using namespace std;
 
 class metaRank {
 public:
-	/**
-	 * Metarank initializer.
-	 * @param query The request
-	 * @param e The list of engines that should be queried
-	 * @param limit The number of results per engines
-	 * @param t the tdParam parameters to pass to engines
-	 * @param res A pointer to a engineResults instance aimed to contain the results. The instance will be deleted by Teardrop.  
-	 * */
+		/**
+		 * @param res This objects contains the query, the list of engines that should be queried and the number of results per engines. It will also be used to store the results.
+		 * @param t the tdParam parameters to pass to engines  
+		 */
     metaRank(engineResults *res, tdParam *t);
+    
+		/**
+		 * Metarank initializer.
+		 * @param res This objects contains the query, the list of engines that should be queried and the number of results per engines. It will also be used to store the results.
+		 * @param t the tdParam parameters to pass to engines  
+		 */
     void init(engineResults *res, tdParam *t);
+    
     ~metaRank();
 
-    /** This method executes the search on the given engines.
-    For each engine, a thread is created, which enables query to be
-    processed in parallel.
-    */   
+    /**
+     * This method executes the search on the given engines.
+     * For each engine, a thread is created, which enables query to be processed in parallel.
+     */
     void startParsing();
 
     /** Wait for all the pageParser to finish
@@ -55,40 +58,63 @@ public:
     void stop();
         
     /** The number of results obtained so far.
-    @param if given, it is returned unless more results than old have been found.
+    @param old if given, it is returned unless more results than old have been found.
     Usefull to get a strictly non decreasing number as result number can decrease
     when ranking is started, due to multiple same results.
     */
     int getResultsNumber(int old = 0);
     
-    /** A simple method used to display the final results.
-    */
+    /**
+     * A simple method used to display the final results.
+     */
     void toString();
     
-    /** A more advanced method to display only required fields   
-    */
-    void toString(string, string);
-    string getString(string, string, string = "", string = "", string = "", bool = false);
+    /**
+     * A more advanced method to display only required fields
+     * @param page The format of a single result with brace enclosed fields name
+     * @param d The engine list separators 
+     */
+    void toString(string page, string d);
     
-    /** Sort the given list of row in order of the given field
-    */
+    /**
+     * A more advanced method to display only required fields
+     * @param page The format of a single result with brace enclosed fields name
+     * @param delim_engs The engine list separator
+     * @param delim_res The results separator
+     * @param pre A string to add before the output
+     * @param post A string to add after the output
+     * @param escape If true, HTML escapes the replaced fields 
+     */
+    string getString(string page, string delim_engs,string delim_res = "", string pre = "", string post = "", bool escape = false );
+    
+    /**
+     * Sort the given list of row in order of the given field
+     * @param lr The list of rows
+     * @param field The field name
+     */
     static void sort(vector<row> & lr,string field);    
     
-    /** Return the number of results that have been retrieved for the given engine
+    /**
+     * @param name The name of the engine
+     * @return The number of results that have been retrieved for the given engine
      */
     int getEngineResults(const string & name);
     
-    /** Retunrs a pointer to the results number map
+    /**
+     * @return A pointer to the results number map
      */
     map<string,int> *getEngineResults();
     
     
-    /** Sort the results by the given column (s), in the given order (ascending)
+    /**
+     * Sort the results
+     * @param s The column name to sort
+     * @param ascending The direction of sort
      */
     void sortResults(string s, bool ascending = true);
     
     /** This method only returns when new results are available
-     * Returns true if every awaited results available
+     * @return true if every awaited results available
      */
     bool waitForNewResults();
     
