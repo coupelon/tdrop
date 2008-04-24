@@ -1,4 +1,4 @@
-/** 
+/*
 Copyright 2008 Olivier COUPELON
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License.
 You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
@@ -21,17 +21,42 @@ using namespace std;
 
 class openSave {
 public:
-    //This method saves a query in a file.
-    static bool xmlSave(string, string, list<string>, string, vector<row>);
+    /*
+     * This method saves a query in a file.
+     * @param file The file + path to use
+     * @param query The query used
+     * @param engines The engine list used for that query
+     * @param limit The number of results per engines
+     * @param r The array of results 
+     */
+    static bool xmlSave(string file, string query, list<string> engines, string limit, vector<row> r);
     
-    //This method loads a previously saved file.
-    static bool xmlOpen(string, string &, list<string> &, string &, vector<row> &);
-    
-    //This method saves a query in a file (HTML).
-    static bool htmlExport(string, string, list<string>, string, vector<row>);
-    
-    //This method saves a query in a file (CSV).
-    static bool csvExport(string file, vector<row>);
+    /*
+     * This method loads a previously saved file.
+     * @param file The file + path to use
+     * @param query The query used
+     * @param engines The engine list used for that query
+     * @param limit The number of results per engines
+     * @param r The array of results 
+     */
+    static bool xmlOpen(string file, string & query, list<string> & engines, string & limit, vector<row> & r);
+
+    /*
+     * This method saves a query in a file (HTML).
+     * @param file The file + path to use
+     * @param query The query used
+     * @param engines The engine list used for that query
+     * @param limit The number of results per engines
+     * @param r The array of results 
+     */
+    static bool htmlExport(string file, string query, list<string> engines, string limit, vector<row> r);
+
+    /*
+     * This method saves a query in a file (CSV).
+     * @param file The file + path to use
+     * @param r The array of results 
+     */
+    static bool csvExport(string file, vector<row> r);
 };
 
 #endif
