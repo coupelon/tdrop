@@ -1,4 +1,4 @@
-/** 
+/*
 Copyright 2008 Olivier COUPELON
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License.
 You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
@@ -37,7 +37,7 @@ void nodeDoc::next() {
 	if (xf == NULL) return;
 	xmlNode *child;
 	if (node == NULL) {
-		node = xf->root_element;
+		node = xf->getRootElement();
     	child = node;
 	} else {
 		child = node->next;
@@ -57,7 +57,7 @@ void nodeDoc::next() {
 }
 
 string nodeDoc::getAttributeValueByName(string name) {
-    if (node == NULL) node = xf->root_element;
+    if (node == NULL) node = xf->getRootElement();
     xmlAttr *attr;
     if (node) {   
         if ((attr = getAttributeByName(name))) {
@@ -69,7 +69,7 @@ string nodeDoc::getAttributeValueByName(string name) {
 }
 
 xmlAttr *nodeDoc::getAttributeByName(string c) {
-    if (node == NULL) node = xf->root_element;
+    if (node == NULL) node = xf->getRootElement();
     xmlAttr *attribute = node->properties;
     while( attribute ){
         string name = (char *) attribute->name;
@@ -86,7 +86,7 @@ string nodeDoc::getNodeValue() {
 }
 
 xmlNode *nodeDoc::findChildByName(xmlNode *p, string c) {
-    if (p == NULL) p = xf->root_element;
+    if (p == NULL) p = xf->getRootElement();
     xmlNode *child = p->children;
     while(child) {
         if( child->type == XML_ELEMENT_NODE ) {

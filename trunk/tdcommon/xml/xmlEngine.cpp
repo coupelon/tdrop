@@ -1,4 +1,4 @@
-/** 
+/*
 Copyright 2008 Olivier COUPELON
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License.
 You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
@@ -38,7 +38,7 @@ void xmlEngine::setHttp(getHttp *g) {
 string xmlEngine::getName() {
 	nodeDoc n(xml,"name");
 	if (!n.isValid()) {
-		cerr << "Can't find name node in " << xml->filename << endl;
+		cerr << "Can't find name node in " << xml->getFilename() << endl;
 		return "";
 	}
 	return n.getNodeValue();
@@ -85,13 +85,13 @@ string xmlEngine::getQueryUrl() {
 string xmlEngine::getUrl(nodeDoc *nd) {
 	nodeDoc n = *nd;
 	if (!n.isValid()) {
-		cerr << "Can't find node in " << xml->filename << endl;
+		cerr << "Can't find node in " << xml->getFilename() << endl;
 		return "";
 	}
 	
 	n.findChildByName("url");
 	if (!n.isValid()) {
-		cerr << "Can't find init/url node in " << xml->filename << endl;
+		cerr << "Can't find init/url node in " << xml->getFilename() << endl;
 		return "";
 	}
 	return n.getNodeValue();
@@ -110,14 +110,14 @@ methodParam xmlEngine::getNextInputFields(engineResults *res, regExp *reg,bool m
 	return getInputFields(res,reg,&n,methodGet,r);
 }
 
-methodParam xmlEngine::getInputFields(engineResults *res, regExp *reg,nodeDoc *nd, bool methodGet, int r) {
-    string value;
+methodParam xmlEngine::getInputFields(engineResults *res, regExp *reg,nodeDoc *nd, bool methodGet, int results_per_pages) {
+  string value;
  	methodParam param;
 	string *output;
 	string opt = "";
 	nodeDoc n = *nd;
 	if (!n.isValid()) {
-		cerr << "Can't find node in " << xml->filename << endl;
+		cerr << "Can't find node in " << xml->getFilename() << endl;
 		return param;
 	}
 	n.findChildByName("inputfield");
@@ -148,11 +148,11 @@ methodParam xmlEngine::getInputFields(engineResults *res, regExp *reg,nodeDoc *n
 					cerr << "Warning, %s used in inputfield without association to a num tag" << endl;
 				}
 			}
-	    if (r > -1 && value.find("%n",0) != string::npos) {
-	        value = regExp::replaceAll(value,"%n",xml->itoa(r));
+	    if (results_per_pages > -1 && value.find("%n",0) != string::npos) {
+	        value = regExp::replaceAll(value,"%n",xml->itoa(results_per_pages));
 	    }
-	    if (r > -1 && value.find("%m",0) != string::npos) {
-	        value = regExp::replaceAll(value,"%m",xml->itoa(r+1));
+	    if (results_per_pages > -1 && value.find("%m",0) != string::npos) {
+	        value = regExp::replaceAll(value,"%m",xml->itoa(results_per_pages+1));
 	    }
 			*output += value;
 			n.next();
@@ -172,7 +172,7 @@ string xmlEngine::getMethod(nodeDoc *nd) {
 	//xmlAttr *attr;
 	nodeDoc n = *nd;
 	if (!n.isValid()) {
-		cerr << "Can't find init node in " << xml->filename << endl;
+		cerr << "Can't find init node in " << xml->getFilename() << endl;
 		return "";
 	}
 	return n.getAttributeValueByName("method");
@@ -182,12 +182,12 @@ string xmlEngine::getResultRegExp() {
 	nodeDoc n(xml,"result");
 	
 	if (!n.isValid()) {
-		cerr << "Can't find result node in " << xml->filename << endl;
+		cerr << "Can't find result node in " << xml->getFilename() << endl;
 		return "";
 	}
 	n.findChildByName("regexp");
 	if (!n.isValid()) {
-		cerr << "Can't find result/regexp node in " << xml->filename << endl;
+		cerr << "Can't find result/regexp node in " << xml->getFilename() << endl;
 		return "";
 	}
 	return n.getNodeValue();
@@ -214,7 +214,7 @@ string xmlEngine::getNextInputRegExp() {
 string xmlEngine::getNextInputMethod() {
 	nodeDoc n(xml, "nextinput");
 	if (!n.isValid()) {
-		cerr << "Can't find nextinput node in " << xml->filename << endl;
+		cerr << "Can't find nextinput node in " << xml->getFilename() << endl;
 		return "";
 	}
     return n.getAttributeValueByName("method");
@@ -223,7 +223,7 @@ string xmlEngine::getNextInputMethod() {
 string xmlEngine::getNextInputUrl() {
 	nodeDoc n(xml, "nextinput");
 	if (!n.isValid()) {
-		cerr << "Can't find nextinput node in " << xml->filename << endl;
+		cerr << "Can't find nextinput node in " << xml->getFilename() << endl;
 		return "";
 	}
 	n.findChildByName("url");

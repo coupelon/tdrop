@@ -1,4 +1,4 @@
-/** 
+/*
 Copyright 2008 Olivier COUPELON
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License.
 You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
@@ -31,7 +31,7 @@ map<string,int> & engineResults::getEngineResults() {
   return engines;
 }
 
-void engineResults::addRankedResults(const vector<row> & r,string engname, string sname) {
+void engineResults::addRankedResults(const vector<row> & r, string sname) {
   engines[sname] = r.size();
 	//for each row in the input list
 	for(vector<row>::const_iterator input = r.begin(); input != r.end(); ++input) {

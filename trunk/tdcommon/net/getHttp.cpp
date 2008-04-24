@@ -1,4 +1,4 @@
-/** 
+/*
 Copyright 2008 Olivier COUPELON
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License.
 You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
@@ -278,31 +278,31 @@ string getHttp::getCharset(string ch) {
 }
 
 string getHttp::escape(const string & s) {
-    char *outc = curl_easy_escape(curl,s.c_str(),s.size());
-    string output(outc);
-    curl_free(outc);
-    return output;
+  char *outc = curl_easy_escape(curl,s.c_str(),s.size());
+  string output(outc);
+  curl_free(outc);
+  return output;
 }
 
 string getHttp::unescape(const string & s) {
 	int num;
-    char *outc = curl_easy_unescape(curl,s.c_str(),s.size(),&num);
-    string output(outc,num);
-    curl_free(outc);
-    return output;
+  char *outc = curl_easy_unescape(curl,s.c_str(),s.size(),&num);
+  string output(outc,num);
+  curl_free(outc);
+  return output;
 }
 
 string getHttp::moreUnescape(string s, string to_charset) {
-    regExp r(charsetConvert("&#([0-9]+);","ISO-8859-1",to_charset));
-    string::size_type pos = 0;
-    for(r.newPage(s); !r.endOfMatch(); r.next()) {
-        pos = s.find(r.getMatch(0),pos);
-        string rep = r.getMatch(1);
-        unsigned char c = 0;
-        for (unsigned int i = 0; i < rep.size(); ++i) c = 10*c + (rep[i]-'0');
-        rep = c;
-        rep = charsetConvert(rep,"ISO-8859-1",to_charset);
-        s = s.replace(pos,r.getMatch(0).size(),rep);
+  regExp r(charsetConvert("&#([0-9]+);","ISO-8859-1",to_charset));
+  string::size_type pos = 0;
+  for(r.newPage(s); !r.endOfMatch(); r.next()) {
+    pos = s.find(r.getMatch(0),pos);
+    string rep = r.getMatch(1);
+    unsigned char c = 0;
+    for (unsigned int i = 0; i < rep.size(); ++i) c = 10*c + (rep[i]-'0');
+    rep = c;
+    rep = charsetConvert(rep,"ISO-8859-1",to_charset);
+    s = s.replace(pos,r.getMatch(0).size(),rep);
 	}
-    return s;
+  return s;
 }
