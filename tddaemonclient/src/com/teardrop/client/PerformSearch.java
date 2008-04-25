@@ -8,6 +8,7 @@ See the License for the specific language governing permissions and limitations 
 
 package com.teardrop.client;
 
+import com.google.gwt.http.client.Header;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
@@ -59,6 +60,7 @@ public class PerformSearch {
 	Store resultsStore;
 	Store enginesStore;
 	String checkedNodeString;
+	String cookie = "";
 	float numberOfEngines = 0;
 	
 	private final RecordDef recordResultsDef = new RecordDef(new FieldDef[]{
@@ -227,6 +229,9 @@ public class PerformSearch {
 	    RequestBuilder builder = new RequestBuilder(RequestBuilder.POST, URL.encode(url));
 	    try {
 	    	builder.setHeader("Content-Length", String.valueOf(post.length()));
+	    	if (!cookie.equals("")) {
+	    		builder.setHeader("Cookie", cookie);
+	    	}
 	    	builder.sendRequest(post, new RequestCallback() {
 	    	    public void onError(Request request, Throwable exception) {
 	    	    	Window.alert("Couldn't connect to server (could be timeout, SOP violation, etc.)");     
@@ -234,6 +239,7 @@ public class PerformSearch {
 
 	    	    public void onResponseReceived(Request request, Response response) {
 	    	      if (200 == response.getStatusCode()) {
+	    	    	  parseCookies(response);
 	    	    	  updateGrid(response.getText());
 	    	      } else {
 	    	    	  Window.alert("Incorrect status: " + response.getStatusText());
@@ -244,6 +250,18 @@ public class PerformSearch {
 	    		Window.alert("Couldn't connect to server (could be timeout, SOP violation, etc.)");      
 	    	}
 	  }
+	
+	private void parseCookies(final Response pResponse) {
+        final Header[] headers = pResponse.getHeaders();
+        if (headers == null || headers.length == 0) {
+        	return;
+        }
+        for (int i = 0; i < headers.length; i++) {
+            if (headers[i] != null && "Set-Cookie".equalsIgnoreCase(headers[i].getName())) {
+            	cookie = headers[i].getValue();
+            }
+        }
+	}
 	
 	private Renderer renderTitle = new Renderer() {  
 		public String render(Object value, CellMetadata cellMetadata, Record record,  
@@ -293,8 +311,7 @@ public class PerformSearch {
 				results += enginesStore.getAt(i).getAsInteger("cpt");
 			}
 		}
-		pBar.setValue(count/numberOfEngines);
-		pBar.setText(results + " Results (" + count + "/" + numberOfEngines + ")");
+		pBar.updateProgress(count/numberOfEngines, results + " Results (" + count + "/" + numberOfEngines + ")");
 	}
 	
 	//To circumvent the tree checks bug...
