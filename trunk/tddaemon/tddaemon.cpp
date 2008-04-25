@@ -91,8 +91,10 @@ string TdDaemon::get_next_results(struct shttpd_arg *arg) {
 	  r.newPage(cstring);
 		if (!r.endOfMatch()) {
 			string newID(r.getMatch(1));
-		  return createJSON((*globalSearches)[newID]->waitForNewResults(),
-   					 (*globalSearches)[newID]);
+			if (globalSearches->find(newID) != globalSearches->end()) {
+			  return createJSON((*globalSearches)[newID]->waitForNewResults(),
+	   					 (*globalSearches)[newID]);
+			}
     }
 	}	
   return "";
