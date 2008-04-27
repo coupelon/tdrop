@@ -64,7 +64,6 @@ string TdDaemon::newQuery(struct shttpd_arg *arg, string query,string engines,st
   shttpd_printf(arg, "%s%s%s", "Set-TDSession: query=",
   														 newID.c_str(),
   														 ";\r\n\r\n");
-  cerr << "New request: " << newID << endl;
   (*globalSearches)[newID] = new metaRank(er,tdp);
   (*globalSearches)[newID]->startParsing();
   return createJSON((*globalSearches)[newID]->waitForNewResults(),
@@ -73,14 +72,12 @@ string TdDaemon::newQuery(struct shttpd_arg *arg, string query,string engines,st
 
 string TdDaemon::get_next_results(struct shttpd_arg *arg) {
 	const char *cookie_string = shttpd_get_header(arg, "TDSession");
-	cerr << "Next results: " << cookie_string << endl;
 	if(cookie_string) {
 		regExp r("query=([a-zA-Z0-9]*)");
 		string cstring = cookie_string;
 	  r.newPage(cstring);
 		if (!r.endOfMatch()) {
 			string newID(r.getMatch(1));
-			cerr << "Next value: " << newID << endl;
 			if (globalSearches->find(newID) != globalSearches->end()) {
 			  return createJSON((*globalSearches)[newID]->waitForNewResults(),
 	   					 (*globalSearches)[newID]);
