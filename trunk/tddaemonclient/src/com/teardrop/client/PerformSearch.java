@@ -230,7 +230,7 @@ public class PerformSearch {
 	    try {
 	    	builder.setHeader("Content-Length", String.valueOf(post.length()));
 	    	if (!cookie.equals("")) {
-	    		builder.setHeader("Cookie", cookie);
+	    		builder.setHeader("TDSession", cookie);
 	    	}
 	    	builder.sendRequest(post, new RequestCallback() {
 	    	    public void onError(Request request, Throwable exception) {
@@ -257,7 +257,7 @@ public class PerformSearch {
         	return;
         }
         for (int i = 0; i < headers.length; i++) {
-            if (headers[i] != null && "Set-Cookie".equalsIgnoreCase(headers[i].getName())) {
+            if (headers[i] != null && "Set-TDSession".equalsIgnoreCase(headers[i].getName())) {
             	cookie = headers[i].getValue();
             }
         }
