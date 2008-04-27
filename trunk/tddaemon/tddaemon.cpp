@@ -48,19 +48,6 @@ string TdDaemon::createJSON(bool final, metaRank *mr) {
 }
 
 string TdDaemon::newQuery(struct shttpd_arg *arg, string query,string engines,string limit) {
-	const char *cookie_string = shttpd_get_header(arg, "Cookie");
-	if(cookie_string) {
-		regExp r("query=(.*)");
-		string cstring = cookie_string;
-	  r.newPage(cstring);
-		if (!r.endOfMatch()) {
-			//Stop the preceeding search
-			string newID(r.getMatch(1));
-			if (globalSearches->find(newID) != globalSearches->end())
-		  	(*globalSearches)[newID]->stop();
-		}
-	}
-
 	list<string> lse;
   engineResults *er = new engineResults();
   er->setQuery(query);
@@ -74,9 +61,10 @@ string TdDaemon::newQuery(struct shttpd_arg *arg, string query,string engines,st
   string newID = UIDSession::getID();
   shttpd_printf(arg, "HTTP/1.0 200 OK\n"
 										 "Content-Type: text/plain\r\n");
-  shttpd_printf(arg, "%s%s%s", "Set-Cookie: query=",
+  shttpd_printf(arg, "%s%s%s", "Set-TDSession: query=",
   														 newID.c_str(),
   														 ";\r\n\r\n");
+  cerr << "New request: " << newID << endl;
   (*globalSearches)[newID] = new metaRank(er,tdp);
   (*globalSearches)[newID]->startParsing();
   return createJSON((*globalSearches)[newID]->waitForNewResults(),
@@ -84,13 +72,15 @@ string TdDaemon::newQuery(struct shttpd_arg *arg, string query,string engines,st
 }
 
 string TdDaemon::get_next_results(struct shttpd_arg *arg) {
-	const char *cookie_string = shttpd_get_header(arg, "Cookie");
+	const char *cookie_string = shttpd_get_header(arg, "TDSession");
+	cerr << "Next results: " << cookie_string << endl;
 	if(cookie_string) {
-		regExp r("query=(.*)");
+		regExp r("query=([a-zA-Z0-9]*)");
 		string cstring = cookie_string;
 	  r.newPage(cstring);
 		if (!r.endOfMatch()) {
 			string newID(r.getMatch(1));
+			cerr << "Next value: " << newID << endl;
 			if (globalSearches->find(newID) != globalSearches->end()) {
 			  return createJSON((*globalSearches)[newID]->waitForNewResults(),
 	   					 (*globalSearches)[newID]);
