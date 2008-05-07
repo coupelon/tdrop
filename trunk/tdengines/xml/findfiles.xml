@@ -7,21 +7,20 @@ See the License for the specific language governing permissions and limitations 
  -->
 <engine xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="teardrop_1_0.xsd">
-  <name>FileMirrors</name>
-  <separator value="%" />
-  <terms>http://www.filemirrors.com/about.html</terms>
+  <name>FindFiles</name>
+  <separator value="+" />
+  <terms>http://findfiles.com/faq.php</terms>
   <query method="GET">
-    <url>http://www.filemirrors.com/search.src</url>
-    <inputfield name="type" value="contains" />
-    <inputfield name="file" value="%q" />
-    <inputfield name="action" value="Find" />
+    <url>http://findfiles.com/list.php</url>
+    <inputfield name="db" value="Mirrors" />
+    <inputfield name="string" value="%q" />
+    <inputfield name="match" value="All" />
   </query>
   <result>
-    <regexp>&lt;/td&gt;&lt;td nowrap&gt;&lt;a href="([^"]*)"&gt;([^&gt;]*)&lt;/a&gt;&lt;/td&gt;&lt;td align="right"&gt;([^&gt;]*)&lt;/td&gt;&lt;td align="center"&gt;&lt;a href="[^"]*"&gt;Search&lt;/a&gt;&lt;/td&gt;&lt;td align="right"&gt;([^&gt;]*)&lt;/td&gt;&lt;/tr&gt;</regexp>
+    <regexp><![CDATA[<tr><td><p><a href="([^"]*)">([^<]*)</a></p></td><td><p>[^<]*</p></td><td align="right"><p>([^&]*)]]></regexp>
     <field num="1" comparable="yes" name="url" />
     <field num="2" name="title" />
     <field num="3" name="size" />
-    <field num="4" name="date" />
   </result>
 </engine>
 
