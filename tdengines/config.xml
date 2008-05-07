@@ -7,44 +7,71 @@ Unless required by applicable law or agreed to in writing, software distributed 
 See the License for the specific language governing permissions and limitations under the License.
  -->
 <config>
-    <browser>firefox "%b"</browser>
+	<browser>firefox "%b"</browser>
 
-    <proxy-address></proxy-address>
-    <proxy-port>0</proxy-port>
-    <proxy-type>HTTP</proxy-type>
-    
-    <category name="English">
-        <engine name="alltheweb"/>
-        <engine name="dmoz"/>
-        <engine name="dogpile"/>
-        <engine name="livesearch"/>
-        <engine name="yahoo"/>
-    </category>
-    <category name="French">
-        <engine name="allthewebfr"/>
-        <engine name="livesearchfr"/>
-        <engine name="voilafr"/>
-        <engine name="yahoofr"/>
-    </category>
-    <category name="Files">
-        <engine name="filemirrors"/>
-        <engine name="filesearching"/>
-        <engine name="fileslt"/>
-        
-        <engine name="ftpindexer"/><engine name="filewatcher"/>
-        <engine name="napalm"/>
-        <engine name="yahoofiles"/>
-    </category>
-    <category name="Images">
-	<engine name="yahooimg"/>
-    </category>
-    <category name="IRC">
-	<engine name="packetnews"/>
-    </category>
-    <category name="Video">
-	<engine name="yahoovideo"/>
-    </category>
-    <category name="Agence">
-	<engine name="fnaim"/>
-    </category>
-<timeout>90</timeout><maxthread>20</maxthread></config>
+	<proxy-address></proxy-address>
+	<proxy-port>0</proxy-port>
+	<proxy-type>HTTP</proxy-type>
+
+	<timeout>90</timeout>
+	<maxthread>20</maxthread>
+
+	<category name="Ebook">
+		<engine version="1.0" path="xml/aleria.xml" />
+		<engine version="1.0" path="xml/ebooksportal.xml" />
+		<engine version="1.0" path="xml/archive.xml" />
+		<engine version="1.0" path="xml/lookforbook.xml" />
+	</category>
+	<category name="English">
+		<engine version="1.0" path="xml/alltheweb.xml" />
+		<engine version="1.0" path="xml/altavista.xml" />
+		<engine version="1.0" path="xml/ask.xml" />
+		<engine version="1.0" path="xml/dmoz.xml" />
+		<engine version="1.0" path="xml/dogpile.xml" />
+		<engine version="1.0" path="xml/google.xml" />
+		<engine version="1.0" path="xml/livesearch.xml" />
+		<engine version="1.0" path="xml/yahoo.xml" />
+	</category>
+	<category name="Files">
+		<engine version="1.0" path="xml/filemirrors.xml" />
+		<engine version="1.0" path="xml/filesearching.xml" />
+		<engine version="1.0" path="xml/filewatcher.xml" />
+		<engine version="1.0" path="xml/ftpindexer.xml" />
+		<engine version="1.0" path="xml/googlefiles.xml" />
+		<engine version="1.0" path="xml/metaftp.xml" />
+		<engine version="1.0" path="xml/napalm.xml" />
+		<engine version="1.0" path="xml/ramblerftp.xml" />
+		<engine version="1.0" path="xml/yahoofiles.xml" />
+	</category>
+	<category name="French">
+		<engine version="1.0" path="xml/aefdmoz.xml" />
+		<engine version="1.0" path="xml/allthewebfr.xml" />
+		<engine version="1.0" path="xml/altavistafr.xml" />
+		<engine version="1.0" path="xml/askfr.xml" />
+		<engine version="1.0" path="xml/googlefr.xml" />
+		<engine version="1.0" path="xml/livesearchfr.xml" />
+		<engine version="1.0" path="xml/voilafr.xml" />
+		<engine version="1.0" path="xml/yahoofr.xml" />
+	</category>
+	<category name="Images">
+		<engine version="1.0" path="xml/dogpileimg.xml" />
+		<engine version="1.0" path="xml/yahooimg.xml" />
+	</category>
+	<category name="IRC">
+		<engine version="1.0" path="xml/packetnews.xml" />
+	</category>
+	<category name="Research">
+		<engine version="1.0" path="xml/arxiv.xml" />
+		<engine version="1.0" path="xml/citebase.xml" />
+		<engine version="1.0" path="xml/citeseer.xml" />
+	</category>
+	<category name="Torrent">
+		<engine version="1.0" path="xml/isohunt.xml" />
+	</category>
+	<category name="Videos">
+		<engine version="1.0" path="xml/aolvideo.xml" />
+		<engine version="1.0" path="xml/blinkx.xml" />
+		<engine version="1.0" path="xml/searchforvideo.xml" />
+		<engine version="1.0" path="xml/yahoovideo.xml" />
+	</category>
+</config>
