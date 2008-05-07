@@ -15,8 +15,8 @@ pageParser::pageParser(const string & e, engineResults *ler, threadPool<pagePars
 	limit = ler->getLimit();
 	global_results = ler;
 	results_lock = mut;
-    tdp = t;
-    //setAbort(false);
+  tdp = t;
+  //setAbort(false);
 }
 
 pageParser::pageParser(const pageParser & pp) {
@@ -29,7 +29,7 @@ pageParser::pageParser(const pageParser & pp) {
 	results = pp.results;
 	global_results = pp.global_results;
 	results_lock = pp.results_lock;
-    tdp = pp.tdp;
+  tdp = pp.tdp;
   //abort = pp.abort;
 }
 
