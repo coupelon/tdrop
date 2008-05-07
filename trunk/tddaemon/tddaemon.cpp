@@ -108,8 +108,7 @@ string TdDaemon::show_tree() {
 	string config_path;
 	string output = "";
 	
-	if (selectFile::find("config",".xml",config_path) && xf.openFile(config_path + "config.xml")) {
-		
+	if (selectFile::find("config.xml",config_path) && xf.openFile(config_path)) {
 		nodeDoc ndCateg(&xf,"category");
 		output += "{\"categories\":[";
 		while(ndCateg.isValid()) {
@@ -120,21 +119,23 @@ string TdDaemon::show_tree() {
 			nodeDoc ndEngine(&xf,"engine",ndCateg);
 			while(ndEngine.isValid()) {
 				output += "{\"name\":\"";
-				output += ndEngine.getAttributeValueByName("name");
-				string filename = ndEngine.getAttributeValueByName("name");
-				string path;
+				string filepath = ndEngine.getAttributeValueByName("path");
+				output += filepath;
+				string filename = selectFile::getFilename(filepath);
+				//Only keep the filename without extension
+				filename = filename.substr(0,filename.find_last_of("."));
 
 				output += "\",\"icon\":\"";
 				output += "/engines_icons/" + filename + ".png";
 				output += "\",\"title\":\"";
 				
 				xmlEngine xe;
-				if (selectFile::find(filename,".xml",path) && xe.openEngine(filename)) {
+				if (xe.openEngine(filepath)) {
 					output += xe.getName();
 				} else {
-					// The file we a looking for was not found.
-					//cerr << "The file " << filename << ".xml was not found." << endl;
+					output += filename;
 				}
+
 				output += "\"}";
 				ndEngine.next();
 				if (ndEngine.isValid()) output += ",";
