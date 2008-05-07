@@ -33,9 +33,9 @@ See the License for the specific language governing permissions and limitations 
 		<engine version="1.0" path="xml/yahoo.xml" />
 	</category>
 	<category name="Files">
-		<engine version="1.0" path="xml/filemirrors.xml" />
 		<engine version="1.0" path="xml/filesearching.xml" />
 		<engine version="1.0" path="xml/filewatcher.xml" />
+		<engine version="1.0" path="xml/findfiles.xml" />
 		<engine version="1.0" path="xml/ftpindexer.xml" />
 		<engine version="1.0" path="xml/googlefiles.xml" />
 		<engine version="1.0" path="xml/metaftp.xml" />
