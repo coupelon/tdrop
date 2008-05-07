@@ -29,7 +29,7 @@ See the License for the specific language governing permissions and limitations 
 #include "shttpd.h"
 
 #define WEBINTERFACE_URI "/WebInterface/*"
-#define WEBINTERFACE_PATH "/home/olivier/workspace/tddaemonclient/www/com.teardrop.WebInterface/"
+#define WEBINTERFACE_PATH "/home/olivier/teardrop/tddaemonclient/www/com.teardrop.WebInterface/"
 #define WEBINTERFACE_ROOT_SIZE 14
 #define WEBINTERFACE_ENGINES_ICONS_URI "/engines_icons/*"
 #define WEBINTERFACE_ENGINES_ICONS "/home/olivier/workspace/tdengines/icons/"
