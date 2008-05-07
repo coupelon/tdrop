@@ -26,9 +26,9 @@ xmlEngine::~xmlEngine() {
 }
 
 bool xmlEngine::openEngine(string f) {
-    string path;
-    if (!selectFile::find(f,".xml",path)) return false;
-    return xml->openFile(path + f + ".xml");
+    string fullfilename;
+    if (!selectFile::find(f,fullfilename)) return false;
+    return xml->openFile(fullfilename);
 }
 
 void xmlEngine::setHttp(getHttp *g) {

@@ -64,7 +64,7 @@ void tdParam::getInitValues() {
   //Setting proxy settings
   xmlFile xf;
   string path;
-  if (selectFile::find("config",".xml",path) && xf.openFile(path + "config.xml"))
+  if (selectFile::find("config.xml",path) && xf.openFile(path))
   {
     nodeDoc *n = new nodeDoc(&xf,"browser");
     if (n->isValid())
@@ -98,14 +98,14 @@ void tdParam::getInitValues() {
 void tdParam::commit() {
   xmlFile xf;
   string path;
-  if (selectFile::find("config",".xml",path) && xf.openFile(path + "config.xml"))
+  if (selectFile::find("config.xml",path) && xf.openFile(path))
   {
   	nodeDoc n(&xf,"browser");
-	n.setNodeContent(getBrowser());
-	n.findChildByName("proxy-address",NULL);
-	n.setNodeContent(getProxyAddress());
-	n.findChildByName("proxy-port",NULL);
-	n.setNodeContent(xmlFile::ltoa(getProxyPort()));
+		n.setNodeContent(getBrowser());
+		n.findChildByName("proxy-address",NULL);
+		n.setNodeContent(getProxyAddress());
+		n.findChildByName("proxy-port",NULL);
+		n.setNodeContent(xmlFile::ltoa(getProxyPort()));
     n.findChildByName("proxy-type",NULL);
     n.setNodeContent((getProxyType()==CURLPROXY_HTTP)?"HTTP":"SOCKS5");
     n.findChildByName("timeout",NULL);
