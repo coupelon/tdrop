@@ -24,17 +24,24 @@ public:
 		/**
 		 * This method searches for a file on the known directories
 		 * @param f the file name
-		 * @param e the file extension
-		 * @param path if the file is found, this path will be set to the actual file path
+		 * @param path if the file is found, this path will be set to the actual file path + name
 		 * @return True is the file was found
 		 */
-    static bool find(string f, string e, string & path);
+    static bool find(string f, string & path);
     
     /**
      * This method is used to get the Teardrop's home configuration directory
      * @return the path to the Teardrop's directory
      */
     static string getHomeDirectory();
+    
+    /**
+     * This method returns the filename of the given string, either it
+     * being a windows path, linux path or a web url.
+     * @param str the string containing the path+filename
+     * @return the file name
+     */
+    static string getFilename(const string& str);
 private:
     static bool fileexist(string);
 };
