@@ -288,7 +288,6 @@ public class PerformSearch {
 	}
 	
 	private void updateGrid(String jsonString) {
-		//Window.alert(jsonString);
 		if (jsonString.startsWith("{\"final\":\"false\"")) {
 			doPostURL("",DEFAULT_NEXT_URL);
 		}
