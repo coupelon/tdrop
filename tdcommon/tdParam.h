@@ -16,6 +16,7 @@ See the License for the specific language governing permissions and limitations 
 #include "selectFile.h"
 
 #define CURL_TIMEOUT 90
+#define THMAX 16
 
 using namespace std;
 
@@ -48,6 +49,8 @@ public:
      */
     void setTimeout(string t);
     long getTimeout() const;
+    void setMaxThreads(string t);
+    long getMaxThreads() const;
     string getBrowser();
     
     /**
@@ -67,6 +70,7 @@ private:
     long proxy_port;
     long proxy_type;
     long curl_timeout;
+    long max_threads;
     string browser;
     void getInitValues();
 };

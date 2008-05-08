@@ -15,6 +15,7 @@ tdParam::tdParam() {
     proxy_port = 0;
     proxy_type = CURLPROXY_HTTP;
     curl_timeout = CURL_TIMEOUT;
+    max_threads = THMAX;
     getInitValues();
 }
 
@@ -60,6 +61,14 @@ long tdParam::getTimeout() const {
     return curl_timeout;
 }
 
+void tdParam::setMaxThreads(string t){
+	max_threads = atol(t.c_str());
+}
+
+long tdParam::getMaxThreads() const {
+	return max_threads;
+}
+
 void tdParam::getInitValues() {
   //Setting proxy settings
   xmlFile xf;
@@ -91,6 +100,11 @@ void tdParam::getInitValues() {
     {
       curl_timeout = atol(n->getNodeValue().c_str());
     }
+    n->findChildByName("maxthreads",NULL);
+    if (n->isValid())
+    {
+      max_threads = atol(n->getNodeValue().c_str());
+    }
     delete n;
   }
 }
@@ -110,6 +124,8 @@ void tdParam::commit() {
     n.setNodeContent((getProxyType()==CURLPROXY_HTTP)?"HTTP":"SOCKS5");
     n.findChildByName("timeout",NULL);
     n.setNodeContent(xmlFile::ltoa(getTimeout()));
+    n.findChildByName("maxthreads",NULL);
+    n.setNodeContent(xmlFile::ltoa(getMaxThreads()));
 
     string out = selectFile::getHomeDirectory() + "config.xml";
     xf.saveDocTo(out);
