@@ -8,7 +8,7 @@ See the License for the specific language governing permissions and limitations 
 <engine xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="teardrop_1_0.xsd">
 	<name>MetaFtp.com</name>
-	<separator value="%20" />
+	<separator value=" " />
   <charset>ISO-8859-5</charset>
 	<terms>http://www.metaftp.com/?t=termsofuse&amp;l=en</terms>
 	<query method="GET">
