@@ -16,9 +16,6 @@ See the License for the specific language governing permissions and limitations 
 
 using namespace std;
 
-/// Maximum defaultnumber of threads
-#define THMAX 16
-
 /**
  * This class is a Thread pool. It can manage the creation and
  * work of a given amount of threads, making sure that at most
@@ -42,7 +39,7 @@ class threadPool {
          * @param detached If true the threads are created detached, meaning that they can't be joined
          * @param mt The maximum number of threads
          */
-        threadPool(bool detached = false, int mt = THMAX){
+        threadPool(int mt, bool detached = false){
             tpMaxThread = mt;
             tpNbThread = 0;
             pthread_mutex_init(&mtex,NULL);
@@ -151,15 +148,6 @@ class threadPool {
          */
         static void unlock(threadPool & tp){
             pthread_mutex_unlock( &tp.mtex );
-        }
-        
-        /**
-         * Sets the maximum number of threads can be
-         * concurrently running
-         * @param mt The maximum number of threads.
-         */
-        void setMaxThread(int mt = THMAX) {
-            tpMaxThread = mt;
         }
         
     private:

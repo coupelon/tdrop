@@ -19,10 +19,15 @@ using namespace std;
 class engineResults {
 public:
 	engineResults() {
+	  //This shouldn't be used to create threads, only mutex, so
+	  // the maximum number of threads is set to 0.
+	  new_results = new threadPool<engineResults>(0);
 		threadPool<engineResults>::lock(new_results);
 	  abort = false;
 	};
-	virtual ~engineResults() {};
+	~engineResults() {
+		delete new_results;
+	};
 
   /**
    * Set the maximum number of results per engines
@@ -110,7 +115,7 @@ protected:
 	string query;
 	vector<row> results;
 	bool abort;
-	threadPool<engineResults> new_results;
+	threadPool<engineResults> *new_results;
 };
 
 #endif
