@@ -1,0 +1,58 @@
+.hl {
+     color:black;
+     font-weight: bold;
+     background-color:#ffff66;
+}
+
+#header img {
+	position:absolute;
+	left:-30px;
+	z-index:10;
+}
+
+#header .inside{
+	position:relative;
+	left:40px;
+	color:#BFBFBF;
+	font-size:70%;
+	font-family:"Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Verdana, Arial, sans-serif;
+}
+
+#header h2{
+	font-size:2.25em;
+	margin:0 0.5em 0 0;
+	padding:0 0.5em 0em 0;
+	border-right:1px solid #808080;
+	font-weight:normal;
+	float:left;
+}
+
+#header h2 a{ text-decoration:none; color:#000}
+
+#header p{
+	padding:1em 0;
+	margin:0;
+	line-height:1em;
+}
+
+#centerpanel {
+	font-size:200%;
+	font-family:"Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Verdana, Arial, sans-serif;
+}
+
+#centerpanel .inside {
+	position:relative;
+	height:100%;
+	background-image:url('imgs/teardrop.png');
+	background-repeat: no-repeat;
+	background-position:center center;
+}
+
+#centerpanel p {
+	position:absolute;
+	top:50%;
+	width:100%;
+	text-align: center;
+	color:#BFBFBF;
+}
+
