@@ -143,7 +143,7 @@ public class PerformSearch {
 					if (!img.equals("")) {
 						rowParams.setBody("<img width=\"40\" height =\"30\" src=\"" + img + "\" />" + getDecodedRecord(record,"abstract"));
 					} else {
-						rowParams.setBody(getDecodedRecord(record,"abstract"));
+						rowParams.setBody(getHighLight(getDecodedRecord(record,"abstract")));
 					}
 					return "x-grid3-row-expanded";  
 				} else {  
@@ -268,7 +268,7 @@ public class PerformSearch {
 							int rowIndex, int colNum, Store store) {
 			
 			return Format.format("<b><a href=\"{1}\"target=\"_blank\">{0}</a></b>",  
-					new String[]{getDecodedRecord(record,"title"),  
+					new String[]{getHighLight(getDecodedRecord(record,"title")),  
 					getDecodedRecord(record,"url")  
 					});  
 		}
@@ -285,6 +285,25 @@ public class PerformSearch {
 	private String getDecodedRecord(Record r,String name) {
 		if (r.getAsString(name) == null) return "";
 		return URL.decodeComponent(r.getAsString(name));
+	}
+	
+	//This method highlights the query keywords in the given string.
+	//Instead of using replaceAll(), I used that to make it portably
+	// case-insensitive (Not well supported by GWT otherwise).
+	private String getHighLight(String s) {
+		String hlighted = s;
+		String[] keys = queryText.getText().toLowerCase().split(" ");
+		for(int i = 0; i < keys.length; ++i) {
+			String sLower = hlighted.toLowerCase();
+			int mindex = sLower.length();
+			while(mindex > 1) {
+				mindex = sLower.lastIndexOf(keys[i], mindex-1);
+				if (mindex != -1) {
+					hlighted = hlighted.substring(0, mindex) + "<span class=\"hl\">" + hlighted.substring(mindex,mindex+keys[i].length()) + "</span>" + hlighted.substring(mindex+keys[i].length());
+				}
+			}
+		}
+		return hlighted;
 	}
 	
 	private void updateGrid(String jsonString) {
