@@ -13,6 +13,9 @@
 <listOptionValue builtIn="false" value="&quot;${workspace_loc:/tdcommon/regexp}&quot;"/>
 <listOptionValue builtIn="false" value="&quot;${workspace_loc:/tdcommon/xml}&quot;"/>
 </option>
+<option id="gnu.cpp.compiler.option.preprocessor.def.460310027" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
+<listOptionValue builtIn="false" value="WORKSPACE=\&quot;${workspace_loc}\&quot;"/>
+</option>
 </tool>
 <tool id="cdt.managedbuild.tool.gnu.c.compiler.so.debug.1133125532" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.so.debug"/>
 <tool id="cdt.managedbuild.tool.gnu.c.linker.so.debug.1009046332" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.so.debug"/>

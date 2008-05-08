@@ -259,16 +259,16 @@ void TdDaemon::show_file(struct shttpd_arg *arg,string filename) {
 }
 
 void TdDaemon::show_engines_icons(struct shttpd_arg *arg) {
-	string filename = WEBINTERFACE_ENGINES_ICONS + string(shttpd_get_env(arg, "REQUEST_URI")).erase(0,WEBINTERFACE_ENGINES_ICONS_SIZE);
+	string filename = WORKSPACE + string(WEBINTERFACE_ENGINES_ICONS) + string(shttpd_get_env(arg, "REQUEST_URI")).erase(0,WEBINTERFACE_ENGINES_ICONS_SIZE);
 	FILE *fp = fopen(filename.c_str(),"rb");
-	if (fp == NULL) filename = string(WEBINTERFACE_PATH) + "imgs/default_engine.png";
+	if (fp == NULL) filename = string (WORKSPACE) + string(WEBINTERFACE_PATH) + "imgs/default_engine.png";
 	else fclose(fp);
 	show_file(arg, filename);
 }
 
 
 void TdDaemon::show_wi(struct shttpd_arg *arg) {
-	string filename = WEBINTERFACE_PATH + string(shttpd_get_env(arg, "REQUEST_URI")).erase(0,WEBINTERFACE_ROOT_SIZE);
+	string filename = WORKSPACE + string(WEBINTERFACE_PATH) + string(shttpd_get_env(arg, "REQUEST_URI")).erase(0,WEBINTERFACE_ROOT_SIZE);
 	show_file(arg, filename);
 }
 
