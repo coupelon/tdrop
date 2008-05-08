@@ -119,7 +119,7 @@ public:
     bool waitForNewResults();
     
 private:
-    threadPool<pageParser> threads;
+    threadPool<pageParser> *threads;
     list<pageParser *> pplist;
     engineResults *ranked_results;
     static string intToString(int);

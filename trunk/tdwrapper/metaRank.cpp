@@ -15,23 +15,25 @@ metaRank::metaRank(engineResults *res,tdParam *t) {
 void metaRank::init(engineResults *res,tdParam *t) {
   ranked_results = res;
   tdp = t;
+  threads = new threadPool<pageParser>(t->getMaxThreads()); 
 }
 
 metaRank::~metaRank() {
     delete ranked_results;
+    delete threads;
 }
 
 void metaRank::startParsing() {
     pageParser *p;
     for(map<string,int>::const_iterator eng = ranked_results->getEngines().begin(); ranked_results->getEngines().end() != eng; ++eng) {
-        p = new pageParser(eng->first,ranked_results, &threads, tdp);
+        p = new pageParser(eng->first,ranked_results, threads, tdp);
         pplist.push_back(p);
-        threads.createThread(&(*p));
+        threads->createThread(&(*p));
     }
 }
 
 void metaRank::joinAll() {
-  threads.joinAll();
+  threads->joinAll();
 }
 
 void metaRank::stop() {
