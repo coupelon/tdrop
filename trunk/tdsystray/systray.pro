@@ -4,10 +4,11 @@
 # Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-HEADERS       = systray.h daemonThread.h 
-SOURCES       = main.cpp systray.cpp daemonThread.cpp
+HEADERS       = systray.h daemonThread.h prefDialog.h
+SOURCES       = main.cpp systray.cpp daemonThread.cpp prefDialog.cpp
 RESOURCES     = systray.qrc
 INCLUDEPATH   = ../tddaemon ../tdcommon ../tdcommon/xml ../tdcommon/regexp ../tdwrapper 
 QMAKE_CXXFLAGS  = $$system(xml2-config --cflags)
 LIBS          = ../tdcommon/Debug/libtdcommon.so ../tddaemon/Debug/libtddaemon.so ../tdwrapper/Debug/libtdwrapper.so \
 		$$system(xml2-config --libs) $$system(curl-config --libs)  $$system(pcre-config --libs)
+FORMS += preferences.ui

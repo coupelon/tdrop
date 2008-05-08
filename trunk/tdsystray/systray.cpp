@@ -16,11 +16,17 @@ Systray::Systray() {
 
 void Systray::createTrayIcon() {
     trayIconMenu = new QMenu();
+    connect(trayIconMenu->addAction("&Preferences"), SIGNAL(triggered()), this, SLOT(showPreferences()));
     connect(trayIconMenu->addAction("&Quit"), SIGNAL(triggered()), qApp, SLOT(quit()));
-
+		
     setContextMenu(trayIconMenu);
     setIcon(QIcon(":/images/teardrop.svg"));
 }
 
+void Systray::showPreferences() {
+  prefDialog *pd = new prefDialog(&tdp);
+  pd->exec();
+  delete pd;
+}
 
 
