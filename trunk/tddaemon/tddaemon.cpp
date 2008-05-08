@@ -233,29 +233,29 @@ void TdDaemon::query_process(struct shttpd_arg *arg) {
 
 void TdDaemon::show_file(struct shttpd_arg *arg,string filename) {
 	FILE *fp = fopen(filename.c_str(),"rb");
-    if (fp == NULL) {
-    	show_404(arg);
-    } else {
-		int state = (int) arg->state;
-	
-		if (state == 0) {
-			shttpd_printf(arg, "%s", "HTTP/1.1 200 OK\r\n\r\n");
-		} else {
-			fseek(fp,state,SEEK_SET);
-		}
-		char b;
-		while (arg->out.num_bytes < arg->out.len && !feof(fp)) {
-			fread(&b,1,1,fp);
-			arg->out.buf[arg->out.num_bytes] = b;
-			arg->out.num_bytes++;
-			state++;
-		}
-		if (feof(fp)) {
-			arg->flags |= SHTTPD_END_OF_OUTPUT;
-		}
-		arg->state = (void *) state;
-		fclose(fp);
-    }
+  if (fp == NULL) {
+  	show_404(arg);
+  } else {
+	int state = (int) arg->state;
+
+	if (state == 0) {
+		shttpd_printf(arg, "%s", "HTTP/1.1 200 OK\r\n\r\n");
+	} else {
+		fseek(fp,state,SEEK_SET);
+	}
+	char b;
+	while (arg->out.num_bytes < arg->out.len && !feof(fp)) {
+		fread(&b,1,1,fp);
+		arg->out.buf[arg->out.num_bytes] = b;
+		arg->out.num_bytes++;
+		state++;
+	}
+	if (feof(fp)) {
+		arg->flags |= SHTTPD_END_OF_OUTPUT;
+	}
+	arg->state = (void *) state;
+	fclose(fp);
+  }
 }
 
 void TdDaemon::show_engines_icons(struct shttpd_arg *arg) {
