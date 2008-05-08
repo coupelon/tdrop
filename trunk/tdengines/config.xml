@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and limitations 
 	<proxy-type>HTTP</proxy-type>
 
 	<timeout>90</timeout>
-	<maxthread>20</maxthread>
+	<maxthreads>20</maxthreads>
 
 	<category name="Ebook">
 		<engine version="1.0" path="xml/aleria.xml" />
