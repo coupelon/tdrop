@@ -14,6 +14,7 @@ See the License for the specific language governing permissions and limitations 
 #include <QApplication>
 
 #include "daemonThread.h"
+#include "prefDialog.h"
 
 class Systray : public QSystemTrayIcon
 {
@@ -21,6 +22,9 @@ class Systray : public QSystemTrayIcon
 
 public:
     Systray();
+
+private slots:
+    void showPreferences();
 
 private:
     void createTrayIcon();
