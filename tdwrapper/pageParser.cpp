@@ -41,13 +41,13 @@ bool pageParser::initParse() {
 	string page;
 	regExp *r = NULL;
 	eng = new xmlEngine();
-    if (!eng->openEngine(engname)) return false;
-    eng->setHttp(&gh);
+  if (!eng->openEngine(engname)) return false;
+  eng->setHttp(&gh);
 	gh.setAcceptCharset(eng->getCharset());
-    gh.setParam(tdp);
-    while(eng->getNextHeader()) {
-        gh.addHttpHeader(eng->getHeader());
-    }
+  gh.setParam(tdp);
+  while(eng->getNextHeader()) {
+      gh.addHttpHeader(eng->getHeader());
+  }
 	while(eng->getNextInit()) {
 		address ad = eng->getInitAddress(global_results,r);
 		page = gh.getPage(ad);
@@ -57,9 +57,13 @@ bool pageParser::initParse() {
 			r = new regExp(reg, page);
 		}
 	}
+	
+	//Modify the query input to the right parameters
   if (eng->getCharset() != "") query = gh.charsetConvert(query, HTTP_DEFAULT_CHARSET, eng->getCharset());
+  query = regExp::replaceAll(query, " ", eng->getSeparator());
   query = gh.escape(query);
-  query = regExp::replaceAll(query, "%20", eng->getSeparator());
+  global_results->setQuery(query);
+
 	while(eng->getNextQuery()) {
 		pages.push_front(eng->getQueryAddress(global_results,r));
 	}
