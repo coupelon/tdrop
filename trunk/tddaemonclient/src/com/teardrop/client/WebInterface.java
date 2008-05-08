@@ -20,6 +20,7 @@ import com.gwtext.client.widgets.layout.BorderLayout;
 import com.gwtext.client.widgets.layout.BorderLayoutData;
 import com.gwtext.client.widgets.layout.FitLayout;
 import com.gwtext.client.widgets.layout.RowLayout;
+import com.gwtext.client.widgets.layout.RowLayoutData;
 import com.gwtext.client.widgets.menu.CheckItem;
 
 /**
@@ -61,10 +62,11 @@ public class WebInterface implements EntryPoint {
 	    /**
 	     * The north panel is used to display the title and other future menus
 	     */
-	    Panel northPanel = new Panel("", "<p>Teardrop, The personnal meta-search engine</p>");
-	    northPanel.setHeight(32);
+	    Panel northPanel = new Panel("", "<div class='inside'><h2><img src='imgs/tdlogo.png' alt='Logo' />&nbsp;<a href='http://www.teardrop.fr/'>Teardrop</a></h2><p class='description'>The personal meta search engine</p></div>");
 	    northPanel.setBodyBorder(false);
 	    northPanel.setHeader(false);
+	    northPanel.setId("header");
+	    northPanel.setHeight(40);
 	    borderPanel.add(northPanel, new BorderLayoutData(RegionPosition.NORTH));
 	    
 	    /**
@@ -111,9 +113,9 @@ public class WebInterface implements EntryPoint {
 	    /**
 	     * The center panel contains the search results
 	     */
-	    Panel defaultCenterPanel = new Panel("Teardrop", "Welcome to Teardrop");
+	    Panel defaultCenterPanel = new Panel("Teardrop", "<div class='inside'><p>Welcome to Teardrop</p></div>");
 	    defaultCenterPanel.setLayout(new FitLayout());
-	    centerPanel.add(defaultCenterPanel);
+	    centerPanel.add(defaultCenterPanel, new RowLayoutData("100%"));
 	    centerPanel.setDeferredRender(false);
 	    centerPanel.setEnableTabScroll(true);
 	    centerPanel.setId("centerpanel");
