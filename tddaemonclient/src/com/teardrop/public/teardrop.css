@@ -56,3 +56,19 @@
 	color:#BFBFBF;
 }
 
+.details .x-btn-text {
+	background-image: url( imgs/details.gif );
+}
+
+.info .x-btn-text {
+	background-image: url( imgs/info.gif );
+}
+
+.btn-search-icon .x-btn-text {
+	background-image: url( imgs/search.png );
+}
+
+.highlight .x-btn-text {
+	background-image: url( imgs/highlight.png );
+}
+

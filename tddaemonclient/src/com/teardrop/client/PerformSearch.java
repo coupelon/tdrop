@@ -15,7 +15,6 @@ import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.RequestException;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.http.client.URL;
-import com.google.gwt.user.client.Window;
 import com.gwtext.client.core.EventObject;
 import com.gwtext.client.core.SortDir;
 import com.gwtext.client.data.FieldDef;
@@ -57,6 +56,7 @@ public class PerformSearch {
 	GridPanel resultsPanel;
 	ProgressBar pBar;
 	boolean showDetails = true;
+	boolean showHighlight = true;
 	Store resultsStore;
 	Store enginesStore;
 	String checkedNodeString;
@@ -205,6 +205,18 @@ public class PerformSearch {
 		});
 		toggleDetails.setTooltip("Toggle between simple and detailed view");
 		
+		ToolbarButton toggleHighlight = new ToolbarButton("Highlighting");
+		toggleHighlight.setPressed(showHighlight);
+		toggleHighlight.setEnableToggle(true);
+		toggleHighlight.setCls("x-btn-text-icon highlight");  
+		toggleHighlight.addListener(new ButtonListenerAdapter() {  
+			public void onToggle(Button button, boolean pressed) {  
+				showHighlight = pressed;  
+				resultsPanel.getView().refresh();  
+			}  
+		});
+		toggleHighlight.setTooltip("Highlight the search keywords");
+		
 		pBar = new ProgressBar();
 		pBar.setWidth(300);
 		pBar.setText("Searching...");
@@ -212,6 +224,7 @@ public class PerformSearch {
 		toolbar.addFill();
 		toolbar.addButton(moreInfo);
 		toolbar.addButton(toggleDetails);
+		toolbar.addButton(toggleHighlight);
 		toolbar.addElement(pBar.getElement());
 		resultsPanel.setBottomToolbar(toolbar);
 		
@@ -234,7 +247,7 @@ public class PerformSearch {
 	    	}
 	    	builder.sendRequest(post, new RequestCallback() {
 	    	    public void onError(Request request, Throwable exception) {
-	    	    	Window.alert("Couldn't connect to server (could be timeout, SOP violation, etc.)");     
+	    	    	setProgessMessage("Couldn't connect to server (could be timeout, SOP violation, etc.)");     
 	    	    }
 
 	    	    public void onResponseReceived(Request request, Response response) {
@@ -242,12 +255,12 @@ public class PerformSearch {
 	    	    	  parseCookies(response);
 	    	    	  updateGrid(response.getText());
 	    	      } else {
-	    	    	  Window.alert("Incorrect status: " + response.getStatusText());
+	    	    	  setProgessMessage("Incorrect status: " + response.getStatusText());
 	    	      }
 	    	    }
 	    	  });
 	    	} catch (RequestException e) {
-	    		Window.alert("Couldn't connect to server (could be timeout, SOP violation, etc.)");      
+	    		setProgessMessage("Couldn't connect to server (could be timeout, SOP violation, etc.)");      
 	    	}
 	  }
 	
@@ -291,6 +304,7 @@ public class PerformSearch {
 	//Instead of using replaceAll(), I used that to make it portably
 	// case-insensitive (Not well supported by GWT otherwise).
 	private String getHighLight(String s) {
+		if (!showHighlight) return s;
 		String hlighted = s;
 		String[] keys = queryText.getText().toLowerCase().split(" ");
 		for(int i = 0; i < keys.length; ++i) {
@@ -315,7 +329,7 @@ public class PerformSearch {
 		enginesStore.loadJsonData(jsonString, false);
 		resultsPanel.getView().refresh();
 		} catch (Exception e) {
-			Window.alert("updateGrid: an error was catched: " + e.getMessage());
+			setProgessMessage("updateGrid: an error was catched: " + e.getMessage());
 		}
 		updateProgress();
 	}
@@ -329,7 +343,7 @@ public class PerformSearch {
 				results += enginesStore.getAt(i).getAsInteger("cpt");
 			}
 		}
-		pBar.updateProgress(count/numberOfEngines, results + " Results (" + count + "/" + numberOfEngines + ")");
+		setProgessMessage(count/numberOfEngines, results + " Results (" + count + "/" + numberOfEngines + ")");
 	}
 	
 	//To circumvent the tree checks bug...
@@ -347,5 +361,13 @@ public class PerformSearch {
 			}
 		}
 		return checkedNodeString;
+	}
+	
+	private void setProgessMessage(float value, String text) {
+		pBar.updateProgress(value,text);
+	}
+	
+	private void setProgessMessage(String text) {
+		pBar.updateProgress(0,text);
 	}
 }
