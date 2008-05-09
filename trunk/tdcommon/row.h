@@ -61,13 +61,13 @@ public:
    * Add an engine to that row
    * @param e The engine name 
    */
-  void addEngine(string e);
+  void addEngine(const string & e);
   
   /**
    * Add a list of engines to that row
    * @param e The engines name list 
    */
-  void addEngine(list<string> e);
+  void addEngine(const list<string> & e);
   
   /**
    * Retrieve the engine list in a comma separated string of engines names
@@ -83,7 +83,7 @@ public:
   
   int getNum() const;
   void setNum(int);
-  list<string> getEngine() const;
+  const list<string> & getEngine() const;
   map<string, string, compstr> & getFields();
   string getField(string s) const;
   

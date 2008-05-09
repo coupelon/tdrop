@@ -25,7 +25,7 @@ void row::setNum( int n ) {
 	num = n;
 }
 
-list<string> row::getEngine() const {
+const list<string> & row::getEngine() const {
     return engine;
 }
 
@@ -50,11 +50,11 @@ void row::addComparable(string c) {
     comparable.push_back(c);
 }
 
-void row::addEngine(string e) {
+void row::addEngine(const string & e) {
     engine.push_back(e);
 }
 
-void row::addEngine(list<string> e) {
+void row::addEngine(const list<string> & e) {
     engine.insert(engine.end(),e.begin(),e.end());
 }
 
