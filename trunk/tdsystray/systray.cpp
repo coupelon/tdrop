@@ -12,6 +12,7 @@ Systray::Systray() {
     createTrayIcon();
     tdp.setEcho(false);
     (new daemonThread(&tdp))->start();
+    qApp->setQuitOnLastWindowClosed(false);
 }
 
 void Systray::createTrayIcon() {
