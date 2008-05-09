@@ -9,11 +9,14 @@ See the License for the specific language governing permissions and limitations 
 package com.teardrop.client;
 
 import com.google.gwt.core.client.EntryPoint;
+import com.google.gwt.user.client.Window;
+import com.gwtext.client.core.EventObject;
 import com.gwtext.client.core.RegionPosition;
 import com.gwtext.client.widgets.CycleButton;
 import com.gwtext.client.widgets.Panel;
 import com.gwtext.client.widgets.TabPanel;
 import com.gwtext.client.widgets.Viewport;
+import com.gwtext.client.widgets.event.KeyListener;
 import com.gwtext.client.widgets.form.FormPanel;
 import com.gwtext.client.widgets.form.TextField;
 import com.gwtext.client.widgets.layout.BorderLayout;
@@ -41,6 +44,13 @@ public class WebInterface implements EntryPoint {
 	  public void onModuleLoad() {
 	    initializeMainForm();
 	  }
+	  
+
+    private static class KeyListenerAdapter implements KeyListener {
+    	public void onKey(int key,EventObject e) {
+    		Window.alert("Enter was pressed");
+    	}
+    }
 
 	  /**
 	   * Initialize the main form's layout and content.
@@ -87,6 +97,9 @@ public class WebInterface implements EntryPoint {
 	    queryText.setHideLabel(true);
 	    //queryText.setWidth(limitButton.getOffsetWidth());
 	    queryText.setTabIndex(0);
+
+	    KeyListenerAdapter listener = new KeyListenerAdapter();
+	    queryText.addKeyListener(EventObject.ENTER, listener);
 	    
 	    FormPanel criterPanel = new FormPanel();
 	    criterPanel.setLayout(new RowLayout());
