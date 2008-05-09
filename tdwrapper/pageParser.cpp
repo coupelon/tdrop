@@ -57,12 +57,6 @@ bool pageParser::initParse() {
 			r = new regExp(reg, page);
 		}
 	}
-	
-	//Modify the query input to the right parameters
-  if (eng->getCharset() != "") query = gh.charsetConvert(query, HTTP_DEFAULT_CHARSET, eng->getCharset());
-  query = regExp::replaceAll(query, " ", eng->getSeparator());
-  query = gh.escape(query);
-  global_results->setQuery(query);
 
 	while(eng->getNextQuery()) {
 		pages.push_front(eng->getQueryAddress(global_results,r));
