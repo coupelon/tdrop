@@ -9,14 +9,13 @@ See the License for the specific language governing permissions and limitations 
 package com.teardrop.client;
 
 import com.google.gwt.core.client.EntryPoint;
-import com.google.gwt.user.client.Window;
 import com.gwtext.client.core.EventObject;
 import com.gwtext.client.core.RegionPosition;
+import com.gwtext.client.widgets.Button;
 import com.gwtext.client.widgets.CycleButton;
 import com.gwtext.client.widgets.Panel;
 import com.gwtext.client.widgets.TabPanel;
 import com.gwtext.client.widgets.Viewport;
-import com.gwtext.client.widgets.event.KeyListener;
 import com.gwtext.client.widgets.form.FormPanel;
 import com.gwtext.client.widgets.form.TextField;
 import com.gwtext.client.widgets.layout.BorderLayout;
@@ -35,7 +34,7 @@ public class WebInterface implements EntryPoint {
 	  private TextField queryText = new TextField("");
 	  private CycleButton limitButton = new CycleButton();
 	  private TabPanel centerPanel = new TabPanel();
-	  private QueryButton searchButton = new QueryButton(SEARCH_BUTTON_DEFAULT_TEXT,engTree,queryText,limitButton,centerPanel);
+	  private Button searchButton = new Button(SEARCH_BUTTON_DEFAULT_TEXT);
 
 	  /**
 	   * Entry point for this simple application. Currently, we build the
@@ -44,13 +43,6 @@ public class WebInterface implements EntryPoint {
 	  public void onModuleLoad() {
 	    initializeMainForm();
 	  }
-	  
-
-    private static class KeyListenerAdapter implements KeyListener {
-    	public void onKey(int key,EventObject e) {
-    		Window.alert("Enter was pressed");
-    	}
-    }
 
 	  /**
 	   * Initialize the main form's layout and content.
@@ -83,7 +75,9 @@ public class WebInterface implements EntryPoint {
 	     * The panel for the search criterions
 	     */
 	    searchButton.setText(SEARCH_BUTTON_DEFAULT_TEXT);
+	    searchButton.addListener(new OnSearchSubmit(engTree, queryText,limitButton,centerPanel));
 	    searchButton.setTabIndex(2);
+	    searchButton.setCls("x-btn-text-icon btn-search-icon");
 	    
 	    limitButton.setShowText(true);  
 	    limitButton.setPrependText("Results per engines: ");
@@ -98,8 +92,7 @@ public class WebInterface implements EntryPoint {
 	    //queryText.setWidth(limitButton.getOffsetWidth());
 	    queryText.setTabIndex(0);
 
-	    KeyListenerAdapter listener = new KeyListenerAdapter();
-	    queryText.addKeyListener(EventObject.ENTER, listener);
+	    queryText.addKeyListener(EventObject.ENTER, new OnSearchSubmit(engTree, queryText,limitButton,centerPanel));
 	    
 	    FormPanel criterPanel = new FormPanel();
 	    criterPanel.setLayout(new RowLayout());
