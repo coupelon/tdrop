@@ -74,7 +74,6 @@ public class WebInterface implements EntryPoint {
 	    /**
 	     * The panel for the search criterions
 	     */
-	    searchButton.setText(SEARCH_BUTTON_DEFAULT_TEXT);
 	    searchButton.addListener(new OnSearchSubmit(engTree, queryText,limitButton,centerPanel));
 	    searchButton.setTabIndex(2);
 	    searchButton.setCls("x-btn-text-icon btn-search-icon");
