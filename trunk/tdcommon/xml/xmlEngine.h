@@ -186,6 +186,9 @@ private:
   
   /** Returns the input method of the given block */
   string getMethod(nodeDoc *);
+  
+  /** Generates the query based on the input, charset, and the separator */
+  string generateQuery(engineResults *res);
 
 	nodeDoc *init;
 	nodeDoc *query;

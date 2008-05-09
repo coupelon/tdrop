@@ -136,8 +136,9 @@ methodParam xmlEngine::getInputFields(engineResults *res, regExp *reg,nodeDoc *n
 			  if ((opt = res->getOptions()[fieldname]) != "")
 	  		  value = regExp::replaceAll(value,"%u",opt);
 	  		else value = regExp::replaceAll(value,"%u",n.getAttributeValueByName("default"));
-			if (res->getQuery() != "" && value.find("%q",0) != string::npos)
-				value = regExp::replaceAll(value,"%q",res->getQuery());
+	  	string q;
+			if ((q = generateQuery(res)) != "" && value.find("%q",0) != string::npos)
+				value = regExp::replaceAll(value,"%q",q);
 			if (reg != NULL && value.find("%s",0) != string::npos) {
 				string num = n.getAttributeValueByName("num");
 				if (num != "") {
@@ -158,6 +159,14 @@ methodParam xmlEngine::getInputFields(engineResults *res, regExp *reg,nodeDoc *n
 			n.next();
 	}
 	return param;
+}
+
+string xmlEngine::generateQuery(engineResults *res) {
+	string q = res->getQuery();
+	if (getCharset() != "") q = gh->charsetConvert(q, HTTP_DEFAULT_CHARSET, getCharset());
+  q = regExp::replaceAll(q, " ", getSeparator());
+  q = gh->escape(q);
+  return q;
 }
 
 string xmlEngine::getInitMethod() {
