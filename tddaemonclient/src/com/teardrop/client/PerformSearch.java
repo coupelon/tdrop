@@ -145,6 +145,7 @@ public class PerformSearch {
 					} else {
 						rowParams.setBody(getHighLight(getDecodedRecord(record,"abstract")));
 					}
+					rowParams.setBodyStyle("text-align:middle;");
 					return "x-grid3-row-expanded";  
 				} else {  
 					return "x-grid3-row-collapsed";  
