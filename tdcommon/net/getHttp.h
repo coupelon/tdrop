@@ -19,8 +19,10 @@ See the License for the specific language governing permissions and limitations 
 #include "../address.h"
 #include "../regexp/regExp.h"
 #include "../debugmacro.h"
-#include "../tdParam.h"
 #include "rawContainer.h"
+#include "../tdParam.h"
+
+class tdParam;
 
 using namespace std;
 
@@ -55,6 +57,14 @@ public:
    * @return true if everything was ok 
    */
   bool getFile (address & ad, string file);
+  
+  /**
+   * Retrieve a binary url content in memory
+   * @param url The address of the file
+   * @param r The destination rawContainer
+   * @return true if everything was ok 
+   */
+  bool getRawData (address & ad, rawContainer *r);
   
   /**
    * @return true if the given url is pointing to an existing file.
@@ -132,7 +142,6 @@ private:
   CURLcode res;
   static int writer(char *data, size_t size, size_t nmemb, string *writerData);
   static int writerToChar(char *data, size_t size, size_t nmemb, rawContainer * writerData);
-  bool getRawData (string & url, rawContainer *r);
   curl_slist *slist;
   string m_proxyAddress;
   long m_proxyPort;

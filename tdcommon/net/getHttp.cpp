@@ -87,8 +87,7 @@ bool getHttp::getFile (address & ad, string file) {
     FILE *output = fopen(file.c_str(),"wb");
     if (output) {
         rawContainer cont;
-        string url = ad.getFullUrl();
-        if (getRawData(url,&cont)) {
+        if (getRawData(ad,&cont)) {
             fwrite(cont.getContent(),1,cont.getLength(),output);
             fclose(output);
             return true;
@@ -100,122 +99,96 @@ bool getHttp::getFile (address & ad, string file) {
 
 string getHttp::getPage (address & ad, string ch)
 {
-	string buffer;
-	string url;
-	if (curl) {
-		curl_easy_setopt (curl, CURLOPT_FOLLOWLOCATION, 1);
-		curl_easy_setopt (curl, CURLOPT_COOKIEFILE, "");
-		curl_easy_setopt (curl, CURLOPT_WRITEFUNCTION, writer);
-		curl_easy_setopt (curl, CURLOPT_WRITEDATA, &buffer);
-    curl_easy_setopt (curl, CURLOPT_NOSIGNAL, 1);
-    curl_easy_setopt (curl, CURLOPT_TIMEOUT, m_timeout);
-		debug(ad.getFullUrl().c_str());
-		//This copy to url must be done, instead of what you might get a malformed url error from curl
-		url = ad.getFullUrl ();
-		//		cout << url <<  endl;
-		char *buffer_url = (char *) calloc(2048,1);
-		strncpy(buffer_url,url.c_str(),2047);
-		//curl_easy_setopt (curl, CURLOPT_VERBOSE, 1);
-		curl_easy_setopt (curl, CURLOPT_URL, buffer_url);
-		if (ad.isPOST ()) {
-			url = ad.param.post;
-			curl_easy_setopt (curl, CURLOPT_POSTFIELDS, url.c_str ());
-			curl_easy_setopt (curl, CURLOPT_POST);
-		} else curl_easy_setopt (curl, CURLOPT_HTTPGET);
-    if (m_proxyAddress != "") {
-        curl_easy_setopt(curl, CURLOPT_PROXY, m_proxyAddress.c_str());
-        curl_easy_setopt(curl, CURLOPT_PROXYPORT, m_proxyPort);
-        curl_easy_setopt(curl, CURLOPT_PROXYTYPE, m_proxyType);
-    }
-    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, slist);
-    curl_multi_add_handle(curl_multi,curl);
-    int still_running = 1;
-    
-    //while(CURLM_CALL_MULTI_PERFORM == curl_multi_perform(curl_multi, &still_running));
-    
-    while(still_running) {
-      struct timeval timeout;
-      int rc; /* select() return code */
-
-      fd_set fdread;
-      fd_set fdwrite;
-      fd_set fdexcep;
-      int maxfd;
-
-      FD_ZERO(&fdread);
-      FD_ZERO(&fdwrite);
-      FD_ZERO(&fdexcep);
-
-      /* set a suitable timeout to play around with */
-      timeout.tv_sec = 1;
-      timeout.tv_usec = 0;
-
-      /* get file descriptors from the transfers */
-      curl_multi_fdset(curl_multi, &fdread, &fdwrite, &fdexcep, &maxfd);
-
-      rc = select(maxfd+1, &fdread, &fdwrite, &fdexcep, &timeout);
-
-      switch(rc) {
-      case -1:
-        /* select error */
-        break;
-      case 0:
-        debug("timeout!\n");
-      default:
-        /* timeout or readable/writable sockets */
-        //printf("perform!\n");
-        while(CURLM_CALL_MULTI_PERFORM ==
-              curl_multi_perform(curl_multi, &still_running) && !getAbort());
-        //printf("running: %d!\n", still_running);
-        if (getAbort()) {
-          free(buffer_url);
-          return "";
-        }
-        break;
-      }
-    }
-
-    res = curl_multi_info_read(curl_multi,&still_running)->data.result;
-    curl_multi_remove_handle(curl_multi,curl);
-		//res = curl_easy_perform (curl);
-		free(buffer_url);
-		if (res != CURLE_OK) {
-			cerr << "This page could'nt be retrieved : " << ad << endl;
-			return "";
-		}
-		if (getAbort()) return "";
-		return charsetConvert(buffer,getCharset(ch));
-	}
-	cerr << "Curl was not ready to download : " << ad << endl;
-	return "";
+	rawContainer rc;
+	if (!getRawData(ad,&rc)) return "";
+	return charsetConvert(string(rc.getContent(),rc.getLength()),getCharset(ch));
 }
 
-bool getHttp::getRawData (string & url, rawContainer *r) {
-    if (curl) {
-        curl_easy_setopt (curl, CURLOPT_WRITEFUNCTION, writerToChar);
-		curl_easy_setopt (curl, CURLOPT_WRITEDATA, r);
-        curl_easy_setopt (curl, CURLOPT_NOSIGNAL, 1);
-        curl_easy_setopt (curl, CURLOPT_TIMEOUT, m_timeout);
-        
-        curl_easy_setopt (curl, CURLOPT_FOLLOWLOCATION, 1);
-        curl_easy_setopt (curl, CURLOPT_COOKIEFILE, "");
+bool getHttp::getRawData (address & ad, rawContainer *r) {
+	string url;
+	if (!curl) return false;
+	curl_easy_setopt (curl, CURLOPT_FOLLOWLOCATION, 1);
+	curl_easy_setopt (curl, CURLOPT_COOKIEFILE, "");
+	curl_easy_setopt (curl, CURLOPT_WRITEFUNCTION, writerToChar);
+	curl_easy_setopt (curl, CURLOPT_WRITEDATA, r);
+  curl_easy_setopt (curl, CURLOPT_NOSIGNAL, 1);
+  curl_easy_setopt (curl, CURLOPT_TIMEOUT, m_timeout);
+	debug(ad.getFullUrl().c_str());
+	//This copy to url must be done, instead of what you might get a malformed url error from curl
+	url = ad.getFullUrl ();
+	//		cout << url <<  endl;
+	char *buffer_url = (char *) calloc(2048,1);
+	strncpy(buffer_url,url.c_str(),2047);
+	//curl_easy_setopt (curl, CURLOPT_VERBOSE, 1);
+	curl_easy_setopt (curl, CURLOPT_URL, buffer_url);
+	if (ad.isPOST ()) {
+		url = ad.param.post;
+		curl_easy_setopt (curl, CURLOPT_POSTFIELDS, url.c_str ());
+		curl_easy_setopt (curl, CURLOPT_POST);
+	} else curl_easy_setopt (curl, CURLOPT_HTTPGET);
+  if (m_proxyAddress != "") {
+    curl_easy_setopt(curl, CURLOPT_PROXY, m_proxyAddress.c_str());
+    curl_easy_setopt(curl, CURLOPT_PROXYPORT, m_proxyPort);
+    curl_easy_setopt(curl, CURLOPT_PROXYTYPE, m_proxyType);
+  }
+  curl_easy_setopt(curl, CURLOPT_HTTPHEADER, slist);
+  curl_multi_add_handle(curl_multi,curl);
+  int still_running = 1;
+  
+  //while(CURLM_CALL_MULTI_PERFORM == curl_multi_perform(curl_multi, &still_running));
+  
+  while(still_running) {
+    struct timeval timeout;
+    int rc; /* select() return code */
 
-        curl_easy_setopt (curl, CURLOPT_URL, url.c_str ());
-        curl_easy_setopt (curl, CURLOPT_HTTPGET);
-        
-        if (m_proxyAddress != "") {
-            curl_easy_setopt(curl, CURLOPT_PROXY, m_proxyAddress.c_str());
-            curl_easy_setopt(curl, CURLOPT_PROXYPORT, m_proxyPort);
-            curl_easy_setopt(curl, CURLOPT_PROXYTYPE, m_proxyType);
-        }
-        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, slist);
-        res = curl_easy_perform (curl);
+    fd_set fdread;
+    fd_set fdwrite;
+    fd_set fdexcep;
+    int maxfd;
 
-        long code;
-		curl_easy_getinfo (curl, CURLINFO_RESPONSE_CODE, &code);
-        if (code != 404 && res == CURLE_OK) return true;
+    FD_ZERO(&fdread);
+    FD_ZERO(&fdwrite);
+    FD_ZERO(&fdexcep);
+
+    /* set a suitable timeout to play around with */
+    timeout.tv_sec = 1;
+    timeout.tv_usec = 0;
+
+    /* get file descriptors from the transfers */
+    curl_multi_fdset(curl_multi, &fdread, &fdwrite, &fdexcep, &maxfd);
+
+    rc = select(maxfd+1, &fdread, &fdwrite, &fdexcep, &timeout);
+
+    switch(rc) {
+    case -1:
+      /* select error */
+      break;
+    case 0:
+      debug("timeout!\n");
+    default:
+      /* timeout or readable/writable sockets */
+      //printf("perform!\n");
+      while(CURLM_CALL_MULTI_PERFORM ==
+            curl_multi_perform(curl_multi, &still_running) && !getAbort());
+      //printf("running: %d!\n", still_running);
+      if (getAbort()) {
+        free(buffer_url);
+        return false;
+      }
+      break;
     }
-    return false;
+  }
+
+  res = curl_multi_info_read(curl_multi,&still_running)->data.result;
+  curl_multi_remove_handle(curl_multi,curl);
+	//res = curl_easy_perform (curl);
+	free(buffer_url);
+	if (res != CURLE_OK) {
+		cerr << "This page could'nt be retrieved : " << ad << endl;
+		return false;
+	}
+	if (getAbort()) return false;
+	return true;
 }
 
 
