@@ -10,7 +10,7 @@
 <listOptionValue builtIn="false" value="/usr/include/libxml2"/>
 </option>
 <option id="gnu.cpp.compiler.option.preprocessor.def.919152059" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
-<listOptionValue builtIn="false" value="HOME_LINUX=\&quot;${workspace_loc:/tdengines}/\&quot;"/>
+<listOptionValue builtIn="false" value="HOME_LINUX_DEV=\&quot;${workspace_loc:/tdengines}/\&quot;"/>
 </option>
 <option id="gnu.cpp.compiler.option.other.other.237670216" superClass="gnu.cpp.compiler.option.other.other" value="-c -fmessage-length=0" valueType="string"/>
 </tool>
@@ -18,7 +18,7 @@
 <option id="gnu.c.compiler.option.preprocessor.def.symbols.1671774369" superClass="gnu.c.compiler.option.preprocessor.def.symbols" valueType="definedSymbols">
 <listOptionValue builtIn="false" value=""/>
 </option>
-<option id="gnu.c.compiler.option.include.paths.1524122605" superClass="gnu.c.compiler.option.include.paths" valueType="includePath"/>
+<option id="gnu.c.compiler.option.include.paths.1524122605" superClass="gnu.c.compiler.option.include.paths"/>
 </tool>
 <tool id="cdt.managedbuild.tool.gnu.c.linker.so.debug.1317049736" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.so.debug"/>
 <tool id="cdt.managedbuild.tool.gnu.cpp.linker.so.debug.176658743" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.so.debug">

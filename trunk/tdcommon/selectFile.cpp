@@ -49,9 +49,9 @@ string selectFile::getHomeDirectory() {
     if ((h = getenv("APPDATA")) != NULL) {
         return string(h) + "/Teardrop/";
     }
-//    if ((h = getenv("HOME")) != NULL) {
-//        return string(h) + HOME_LINUX;
-//    }
+    if ((h = getenv("HOME")) != NULL) {
+        return string(h) + HOME_LINUX;
+    }
     return HOME_LINUX;
 }
 
@@ -61,4 +61,7 @@ string selectFile::getFilename(const string& str) {
   return str.substr(found+1);
 }
 
+string selectFile::getBasename(const string& str) {
+	return str.substr(0,str.find_last_of("."));
+}
 

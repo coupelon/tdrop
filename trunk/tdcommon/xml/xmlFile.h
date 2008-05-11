@@ -42,6 +42,12 @@ public:
   bool openUrl(string, tdParam *);
   
   /**
+   * This method tries to open an xml formatted string
+   * @return true in case of success
+   */
+  bool openMemory(string content);
+  
+  /**
    * Closes the file
    */
   void close();

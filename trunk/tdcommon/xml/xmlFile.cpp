@@ -66,6 +66,27 @@ bool xmlFile::openUrl(string f, tdParam *tdp) {
     return true;   
 }
 
+bool xmlFile::openMemory(string content) {
+    filename = "";
+
+    if (doc) {
+        xmlFreeDoc(doc);
+        xmlCleanupParser();
+        if (rc) {
+        	delete rc;
+        	rc = NULL;
+        }
+    }
+    rc = new rawContainer();
+    rc->append(content.c_str(),content.size());
+    doc = xmlReadMemory(rc->getContent(), rc->getLength(), "", NULL, 0);
+    if (doc == NULL) {
+        return false;
+    }
+    root_element = xmlDocGetRootElement(doc);
+    return true;   
+}
+
 void xmlFile::close() {
     if (doc)
       xmlFreeDoc(doc);
