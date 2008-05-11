@@ -11,6 +11,48 @@ See the License for the specific language governing permissions and limitations 
 map<string, metaRank*> *TdDaemon::globalSearches = NULL;
 tdParam *TdDaemon::tdp = NULL;
 
+void TdDaemon::save_config(string s) {
+	xmlFile xf;
+	getHttp gh;
+	string path = selectFile::getHomeDirectory();
+	gh.setParam(tdp);
+	if (xf.openMemory(s)) {
+		//Write the data to the config file.
+		ofstream config;
+		config.open(string(path + "config.xml").c_str(), ios::out | ios::trunc | ios::binary);
+		if (config.is_open()) {
+			config << "<?xml version=\"1.0\"?>" << endl << "<config>" << endl;
+			nodeDoc ndCateg(&xf,"category");
+			while(ndCateg.isValid()) {
+				config << "\t<category name=\"" << ndCateg.getAttributeValueByName("name");
+				config << "\">" << endl;
+				nodeDoc ndEngine(&xf,"engine",ndCateg);
+				while(ndEngine.isValid()) {
+					string url = ndEngine.getAttributeValueByName("url");
+					string file = ndEngine.getAttributeValueByName("path");
+					if (url != "") {
+						file =  "xml/" + selectFile::getFilename(url);
+						address ad;
+						ad.url = url;
+						if (gh.getFile(ad,path + file)) {
+							//TODO: retrieve the icon.
+						}
+					}
+					config << "\t\t<engine path=\"" << file
+								 << "\" version=\"" << ndEngine.getAttributeValueByName("version")
+								 << "\" />" << endl;
+					ndEngine.next();
+				}
+				config << "\t</category>" << endl;
+				ndCateg.next();
+			}
+			config << "</config>" << endl;
+			config.close();
+		}
+		tdp->commit();
+	}
+}
+
 string TdDaemon::createJSON(bool final, metaRank *mr) {
 	string pre;
 	if (final) {
@@ -123,7 +165,7 @@ string TdDaemon::show_tree() {
 				output += filepath;
 				string filename = selectFile::getFilename(filepath);
 				//Only keep the filename without extension
-				filename = filename.substr(0,filename.find_last_of("."));
+				filename = selectFile::getBasename(filename);
 
 				output += "\",\"icon\":\"";
 				output += "/engines_icons/" + filename + ".png";
@@ -160,26 +202,28 @@ string TdDaemon::show_available_engines() {
 		nodeDoc ndCateg(&xf,"category");
 		while(ndCateg.isValid()) {
 			nodeDoc ndEngine(&xf,"engine",ndCateg);
+			string engines;
 			while(ndEngine.isValid()) {
-				output += "{\"select\":\"true\",\"categ\":\"" + ndCateg.getAttributeValueByName("name") + "\",";
+				engines += "{\"select\":\"true\",\"categ\":\"" + ndCateg.getAttributeValueByName("name") + "\",";
 				string filepath = ndEngine.getAttributeValueByName("path");
-				output += "\"file\":\"" + filepath + "\",\"name\":\"";
+				engines += "\"file\":\"" + filepath + "\",\"name\":\"";
 
 				xmlEngine xe;
 				if (xe.openEngine(filepath)) {
-					output += xe.getName();
+					engines += xe.getName();
 				} else {
-					output += selectFile::getFilename(filepath);;
+					engines += selectFile::getFilename(filepath);;
 				}				
-				output += "\",";
+				engines += "\",";
 				string version = ndEngine.getAttributeValueByName("version");
-				output += "\"version\":\"" + version + "\"}";
+				engines += "\"version\":\"" + version + "\"}";
 
 				ndEngine.next();
-				if (ndEngine.isValid()) output += ",";
+				if (ndEngine.isValid()) engines += ",";
 			}
 			ndCateg.next();
-			output += ",";
+			output += engines;
+			if (engines != "") output += ",";
 		}
 	}
 	if (xf.openUrl(UPDATE_URL,tdp)) {
@@ -233,13 +277,13 @@ void TdDaemon::query_process(struct shttpd_arg *arg) {
 	/* If the connection was broken prematurely, cleanup */
 	if (arg->flags & SHTTPD_CONNECTION_ERROR && arg->state) {
 		delete (struct state *)arg->state;
-	} else if (uri == QUERY_POST && (s = shttpd_get_header(arg, "Content-Length")) == NULL) {
+	} else if ((uri == QUERY_POST || uri == SAVE_ENGINES) && (s = shttpd_get_header(arg, "Content-Length")) == NULL) {
 		shttpd_printf(arg, "HTTP/1.0 411 Length Required\n\n");
 		arg->flags |= SHTTPD_END_OF_OUTPUT;
 	} else if (arg->state == NULL) {
 		/* New request. Allocate a state structure */
 		arg->state = state = new (struct state);
-		if (uri == QUERY_POST)
+		if (uri == QUERY_POST || uri == SAVE_ENGINES)
 			state->cl = strtoul(s, NULL, 10);
 		else
 			state->cl = 0;
@@ -275,6 +319,8 @@ void TdDaemon::query_process(struct shttpd_arg *arg) {
 					state->buffer = show_tree();
 				} else if (uri == AVAILABLE_ENGINES) {
 					state->buffer = show_available_engines();
+				} else if (uri == SAVE_ENGINES) {
+					save_config(state->buffer);
 				}
 			}
 			while (arg->out.num_bytes < arg->out.len && state->count < state->buffer.length()) {
@@ -359,6 +405,7 @@ void TdDaemon::launchDaemon(tdParam *t) {
 	shttpd_register_uri(ctx, WEBINTERFACE_ENGINES_ICONS_URI, &show_engines_icons, NULL);
 	shttpd_register_uri(ctx, WEBINTERFACE_URI, &show_wi, NULL);
 	shttpd_register_uri(ctx, AVAILABLE_ENGINES, &query_process, NULL);
+	shttpd_register_uri(ctx, SAVE_ENGINES, &query_process, NULL);
 
 	shttpd_handle_error(ctx, 404, show_404, NULL);
 
