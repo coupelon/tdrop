@@ -72,3 +72,11 @@
 	background-image: url( imgs/highlight.png );
 }
 
+.add .x-btn-text {
+	background-image: url( imgs/add.gif );
+}
+
+.save .x-btn-text {
+	background-image: url( imgs/save.gif );
+}
+
