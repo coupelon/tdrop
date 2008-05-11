@@ -37,6 +37,8 @@ See the License for the specific language governing permissions and limitations 
 #define NEXT_RESULTS "/services/get_next_results"
 #define QUERY_POST "/services/query_post"
 #define REQUEST_TREE "/services/request_tree"
+#define AVAILABLE_ENGINES "/config/get_available_engines"
+#define UPDATE_URL "http://www.teardrop.fr/updates.xml"
 
 using namespace std;
 
@@ -60,6 +62,7 @@ private:
 	static void show_file(struct shttpd_arg *arg,string filename);
 	static void show_engines_icons(struct shttpd_arg *arg);
 	static void show_wi(struct shttpd_arg *arg);
+	static string show_available_engines();
 	
 	//The map that will hold sessions
 	static map<string, metaRank*> *globalSearches;
