@@ -161,7 +161,7 @@ string TdDaemon::show_available_engines() {
 		while(ndCateg.isValid()) {
 			nodeDoc ndEngine(&xf,"engine",ndCateg);
 			while(ndEngine.isValid()) {
-				output += "{\"categ\":\"" + ndCateg.getAttributeValueByName("name") + "\",";
+				output += "{\"select\":\"true\",\"categ\":\"" + ndCateg.getAttributeValueByName("name") + "\",";
 				string filepath = ndEngine.getAttributeValueByName("path");
 				output += "\"file\":\"" + filepath + "\",\"name\":\"";
 
@@ -187,7 +187,7 @@ string TdDaemon::show_available_engines() {
 		while(ndCateg.isValid()) {
 			nodeDoc ndEngine(&xf,"engine",ndCateg);
 			while(ndEngine.isValid()) {
-				output += "{\"categ\":\"" + ndCateg.getAttributeValueByName("name") + "\",";
+				output += "{\"select\":\"false\",\"categ\":\"" + ndCateg.getAttributeValueByName("name") + "\",";
 				string filepath = ndEngine.getAttributeValueByName("url");
 				output += "\"file\":\"" + filepath + "\",\"name\":\"";
 
