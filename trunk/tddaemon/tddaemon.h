@@ -39,6 +39,7 @@ See the License for the specific language governing permissions and limitations 
 #define REQUEST_TREE "/services/request_tree"
 #define AVAILABLE_ENGINES "/config/get_available_engines"
 #define UPDATE_URL "http://www.teardrop.fr/updates.xml"
+#define SAVE_ENGINES "/config/save_engines"
 
 using namespace std;
 
@@ -63,6 +64,7 @@ private:
 	static void show_engines_icons(struct shttpd_arg *arg);
 	static void show_wi(struct shttpd_arg *arg);
 	static string show_available_engines();
+	static void save_config(string s);
 	
 	//The map that will hold sessions
 	static map<string, metaRank*> *globalSearches;
