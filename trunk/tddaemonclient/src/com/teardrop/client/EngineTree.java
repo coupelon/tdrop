@@ -96,7 +96,7 @@ public class EngineTree extends TreePanel {
 	    Toolbar toolbar = new Toolbar();
 		ToolbarButton editTree = new ToolbarButton("Edit", new ButtonListenerAdapter() {  
 			public void onClick(final Button innerButton, EventObject e) {  
-				new EditTree(EngineTree.this.centerPanel);
+				new EditTree(EngineTree.this.centerPanel, EngineTree.this);
 			}  
 		});
 		editTree.setCls("x-btn-text-icon info");

@@ -46,6 +46,7 @@ public class EditTree {
 	private static final String GET_AVAILABLE_ENGINES = "/config/get_available_engines";
 	private static final String SAVE_ENGINES = "/config/save_engines";
 	TabPanel centerPanel;
+	EngineTree engTree;
 	EditorGridPanel editPanel;
 	Store engineStore;
 	SimpleStore categStore;
@@ -64,8 +65,9 @@ public class EditTree {
 			new StringFieldDef("name")
 		});
 	
-	public EditTree(TabPanel centerPanel) {
+	public EditTree(TabPanel centerPanel, EngineTree engTree) {
 		this.centerPanel = centerPanel;
+		this.engTree = engTree;
 		
 		//Store initialisation
 		engineStore = new Store(recordEngineDef);
@@ -230,20 +232,29 @@ public class EditTree {
   }
     
   void generateOutput() {
-	  String post = "";
+	  String post = "<config>\n";
 	  for(int j = 0; j < categStore.getCount(); ++j) {
-		  post += "<category name=\"" + categStore.getAt(j).getAsString("name") + "\">\n";
+		  String engineString = ""; 
 		  for(int i = 0; i < engineStore.getCount(); ++i) {
 			  if (engineStore.getAt(i).getAsBoolean("select") && 
 					  engineStore.getAt(i).getAsString("categ").equals(categStore.getAt(j).getAsString("name"))) {
-				  post += "\t<engine name=\"" + engineStore.getAt(i).getAsString("name");
-				  post += "\" path=\"" + engineStore.getAt(i).getAsString("file");
-				  post += "\" version=\"" + engineStore.getAt(i).getAsString("version");
-				  post += " />\n";
+				  engineString += "\t<engine name=\"" + engineStore.getAt(i).getAsString("name");
+				  if (engineStore.getAt(i).getAsString("file").indexOf("://") != -1) {
+					  engineString += "\" url=\"" + engineStore.getAt(i).getAsString("file");
+				  } else {
+					  engineString += "\" path=\"" + engineStore.getAt(i).getAsString("file");
+				  }
+				  engineString += "\" version=\"" + engineStore.getAt(i).getAsString("version");
+				  engineString += "\" />\n";
 			  }
 		  }
-		  post += "</category>";
+		  if (!"".equals(engineString)) {
+			  post += "<category name=\"" + categStore.getAt(j).getAsString("name") + "\">\n" +
+			  		  engineString + "</category>\n";
+		  }
 	  }
+	  post += "</config>";
 	  doFetchURL(post, SAVE_ENGINES);
+	  gridElement.mask("Applying the new configuration");
   }
 }
