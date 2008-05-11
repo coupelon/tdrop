@@ -151,6 +151,63 @@ string TdDaemon::show_tree() {
 	return output;
 }
 
+string TdDaemon::show_available_engines() {
+	xmlFile xf;
+	string config_path;
+	string output = "";
+  output += "{\"engines\":[";
+	if (selectFile::find("config.xml",config_path) && xf.openFile(config_path)) {
+		nodeDoc ndCateg(&xf,"category");
+		while(ndCateg.isValid()) {
+			nodeDoc ndEngine(&xf,"engine",ndCateg);
+			while(ndEngine.isValid()) {
+				output += "{\"categ\":\"" + ndCateg.getAttributeValueByName("name") + "\",";
+				string filepath = ndEngine.getAttributeValueByName("path");
+				output += "\"file\":\"" + filepath + "\",\"name\":\"";
+
+				xmlEngine xe;
+				if (xe.openEngine(filepath)) {
+					output += xe.getName();
+				} else {
+					output += selectFile::getFilename(filepath);;
+				}				
+				output += "\",";
+				string version = ndEngine.getAttributeValueByName("version");
+				output += "\"version\":\"" + version + "\"}";
+
+				ndEngine.next();
+				if (ndEngine.isValid()) output += ",";
+			}
+			ndCateg.next();
+			output += ",";
+		}
+	}
+	if (xf.openUrl(UPDATE_URL,tdp)) {
+		nodeDoc ndCateg(&xf,"category");
+		while(ndCateg.isValid()) {
+			nodeDoc ndEngine(&xf,"engine",ndCateg);
+			while(ndEngine.isValid()) {
+				output += "{\"categ\":\"" + ndCateg.getAttributeValueByName("name") + "\",";
+				string filepath = ndEngine.getAttributeValueByName("url");
+				output += "\"file\":\"" + filepath + "\",\"name\":\"";
+
+				output += ndEngine.getAttributeValueByName("name");	
+				
+				output += "\",";
+				string version = ndEngine.getAttributeValueByName("version");
+				output += "\"version\":\"" + version + "\"}";
+
+				ndEngine.next();
+				if (ndEngine.isValid()) output += ",";
+			}
+			ndCateg.next();
+			if (ndCateg.isValid()) output += ",";
+		}
+	}
+	output+="]}";
+	return output;
+}
+
 /*
  * This callback function is used to show how to handle 404 error
  */
@@ -216,6 +273,8 @@ void TdDaemon::query_process(struct shttpd_arg *arg) {
 					}
 				} else if (uri == REQUEST_TREE) {
 					state->buffer = show_tree();
+				} else if (uri == AVAILABLE_ENGINES) {
+					state->buffer = show_available_engines();
 				}
 			}
 			while (arg->out.num_bytes < arg->out.len && state->count < state->buffer.length()) {
@@ -299,6 +358,7 @@ void TdDaemon::launchDaemon(tdParam *t) {
 	shttpd_register_uri(ctx, NEXT_RESULTS, &query_process, NULL);
 	shttpd_register_uri(ctx, WEBINTERFACE_ENGINES_ICONS_URI, &show_engines_icons, NULL);
 	shttpd_register_uri(ctx, WEBINTERFACE_URI, &show_wi, NULL);
+	shttpd_register_uri(ctx, AVAILABLE_ENGINES, &query_process, NULL);
 
 	shttpd_handle_error(ctx, 404, show_404, NULL);
 
