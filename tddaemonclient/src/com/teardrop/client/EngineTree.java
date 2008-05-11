@@ -18,7 +18,13 @@ import com.google.gwt.json.client.JSONArray;
 import com.google.gwt.json.client.JSONException;
 import com.google.gwt.json.client.JSONParser;
 import com.google.gwt.json.client.JSONValue;
+import com.gwtext.client.core.EventObject;
 import com.gwtext.client.data.Node;
+import com.gwtext.client.widgets.Button;
+import com.gwtext.client.widgets.TabPanel;
+import com.gwtext.client.widgets.Toolbar;
+import com.gwtext.client.widgets.ToolbarButton;
+import com.gwtext.client.widgets.event.ButtonListenerAdapter;
 import com.gwtext.client.widgets.tree.TreeNode;
 import com.gwtext.client.widgets.tree.TreePanel;
 import com.gwtext.client.widgets.tree.event.TreeNodeListener;
@@ -66,8 +72,11 @@ public class EngineTree extends TreePanel {
 		}
 	};
 	
-	public EngineTree() {
+	final TabPanel centerPanel;
+	
+	public EngineTree(TabPanel centerPanel) {
 		super();
+		this.centerPanel = centerPanel;
 		// TODO Auto-generated constructor stub
 		TreeNode aroot = new TreeNode("categories"); 
 		setRootNode(aroot);
@@ -83,6 +92,18 @@ public class EngineTree extends TreePanel {
 	    doFetchURL();
 	    setVisible(true);
 	    setPaddings(5);
+	    
+	    Toolbar toolbar = new Toolbar();
+		ToolbarButton editTree = new ToolbarButton("Edit", new ButtonListenerAdapter() {  
+			public void onClick(final Button innerButton, EventObject e) {  
+				new EditTree(EngineTree.this.centerPanel);
+			}  
+		});
+		editTree.setCls("x-btn-text-icon info");
+		editTree.setTooltip("Edit the engines");
+		toolbar.addButton(editTree);
+		setTopToolbar(toolbar);
+	    
 	}
 
 	/*

@@ -30,10 +30,10 @@ import com.gwtext.client.widgets.menu.CheckItem;
  */
 public class WebInterface implements EntryPoint {
 	  private static final String SEARCH_BUTTON_DEFAULT_TEXT = "Search";
-	  private EngineTree engTree = new EngineTree();
 	  private TextField queryText = new TextField("");
 	  private CycleButton limitButton = new CycleButton();
 	  private TabPanel centerPanel = new TabPanel();
+	  private EngineTree engTree = new EngineTree(centerPanel);
 	  private Button searchButton = new Button(SEARCH_BUTTON_DEFAULT_TEXT);
 
 	  /**
