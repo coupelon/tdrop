@@ -29,7 +29,7 @@ public:
      * @param pt A pointer to the data to copy
      * @param value The size of the data to copy in memory
      */
-    void append(char *pt,size_t value) {
+    void append(const char *pt,size_t value) {
         content = (char *) realloc(content,(size+value)*sizeof(char *));
         memcpy(content+size,pt,value);
         size += value;

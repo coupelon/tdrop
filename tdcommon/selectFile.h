@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and limitations 
 #include "debugmacro.h"
 
 #ifndef HOME_LINUX
-#define HOME_LINUX "~/.teardrop/"
+#define HOME_LINUX "/.teardrop/"
 #endif
 
 using namespace std;
@@ -42,6 +42,14 @@ public:
      * @return the file name
      */
     static string getFilename(const string& str);
+    
+    /**
+     * This method returns the filename of the given string, 
+     * without its extension.
+     * @param str the string containing the filename
+     * @return the base file name
+     */
+    static string getBasename(const string& str);
 private:
     static bool fileexist(string);
 };
