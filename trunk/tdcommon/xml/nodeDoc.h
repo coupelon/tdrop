@@ -11,6 +11,8 @@ See the License for the specific language governing permissions and limitations 
 
 #include "xmlFile.h"
 
+class xmlFile;
+
 class nodeDoc {
 public:
 	/**

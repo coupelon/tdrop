@@ -12,11 +12,14 @@ xmlFile::xmlFile() {
     filename = "";
     doc = NULL;
     root_element = NULL;
+    rc = NULL;
 }
 
 xmlFile::~xmlFile() {
     if (doc)
         xmlFreeDoc(doc);
+    if (rc)
+        delete rc;
     xmlCleanupParser();
 }
 
@@ -25,6 +28,10 @@ bool xmlFile::openFile(string f) {
     if (doc) {
         xmlFreeDoc(doc);
         xmlCleanupParser();
+        if (rc) {
+        	delete rc;
+        	rc = NULL;
+        }
     }
     doc = xmlReadFile(filename.c_str(), NULL, 0);
     if (doc == NULL) {
@@ -34,9 +41,38 @@ bool xmlFile::openFile(string f) {
     return true;   
 }
 
+bool xmlFile::openUrl(string f, tdParam *tdp) {
+    filename = f;
+    getHttp gh;
+    gh.setParam(tdp);
+    address ad;
+    ad.url = f;
+    if (doc) {
+        xmlFreeDoc(doc);
+        xmlCleanupParser();
+        if (rc) {
+        	delete rc;
+        	rc = NULL;
+        }
+    }
+    rc = new rawContainer();
+    
+    if (!gh.getRawData(ad,rc)) return false;
+    doc = xmlReadMemory(rc->getContent(), rc->getLength(), f.c_str(), NULL, 0);
+    if (doc == NULL) {
+        return false;
+    }
+    root_element = xmlDocGetRootElement(doc);
+    return true;   
+}
+
 void xmlFile::close() {
     if (doc)
-        xmlFreeDoc(doc);
+      xmlFreeDoc(doc);
+    if (rc) {
+    	delete rc;
+    	rc = NULL;
+    }
 }
 
 
@@ -73,5 +109,3 @@ string & xmlFile::getFilename() {
 xmlNode *xmlFile::getRootElement() {
 	return root_element;
 }
-
-

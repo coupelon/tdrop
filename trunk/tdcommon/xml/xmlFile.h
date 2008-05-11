@@ -15,6 +15,13 @@ See the License for the specific language governing permissions and limitations 
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 
+#include "../net/getHttp.h"
+#include "../net/rawContainer.h"
+#include "../tdParam.h"
+#include "../address.h"
+
+class tdParam;
+
 using namespace std;
 
 class xmlFile {
@@ -27,6 +34,12 @@ public:
    * @return true in case of success
    */
   bool openFile(string);
+  
+  /**
+   * This method tries to open the given url
+   * @return true in case of success
+   */
+  bool openUrl(string, tdParam *);
   
   /**
    * Closes the file
@@ -52,6 +65,7 @@ private:
   string filename;
   xmlDoc *doc;
   xmlNode *root_element;
+  rawContainer *rc;
 };
 
 #endif
