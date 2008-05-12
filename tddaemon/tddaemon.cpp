@@ -35,7 +35,13 @@ void TdDaemon::save_config(string s) {
 						address ad;
 						ad.url = url;
 						if (gh.getFile(ad,path + file)) {
+							//The url should be of the form http://*/xml/*.xml
 							//TODO: retrieve the icon.
+							string icon = "icons/" +
+														selectFile::getBasename(selectFile::getFilename(url)) +
+														".png";
+							ad.url = url.substr(0,url.find_last_of("xml/")) + icon;
+							gh.getFile(ad,path + icon);
 						}
 					}
 					config << "\t\t<engine path=\"" << file
