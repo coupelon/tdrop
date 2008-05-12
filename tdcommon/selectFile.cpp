@@ -68,3 +68,22 @@ string selectFile::getBasename(const string& str) {
 string selectFile::getHomeConfigFile() {
 	return getHomeDirectory() + CONFIG_FILE;
 }
+
+void selectFile::createDirectoryStructure() {
+		/* Create the Teardrop personal directory if it doesn't exist */
+    string path = selectFile::getHomeDirectory();
+    umask(0);
+    mkdir(path.c_str(),0755);
+    
+    mkdir((path+"xml/").c_str(),0755);
+    mkdir((path+"icons/").c_str(),0755);
+    if (!fileexist(getHomeConfigFile())) {
+    	ofstream config;
+			config.open(selectFile::getHomeConfigFile().c_str(), ios::out | ios::app | ios::binary);
+			config << "<?xml version=\"1.0\"?>"
+						 << endl << "<config>" << endl
+						 << "</config>" << endl;
+			config.close();
+    }
+}
+
