@@ -16,6 +16,7 @@ tdParam::tdParam() {
     proxy_type = CURLPROXY_HTTP;
     curl_timeout = CURL_TIMEOUT;
     max_threads = THMAX;
+    selectFile::createDirectoryStructure();
     getInitValues();
 }
 

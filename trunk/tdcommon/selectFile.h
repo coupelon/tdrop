@@ -11,6 +11,8 @@ See the License for the specific language governing permissions and limitations 
 
 #include <fstream>
 #include <string>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include "debugmacro.h"
 
 #ifndef HOME_LINUX
@@ -57,6 +59,11 @@ public:
      * @return The full path of the personnal config file.
      */
     static string getHomeConfigFile();
+    
+    /**
+     * Creates the home directory structure
+     */
+     static void createDirectoryStructure();
 private:
     static bool fileexist(string);
 };
