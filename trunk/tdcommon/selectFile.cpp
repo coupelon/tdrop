@@ -65,3 +65,6 @@ string selectFile::getBasename(const string& str) {
 	return str.substr(0,str.find_last_of("."));
 }
 
+string selectFile::getHomeConfigFile() {
+	return getHomeDirectory() + CONFIG_FILE;
+}

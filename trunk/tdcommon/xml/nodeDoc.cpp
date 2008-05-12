@@ -8,6 +8,12 @@ See the License for the specific language governing permissions and limitations 
 
 #include "nodeDoc.h"
 
+nodeDoc::nodeDoc(xmlFile *xf) {
+	name = "";
+	this->xf = xf;
+	node = xf->getRootElement();
+}
+
 nodeDoc::nodeDoc(xmlFile *xf, string nd) {
 	name = nd;
 	this->xf = xf;
@@ -111,12 +117,15 @@ xmlNode *nodeDoc::findPreviousNodeByName(xmlNode *p, string c) {
     return child;
 }
 
-void nodeDoc::setNodeContent(string c) {
-    if (!node && name == "") return;
-    if (node) {
-        xmlNodeSetContent(node,(const xmlChar*) c.c_str());
+void nodeDoc::setChildContent(string name, string c) {
+    if (name == "") return;
+    if (!node) node = xf->getRootElement();
+    xmlNode *child = findChildByName(node,name);
+    if (child) {
+        xmlNodeSetContent(child,(const xmlChar*) c.c_str());
     } else {
         xmlNewChild(node,NULL,(const xmlChar*) name.c_str(),(const xmlChar*) c.c_str());
+        
     }
 }
 

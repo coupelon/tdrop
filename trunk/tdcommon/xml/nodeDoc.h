@@ -17,6 +17,12 @@ class nodeDoc {
 public:
 	/**
 	 * Create a new nodeDoc
+	 * @param xf The xml file 
+	 */
+	nodeDoc(xmlFile *xf);
+
+	/**
+	 * Create a new nodeDoc
 	 * @param xf The xml file
 	 * @param nd The parent node name. This node should be accessible from root. 
 	 */
@@ -54,10 +60,11 @@ public:
 	string getAttributeValueByName(string name);
 	
 	/**
-	 * Sets the content of the current node. Create it if needed.
+	 * Sets the content of the targetted current child's item. Create it if needed.
+	 * @param name The name of the child
 	 * @param c The new node value
 	 */
-	void setNodeContent(string c);
+	void setChildContent(string name, string c);
 	
 	/**
 	 * Jump to the specified named current node's child

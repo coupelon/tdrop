@@ -73,7 +73,7 @@ void tdParam::getInitValues() {
   //Setting proxy settings
   xmlFile xf;
   string path;
-  if (selectFile::find("config.xml",path) && xf.openFile(path))
+  if (selectFile::find(CONFIG_FILE,path) && xf.openFile(path))
   {
     nodeDoc *n = new nodeDoc(&xf,"browser");
     if (n->isValid())
@@ -111,24 +111,16 @@ void tdParam::getInitValues() {
 
 void tdParam::commit() {
   xmlFile xf;
-  string path;
-  if (selectFile::find("config.xml",path) && xf.openFile(path))
-  {
-  	nodeDoc n(&xf,"browser");
-		n.setNodeContent(getBrowser());
-		n.findChildByName("proxy-address",NULL);
-		n.setNodeContent(getProxyAddress());
-		n.findChildByName("proxy-port",NULL);
-		n.setNodeContent(xmlFile::ltoa(getProxyPort()));
-    n.findChildByName("proxy-type",NULL);
-    n.setNodeContent((getProxyType()==CURLPROXY_HTTP)?"HTTP":"SOCKS5");
-    n.findChildByName("timeout",NULL);
-    n.setNodeContent(xmlFile::ltoa(getTimeout()));
-    n.findChildByName("maxthreads",NULL);
-    n.setNodeContent(xmlFile::ltoa(getMaxThreads()));
-
-    string out = selectFile::getHomeDirectory() + "config.xml";
-    xf.saveDocTo(out);
+  if (xf.openFile(selectFile::getHomeConfigFile())) {
+  	nodeDoc n(&xf);
+		n.setChildContent("browser",getBrowser());
+		n.setChildContent("proxy-address", getProxyAddress());
+		n.setChildContent("proxy-port",xmlFile::ltoa(getProxyPort()));
+    n.setChildContent("proxy-type",(getProxyType()==CURLPROXY_HTTP)?"HTTP":"SOCKS5");
+    n.setChildContent("timeout",xmlFile::ltoa(getTimeout()));
+    n.setChildContent("maxthreads",xmlFile::ltoa(getMaxThreads()));
+    
+    xf.saveDocTo(selectFile::getHomeConfigFile()); 
   }
 }
 

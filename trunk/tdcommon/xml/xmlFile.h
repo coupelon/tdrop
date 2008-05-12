@@ -56,7 +56,7 @@ public:
    * Saves the XML doc to the specified file
    * @return true if saving succeeded
    */
-  bool saveDocTo(string &);
+  bool saveDocTo(const string &);
   
   /** Convert an integer to a string */
   static string itoa(int);
