@@ -19,7 +19,7 @@ void TdDaemon::save_config(string s) {
 	if (xf.openMemory(s)) {
 		//Write the data to the config file.
 		ofstream config;
-		config.open(string(path + "config.xml").c_str(), ios::out | ios::trunc | ios::binary);
+		config.open(selectFile::getHomeConfigFile().c_str(), ios::out | ios::trunc | ios::binary);
 		if (config.is_open()) {
 			config << "<?xml version=\"1.0\"?>" << endl << "<config>" << endl;
 			nodeDoc ndCateg(&xf,"category");
@@ -150,7 +150,7 @@ string TdDaemon::show_tree() {
 	string config_path;
 	string output = "";
 	
-	if (selectFile::find("config.xml",config_path) && xf.openFile(config_path)) {
+	if (selectFile::find(CONFIG_FILE,config_path) && xf.openFile(config_path)) {
 		nodeDoc ndCateg(&xf,"category");
 		output += "{\"categories\":[";
 		while(ndCateg.isValid()) {
@@ -198,7 +198,7 @@ string TdDaemon::show_available_engines() {
 	string config_path;
 	string output = "";
   output += "{\"engines\":[";
-	if (selectFile::find("config.xml",config_path) && xf.openFile(config_path)) {
+	if (selectFile::find(CONFIG_FILE,config_path) && xf.openFile(config_path)) {
 		nodeDoc ndCateg(&xf,"category");
 		while(ndCateg.isValid()) {
 			nodeDoc ndEngine(&xf,"engine",ndCateg);
