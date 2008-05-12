@@ -40,7 +40,7 @@ void TdDaemon::save_config(string s) {
 							string icon = "icons/" +
 														selectFile::getBasename(selectFile::getFilename(url)) +
 														".png";
-							ad.url = url.substr(0,url.find_last_of("xml/")) + icon;
+							ad.url = url.substr(0,url.find("/xml")) + "/" + icon;
 							gh.getFile(ad,path + icon);
 						}
 					}
@@ -370,7 +370,7 @@ void TdDaemon::show_file(struct shttpd_arg *arg,string filename) {
 }
 
 void TdDaemon::show_engines_icons(struct shttpd_arg *arg) {
-	string filename = WORKSPACE + string(WEBINTERFACE_ENGINES_ICONS) + string(shttpd_get_env(arg, "REQUEST_URI")).erase(0,WEBINTERFACE_ENGINES_ICONS_SIZE);
+	string filename = string(WEBINTERFACE_ENGINES_ICONS) + string(shttpd_get_env(arg, "REQUEST_URI")).erase(0,WEBINTERFACE_ENGINES_ICONS_SIZE);
 	FILE *fp = fopen(filename.c_str(),"rb");
 	if (fp == NULL) filename = string (WORKSPACE) + string(WEBINTERFACE_PATH) + "imgs/default_engine.png";
 	else fclose(fp);
