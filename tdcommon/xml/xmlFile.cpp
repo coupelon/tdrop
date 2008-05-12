@@ -98,8 +98,8 @@ void xmlFile::close() {
 
 
 
-bool xmlFile::saveDocTo(string & file) {
-    FILE *f = fopen(file.c_str(),"wb");
+bool xmlFile::saveDocTo(const string & file) {
+	  FILE *f = fopen(file.c_str(),"wb");
     if (f) {
         xmlOutputBufferPtr output = xmlOutputBufferCreateFile(f, NULL);
         if (output) {

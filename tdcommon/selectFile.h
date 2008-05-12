@@ -17,6 +17,8 @@ See the License for the specific language governing permissions and limitations 
 #define HOME_LINUX "/.teardrop/"
 #endif
 
+#define CONFIG_FILE "config.xml"
+
 using namespace std;
 
 class selectFile {
@@ -50,6 +52,11 @@ public:
      * @return the base file name
      */
     static string getBasename(const string& str);
+    
+    /**
+     * @return The full path of the personnal config file.
+     */
+    static string getHomeConfigFile();
 private:
     static bool fileexist(string);
 };
