@@ -170,13 +170,38 @@ public class EditTree {
 		gridElement = Ext.get(editPanel.getId());
 		gridElement.mask("Looking for available engines...");
 		
-		doFetchURL("",GET_AVAILABLE_ENGINES);
+		doFetchURL(GET_AVAILABLE_ENGINES);
 	}
 	
 	/*
 	 * Fetch the requested URL.
 	 */
-	private void doFetchURL(String post, String url) {
+	private void doFetchURL(String url) {
+	    RequestBuilder builder = new RequestBuilder(RequestBuilder.POST, URL.encode(url));
+	    try {
+	    	builder.sendRequest("", new RequestCallback() {
+				public void onError(Request request, Throwable exception) {
+					Window.alert("Couldn't connect to server (could be timeout, SOP violation, etc.)");     
+				}
+				
+				public void onResponseReceived(Request request, Response response) {
+				  if (200 == response.getStatusCode()) {
+					  generateAvailableEngineList(JSONParser.parse(response.getText()));					  
+					  editPanel.getView().refresh();
+				  } else {
+					  Window.alert("Incorrect status: " + response.getStatusText());
+				  }
+				}
+			});
+    	} catch (RequestException e) {
+    		Window.alert("Couldn't connect to server (could be timeout, SOP violation, etc.)");      
+    	}
+	}
+	
+	/*
+	 * POST the requested URL and data.
+	 */
+	private void doPostURL(String post, String url) {
 	    RequestBuilder builder = new RequestBuilder(RequestBuilder.POST, URL.encode(url));
 	    try {
 	    	builder.setHeader("Content-Length", String.valueOf(post.length()));
@@ -189,6 +214,7 @@ public class EditTree {
 				  if (200 == response.getStatusCode()) {
 					  generateAvailableEngineList(JSONParser.parse(response.getText()));					  
 					  editPanel.getView().refresh();
+					  engTree.loadEngineTree();
 				  } else {
 					  Window.alert("Incorrect status: " + response.getStatusText());
 				  }
@@ -254,7 +280,7 @@ public class EditTree {
 		  }
 	  }
 	  post += "</config>";
-	  doFetchURL(post, SAVE_ENGINES);
+	  doPostURL(post, SAVE_ENGINES);
 	  gridElement.mask("Applying the new configuration");
   }
 }

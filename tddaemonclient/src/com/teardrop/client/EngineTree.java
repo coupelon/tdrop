@@ -89,7 +89,7 @@ public class EngineTree extends TreePanel {
 	    setContainerScroll(true);  
 	    setAutoScroll(true);  
 	    setRootVisible(false);
-	    doFetchURL();
+	    loadEngineTree();
 	    setVisible(true);
 	    setPaddings(5);
 	    
@@ -110,7 +110,10 @@ public class EngineTree extends TreePanel {
 	   * Add the object presented by the JSONValue as a children to the requested
 	   * TreeItem.
 	   */
-	  private void generateEngineTree(TreeNode treeItem, JSONValue jsonValue) {	    
+	  private void generateEngineTree(TreeNode treeItem, JSONValue jsonValue) {
+		while (treeItem.getChildNodes().length > 0) {
+			treeItem.removeChild(treeItem.getLastChild());
+		}
 	    JSONValue categ;
 	    if ((categ = JSONFunctions.getJSONSet(jsonValue,"categories")) != null) {
 	    	JSONArray categArray;
@@ -155,7 +158,7 @@ public class EngineTree extends TreePanel {
 	  /*
 	   * Fetch the requested URL.
 	   */
-	  private void doFetchURL() {
+	  public void loadEngineTree() {
 	    RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, URL.encode(DEFAULT_SEARCH_URL));
 	    try {
 	    	builder.sendRequest(null, new RequestCallback() {
