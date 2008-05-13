@@ -1,0 +1,30 @@
+<!--
+# Teardrop Engine File
+-->
+<engine xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="teardrop_1_0.xsd">
+	<name>EasyBourse Forums</name>
+	<separator value=" " />
+	<charset>ISO-8859-1</charset>
+	<query method="POST">
+		<url>http://www.easybourse.com/forum-bourse/recherche/?forum=</url>
+		<inputfield name="MotsCles" value="%q" />
+		<inputfield name="TypeRecherche" value="message" />
+	</query>
+	<result>
+		<regexp><![CDATA[href="([^"]*)"\s+class="TexteForumViolet"\s+onmouseover="info_bulle\('','(.*?)','[^>]*><u>([^<]*)]]></regexp>
+		<field num="1" comparable="yes" name="url">http://www.easybourse.com/%s</field>
+		<field num="2" striphtml="yes" name="abstract" />
+		<field num="3" striphtml="yes" name="title" />
+	</result>
+	<nextinput method="GET">
+		<regexp><![CDATA[np=([0-9]+)\&PHPSESSID=([^"]*)"\s+class="TexteForumBlancPetitGras">page suivante</a>]]></regexp>
+		<url>http://www.easybourse.com/forum-bourse/recherche/</url>
+		<inputfield name="MotsCles" value="%q" />
+		<inputfield name="TypeRecherche" value="message" />
+		<inputfield num="1" name="np" value="%s" />
+		<inputfield num="2" name="PHPSESSID" value="%s" />
+	</nextinput>
+</engine>
+
+
