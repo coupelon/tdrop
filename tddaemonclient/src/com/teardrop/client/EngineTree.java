@@ -99,11 +99,10 @@ public class EngineTree extends TreePanel {
 				new EditTree(EngineTree.this.centerPanel, EngineTree.this);
 			}  
 		});
-		editTree.setCls("x-btn-text-icon info");
+		editTree.setCls("x-btn-text-icon edit_tree");
 		editTree.setTooltip("Edit the engines");
 		toolbar.addButton(editTree);
 		setTopToolbar(toolbar);
-	    
 	}
 
 	/*

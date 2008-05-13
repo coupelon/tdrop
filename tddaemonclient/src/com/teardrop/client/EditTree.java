@@ -96,6 +96,7 @@ public class EditTree {
 		categBox = new ComboBox();  
 	    categBox.setDisplayField("name");  
 		categBox.setStore(categStore);
+		categBox.setEditable(false);
 		categColumn.setEditor(new GridEditor(categBox));
 		
 		ColumnConfig fileColumn = new ColumnConfig("File", "file", 600);
