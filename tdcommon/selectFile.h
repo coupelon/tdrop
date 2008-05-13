@@ -20,6 +20,8 @@ See the License for the specific language governing permissions and limitations 
 #endif
 
 #define CONFIG_FILE "config.xml"
+#define HOME_XML "xml/"
+#define HOME_ICONS "icons/"
 
 using namespace std;
 

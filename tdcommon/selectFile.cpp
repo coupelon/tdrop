@@ -75,8 +75,8 @@ void selectFile::createDirectoryStructure() {
     umask(0);
     mkdir(path.c_str(),0755);
     
-    mkdir((path+"xml/").c_str(),0755);
-    mkdir((path+"icons/").c_str(),0755);
+    mkdir((path+HOME_XML).c_str(),0755);
+    mkdir((path+HOME_ICONS).c_str(),0755);
     if (!fileexist(getHomeConfigFile())) {
     	ofstream config;
 			config.open(selectFile::getHomeConfigFile().c_str(), ios::out | ios::app | ios::binary);
