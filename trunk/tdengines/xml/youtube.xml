@@ -1,0 +1,29 @@
+<!--
+# Teardrop Engine File
+-->
+<engine xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="teardrop_1_0.xsd">
+	<name>Youtube</name>
+  <separator value="+" />
+	<charset>UTF-8</charset>
+	<query method="GET">
+		<url>http://youtube.com/results</url>
+		<inputfield name="search_query" value="%q" />
+		<inputfield name="search_type" value="" />
+  </query>
+  <result>
+	<regexp><![CDATA[class="vllongTitle">[^<]*<a\s+href="/watch\?v=([^"]*)"\s+title="([^"]*)".*?<span\s+id="BeginvidDesc[^>]*>([^<]*)]]></regexp>
+	<field num="1" comparable="yes" name="url">http://youtube.com/watch?v=%s</field>
+	<field num="1" name="img">http://i.ytimg.com/vi/%s/default.jpg</field>
+	<field num="2" striphtml="yes" name="title" />
+	<field num="3" striphtml="yes" name="abstract" />
+  </result>
+	<nextinput method="GET">
+		<regexp><![CDATA[href="([^"]*)"\s+class="pagerNotCurrent">Next]]></regexp>
+		<inputfield escape="no" num="1" name="" value="http://youtube.com%s" />
+	</nextinput>
+</engine>
+
+
+
+

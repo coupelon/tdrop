@@ -45,8 +45,11 @@ See the License for the specific language governing permissions and limitations 
 		<engine url="http://tdrop.googlecode.com/svn/trunk/tdengines/xml/voilafr.xml" name="Voila France" version="1.0" />
 		<engine url="http://tdrop.googlecode.com/svn/trunk/tdengines/xml/yahoofr.xml" name="Yahoo! France" version="1.0" />
 	</category>
+	<category name="News French">
+		<engine url="http://tdrop.googlecode.com/svn/trunk/tdengines/xml/easybourse-forums.xml" name="EasyBourse Forums" version="1.0" />
+	</category>
 	<category name="Images">
-		<engine url="http://tdrop.googlecode.com/svn/trunk/tdengines/xml/dogpileimg.xml" name="DogPile" version="1.0" />
+		<engine url="http://tdrop.googlecode.com/svn/trunk/tdengines/xml/dogpileimg.xml" name="DogPile Images" version="1.0" />
 		<engine url="http://tdrop.googlecode.com/svn/trunk/tdengines/xml/yahooimg.xml" name="Yahoo! Images" version="1.0" />
 	</category>
 	<category name="IRC">
@@ -65,5 +68,6 @@ See the License for the specific language governing permissions and limitations 
 		<engine url="http://tdrop.googlecode.com/svn/trunk/tdengines/xml/blinkx.xml" name="Blinkx" version="1.0" />
 		<engine url="http://tdrop.googlecode.com/svn/trunk/tdengines/xml/searchforvideo.xml" name="SearchForVideo" version="1.0" />
 		<engine url="http://tdrop.googlecode.com/svn/trunk/tdengines/xml/yahoovideo.xml" name="Yahoo! Video" version="1.0" />
+		<engine url="http://tdrop.googlecode.com/svn/trunk/tdengines/xml/youtube.xml" name="Youtube" version="1.0" />
 	</category>
 </config>
