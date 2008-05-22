@@ -13,7 +13,7 @@ bool selectFile::find(string f, string & path) {
     First check for the file in the current directory or with absolute path
     */    
     if (fileexist(f)) { path=f; return true; }
-    debug("couldn't find ./%s\n",f.c_str());
+    LOG4CXX_DEBUG(tdParam::logger,"couldn't find ./" << f);
     
     /*
     Then check the different home directory
@@ -22,16 +22,17 @@ bool selectFile::find(string f, string & path) {
     if (fileexist(home + f)) { path = home + f; return true; }
     if (fileexist(home + "xml/" + f)) { path = home + "xml/" + f; return true; }
     if (fileexist(home + "icons/" + f)) { path = home + "icons/" + f; return true; }
-    debug("couldn't find %s/{.|xml|icons}/%s\n",home.c_str(),f.c_str());
+    LOG4CXX_DEBUG(tdParam::logger,"couldn't find " << home << "/{.|xml|icons}/ " << f);
     
     /*
     If available, check the installation directory
     */
     #ifdef TEARDROP_DATADIR
         if (fileexist(TEARDROP_DATADIR + string("/") + f)) { path = TEARDROP_DATADIR + string("/") + f; return true; }
-        debug("couldn't find %s/%s\n",TEARDROP_DATADIR,f.c_str());
+        LOG4CXX_DEBUG(tdParam::logger,"couldn't find " << TEARDROP_DATADIR << "/" << f);
     #endif
     
+    LOG4CXX_WARN(tdParam::logger,"File " << f << " not found.");
     path = "";
     return false;
 }

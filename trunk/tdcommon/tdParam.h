@@ -9,14 +9,20 @@ See the License for the specific language governing permissions and limitations 
 #ifndef TDPARAM_H
 #define TDPARAM_H
 
-#include <curl/curl.h>
-#include <string>
-#include "xml/xmlFile.h"
+#include <log4cxx/logger.h>
+#include <log4cxx/propertyconfigurator.h>
+#include <log4cxx/helpers/exception.h>
+
+
+//Cross references
+class tdParam;
+
 #include "xml/nodeDoc.h"
 #include "selectFile.h"
 
 #define CURL_TIMEOUT 90
 #define THMAX 16
+#define LOG_CONFIG "log4cxx.xml"
 
 using namespace std;
 
@@ -64,6 +70,14 @@ public:
      * configuration file.
      */
     void commit();
+    
+    /**
+     * The logger is used directly by the whole program
+     * Although not really a "good" practice, it offers
+     * a "clear" syntax inside the code.
+     */
+    static log4cxx::LoggerPtr logger;
+    
 private:
     bool echopages;
     string proxy_address;

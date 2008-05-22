@@ -13,7 +13,8 @@ See the License for the specific language governing permissions and limitations 
 #include <string>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include "debugmacro.h"
+
+#include "tdParam.h"
 
 #ifndef HOME_LINUX
 #define HOME_LINUX "/.teardrop/"

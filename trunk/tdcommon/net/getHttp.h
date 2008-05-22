@@ -16,13 +16,10 @@ See the License for the specific language governing permissions and limitations 
 #include <curl/curl.h>
 #include <iconv.h>
 #include <errno.h>
+#include "../tdParam.h"
 #include "../address.h"
 #include "../regexp/regExp.h"
-#include "../debugmacro.h"
 #include "rawContainer.h"
-#include "../tdParam.h"
-
-class tdParam;
 
 using namespace std;
 

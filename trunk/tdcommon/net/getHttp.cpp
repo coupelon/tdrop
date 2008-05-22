@@ -113,7 +113,7 @@ bool getHttp::getRawData (address & ad, rawContainer *r) {
 	curl_easy_setopt (curl, CURLOPT_WRITEDATA, r);
   curl_easy_setopt (curl, CURLOPT_NOSIGNAL, 1);
   curl_easy_setopt (curl, CURLOPT_TIMEOUT, m_timeout);
-	debug(ad.getFullUrl().c_str());
+	LOG4CXX_DEBUG(tdParam::logger,ad.getFullUrl());
 	//This copy to url must be done, instead of what you might get a malformed url error from curl
 	url = ad.getFullUrl ();
 	//		cout << url <<  endl;
@@ -164,7 +164,7 @@ bool getHttp::getRawData (address & ad, rawContainer *r) {
       /* select error */
       break;
     case 0:
-      debug("timeout!\n");
+      LOG4CXX_DEBUG(tdParam::logger, "Timeout expired before anything interesting happened.");
     default:
       /* timeout or readable/writable sockets */
       //printf("perform!\n");
@@ -210,7 +210,7 @@ string getHttp::charsetConvert(string s, string from_charset, string to_charset)
     iconv_t trans = iconv_open(to_charset.c_str(), from_charset.c_str());
     
     if (trans == (iconv_t)(-1)) {
-        debug("A problem with the choosen charset occured ! (from %s to %s",from_charset.c_str(),to_charset.c_str());
+        LOG4CXX_WARN(tdParam::logger,"A problem with the choosen charset occured ! (from " << from_charset.c_str() << " to " << to_charset.c_str());
         return s;
     }
     
@@ -226,7 +226,7 @@ string getHttp::charsetConvert(string s, string from_charset, string to_charset)
     delete buf2cop;
     //if (buf2) delete buf2;
     if (res == (size_t) -1) {
-        debug("A conversion error occured, from %s to %s ",from_charset.c_str(),to_charset.c_str());
+         LOG4CXX_WARN(tdParam::logger,"A conversion error occured, from " << from_charset.c_str() << " to " << to_charset.c_str());
         return s;
         
     }
