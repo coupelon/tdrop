@@ -21,6 +21,7 @@
 <tool id="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug.1794407154" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug">
 <option id="gnu.cpp.link.option.libs.1130689842" superClass="gnu.cpp.link.option.libs" valueType="libs">
 <listOptionValue builtIn="false" value="xml2"/>
+<listOptionValue builtIn="false" value="log4cxx"/>
 <listOptionValue builtIn="false" value="pthread"/>
 <listOptionValue builtIn="false" value="pcre"/>
 <listOptionValue builtIn="false" value="curl"/>
