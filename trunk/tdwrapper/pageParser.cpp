@@ -81,7 +81,7 @@ void pageParser::doParse() {
 		if (getAbort()) break;
 		address ad = getNextAddress();
 		if (ad.isEmpty()) { 
-			debug("Can't find enough results");
+			LOG4CXX_INFO(tdParam::logger, "Can't find enough results for " << engname);
 			break;
 		}
 		string page = gh.getPage(ad,eng->getCharset());
@@ -89,7 +89,7 @@ void pageParser::doParse() {
     if (getAbort()) break;
     if (tdp->getEcho()) cout << ">" << ad << endl;
 		if (page == "") { 
-			debug("Invalid url : %s",getFullUrl().c_str());
+			LOG4CXX_INFO(tdParam::logger, "Invalid url : " << ad.getFullUrl());
 			break;
 		}
 
@@ -168,7 +168,6 @@ row pageParser::generateRow(regExp & r) {
         //Removes every control characters
         value = regExp::replaceAll(value,"[[:cntrl:]]"," ");
         if (eng->getResultFieldEscape()) value = gh.escape(value);
-        debug(">ARGUMENTS : " + name + "  = " + value);
         l.addField(value, name);
     }
 	return l;

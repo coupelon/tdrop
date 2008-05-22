@@ -18,7 +18,6 @@ See the License for the specific language governing permissions and limitations 
 #include "net/getHttp.h"
 #include "address.h"
 #include "engineResults.h"
-#include "debugmacro.h"
 #include "tdParam.h"
 #include "tdExcp.h"
 #include "threads/threadPool.h"
