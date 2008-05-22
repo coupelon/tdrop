@@ -9,9 +9,10 @@ See the License for the specific language governing permissions and limitations 
 #ifndef NODEDOC_H_
 #define NODEDOC_H_
 
+#include <string>
 #include "xmlFile.h"
 
-class xmlFile;
+using namespace std;
 
 class nodeDoc {
 public:

@@ -22,12 +22,8 @@
 </tool>
 <tool id="cdt.managedbuild.tool.gnu.c.linker.so.debug.1317049736" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.so.debug"/>
 <tool id="cdt.managedbuild.tool.gnu.cpp.linker.so.debug.176658743" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.so.debug">
-<option id="gnu.cpp.link.option.libs.1329380942" superClass="gnu.cpp.link.option.libs" valueType="libs">
-<listOptionValue builtIn="false" value="xml2"/>
-</option>
-<option id="gnu.cpp.link.option.paths.453876010" superClass="gnu.cpp.link.option.paths" valueType="stringList">
-<listOptionValue builtIn="false" value="/usr/lib"/>
-</option>
+<option id="gnu.cpp.link.option.libs.1329380942" superClass="gnu.cpp.link.option.libs" valueType="libs"/>
+<option id="gnu.cpp.link.option.paths.453876010" superClass="gnu.cpp.link.option.paths" valueType="stringList"/>
 </tool>
 <tool id="cdt.managedbuild.tool.gnu.assembler.so.debug.1192864308" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.so.debug"/>
 <macros/>

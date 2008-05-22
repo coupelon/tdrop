@@ -9,18 +9,16 @@ See the License for the specific language governing permissions and limitations 
 #ifndef XMLFILE_H
 #define XMLFILE_H
 
-#include <iostream>
-#include <sstream>
-#include <string>
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 
+//Cross references
+class xmlFile;
+
+#include "../tdParam.h"
 #include "../net/getHttp.h"
 #include "../net/rawContainer.h"
-#include "../tdParam.h"
 #include "../address.h"
-
-class tdParam;
 
 using namespace std;
 
