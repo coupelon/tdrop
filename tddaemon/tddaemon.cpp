@@ -54,6 +54,8 @@ void TdDaemon::save_config(string s) {
 			}
 			config << "</config>" << endl;
 			config.close();
+		} else {
+			LOG4CXX_DEBUG(tdParam::logger, "Couldn't load configuration file.");
 		}
 		tdp->commit();
 	}
@@ -131,7 +133,8 @@ string TdDaemon::get_next_results(struct shttpd_arg *arg) {
 	   					 (*globalSearches)[newID]);
 			}
     }
-	}	
+	}
+	LOG4CXX_DEBUG(tdParam::logger, "An error occurred while retrieving next results.");
   return "";
 }
 
@@ -232,7 +235,14 @@ string TdDaemon::show_available_engines() {
 			if (engines != "") output += ",";
 		}
 	}
-	if (xf.openUrl(UPDATE_URL,tdp)) {
+	
+	getHttp gh;
+	gh.setParam(tdp);
+	address ad;
+  ad.url = UPDATE_URL;
+  string page = gh.getPage(ad);
+  
+	if (page != "" && xf.openMemory(page)) {
 		nodeDoc ndCateg(&xf,"category");
 		while(ndCateg.isValid()) {
 			nodeDoc ndEngine(&xf,"engine",ndCateg);
@@ -264,9 +274,8 @@ string TdDaemon::show_available_engines() {
 void TdDaemon::show_404(struct shttpd_arg *arg) {
 	shttpd_printf(arg, "%s", "HTTP/1.1 404 OK\r\n");
 	shttpd_printf(arg, "%s", "Content-Type: text/plain\r\n\r\n");
-	//shttpd_printf(arg, "%s", "Oops. File not found! ");
-	shttpd_printf(arg, "%s%s%s", "Oops. File", shttpd_get_env(arg, "REQUEST_URI") , " not found! ");
-	shttpd_printf(arg, "%s", "This is a custom error handler.");
+	shttpd_printf(arg, "%s%s%s", "404 file ", shttpd_get_env(arg, "REQUEST_URI") , " not found! ");
+	LOG4CXX_INFO(tdParam::logger, "Error 404: " << shttpd_get_env(arg, "REQUEST_URI"));
 	arg->flags |= SHTTPD_END_OF_OUTPUT;
 }
 
@@ -285,6 +294,7 @@ void TdDaemon::query_process(struct shttpd_arg *arg) {
 		delete (struct state *)arg->state;
 	} else if ((uri == QUERY_POST || uri == SAVE_ENGINES) && (s = shttpd_get_header(arg, "Content-Length")) == NULL) {
 		shttpd_printf(arg, "HTTP/1.0 411 Length Required\n\n");
+		LOG4CXX_INFO(tdParam::logger, "Error 411: Content-Length not specified.");
 		arg->flags |= SHTTPD_END_OF_OUTPUT;
 	} else if (arg->state == NULL) {
 		/* New request. Allocate a state structure */
@@ -387,6 +397,9 @@ void TdDaemon::launchDaemon(tdParam *t) {
 	struct shttpd_ctx	*ctx;
 	
 	tdp = t;
+	
+	LOG4CXX_INFO(tdParam::logger, "Teardrop started.");
+	
 	globalSearches = new map<string, metaRank*>();
 
 	signal(SIGPIPE, SIG_IGN);
