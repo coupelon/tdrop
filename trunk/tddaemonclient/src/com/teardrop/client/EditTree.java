@@ -77,7 +77,7 @@ public class EditTree {
 		categStore.setDefaultSort("name",SortDir.ASC);
 		
 		//Initialise the columns model
-		ColumnConfig selectColumn = new ColumnConfig("Selected", "select");
+		ColumnConfig selectColumn = new ColumnConfig("Selected", "select",40);
 		selectColumn.setRenderer(new Renderer() {  
 			public String render(Object value, CellMetadata cellMetadata, Record record, int rowIndex, int colNum, Store store) {  
 				boolean checked = ((Boolean) value).booleanValue();  
@@ -86,7 +86,7 @@ public class EditTree {
 				}  
 		});
 		
-		ColumnConfig titleColumn = new ColumnConfig("Name", "name");  
+		ColumnConfig titleColumn = new ColumnConfig("Name", "name",150);  
 		titleColumn.setCss("white-space:normal;");
 		titleColumn.setSortable(true);
 		TextField editTitle = new TextField();
@@ -119,7 +119,24 @@ public class EditTree {
 		columnModel.setDefaultSortable(true);
 		
 		//Set the toolbar
-		Toolbar toolbar = new Toolbar();  
+		Toolbar toolbar = new Toolbar();
+		ToolbarButton selectAll = new ToolbarButton("All", new ButtonListenerAdapter() {  
+			public void onClick(Button button, EventObject e) {  
+				selectAll(true);
+			}  
+		});
+		ToolbarButton selectNone = new ToolbarButton("None", new ButtonListenerAdapter() {  
+			public void onClick(Button button, EventObject e) {  
+				selectAll(false);
+			}
+		});
+		selectNone.setCls("flat");
+		
+		ToolbarButton selectInvert = new ToolbarButton("Invert", new ButtonListenerAdapter() {  
+			public void onClick(Button button, EventObject e) {  
+				selectInvert();
+			}  
+		});
 		ToolbarButton addEngineButton = new ToolbarButton("Add Engine", new ButtonListenerAdapter() {  
 			public void onClick(Button button, EventObject e) {  
 				String cat = "";
@@ -141,6 +158,11 @@ public class EditTree {
 		});
 		saveEngineButton.setCls("x-btn-text-icon save");
 		saveEngineButton.setTooltip("Save the modifications");
+		toolbar.addText("Select: ");
+		toolbar.addButton(selectAll);
+		toolbar.addButton(selectNone);
+		toolbar.addButton(selectInvert);
+		
 		toolbar.addFill();
 		toolbar.addButton(saveEngineButton);
 		toolbar.addButton(addEngineButton);
@@ -238,14 +260,29 @@ public class EditTree {
 	  if ((enginesArray = engines.isArray()) != null) {
 		HashSet categSet = new HashSet();
         for (int i = 0; i < enginesArray.size(); ++i) {
-    	  Record newRecordEngine = recordEngineDef.createRecord(new Object[]{
-    			JSONFunctions.getJSONSetValue(enginesArray.get(i), "select").equals("true")?Boolean.TRUE:Boolean.FALSE,
-    			JSONFunctions.getJSONSetValue(enginesArray.get(i), "categ"),
-    			JSONFunctions.getJSONSetValue(enginesArray.get(i), "file"),
-    			JSONFunctions.getJSONSetValue(enginesArray.get(i), "name"),
-    			JSONFunctions.getJSONSetValue(enginesArray.get(i), "version")});
-    	  categSet.add(JSONFunctions.getJSONSetValue(enginesArray.get(i), "categ"));
-    	  engineStore.addSorted(newRecordEngine);
+          String name = JSONFunctions.getJSONSetValue(enginesArray.get(i), "name");
+          String versionString = JSONFunctions.getJSONSetValue(enginesArray.get(i), "version");
+          float version = Float.parseFloat(versionString);
+          boolean doInsert = true;
+          for(int j = 0; j < engineStore.getCount(); ++j) {
+        	  if (engineStore.getAt(j).getAsString("name").equals(name)) {
+        		  if (Float.parseFloat(engineStore.getAt(j).getAsString("version")) > version) {
+        			  engineStore.remove(engineStore.getAt(j));
+        		  } else {
+        			  doInsert = false;
+        		  }
+        	  }
+      	  }
+          if (doInsert) {
+	    	  Record newRecordEngine = recordEngineDef.createRecord(new Object[]{
+	    			JSONFunctions.getJSONSetValue(enginesArray.get(i), "select").equals("true")?Boolean.TRUE:Boolean.FALSE,
+	    			JSONFunctions.getJSONSetValue(enginesArray.get(i), "categ"),
+	    			JSONFunctions.getJSONSetValue(enginesArray.get(i), "file"),
+	    			name,
+	    			versionString});
+	    	  categSet.add(JSONFunctions.getJSONSetValue(enginesArray.get(i), "categ"));
+	    	  engineStore.addSorted(newRecordEngine);
+          }
 	    }
         Iterator catIt = categSet.iterator();
         categStore.removeAll();
@@ -283,5 +320,19 @@ public class EditTree {
 	  post += "</config>";
 	  doPostURL(post, SAVE_ENGINES);
 	  gridElement.mask("Applying the new configuration");
+  }
+  
+  void selectAll(boolean select) {
+	  for(int i = 0; i < engineStore.getCount(); ++i) {
+		  engineStore.getAt(i).set("select", select);
+	  }
+	  editPanel.getView().refresh();
+  }
+  
+  void selectInvert() {
+	  for(int i = 0; i < engineStore.getCount(); ++i) {
+		  engineStore.getAt(i).set("select", !engineStore.getAt(i).getAsBoolean("select"));
+	  }
+	  editPanel.getView().refresh();
   }
 }
