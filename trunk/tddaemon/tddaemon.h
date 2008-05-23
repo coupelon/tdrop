@@ -38,7 +38,7 @@ See the License for the specific language governing permissions and limitations 
 #define QUERY_POST "/services/query_post"
 #define REQUEST_TREE "/services/request_tree"
 #define AVAILABLE_ENGINES "/config/get_available_engines"
-#define UPDATE_URL "http://www.teardrop.fr/updates.xml"
+#define UPDATE_URL "http://tdrop.googlecode.com/svn/trunk/tdengines/updates.xml"
 #define SAVE_ENGINES "/config/save_engines"
 
 using namespace std;

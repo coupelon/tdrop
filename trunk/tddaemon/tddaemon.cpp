@@ -415,7 +415,8 @@ void TdDaemon::launchDaemon(tdParam *t) {
 	 * Start listening on ports 8080 and 8081
 	 */
 	ctx = shttpd_init();
-	shttpd_set_option(ctx, "ports", "8080");
+	shttpd_set_option(ctx, "ssl_cert", string(selectFile::getHomeDirectory() +"teardrop.pem").c_str());
+	shttpd_set_option(ctx, "ports", "8080,8081s");
 
 	shttpd_register_uri(ctx, "/", &show_index, NULL);
 	shttpd_register_uri(ctx, REQUEST_TREE, &query_process, NULL);
