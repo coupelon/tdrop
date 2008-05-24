@@ -235,8 +235,7 @@ public class EditTree {
 				
 				public void onResponseReceived(Request request, Response response) {
 				  if (200 == response.getStatusCode()) {
-					  generateAvailableEngineList(JSONParser.parse(response.getText()));					  
-					  editPanel.getView().refresh();
+					  centerPanel.remove(editPanel);
 					  engTree.loadEngineTree();
 				  } else {
 					  Window.alert("Incorrect status: " + response.getStatusText());
