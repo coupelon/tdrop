@@ -11,6 +11,7 @@ See the License for the specific language governing permissions and limitations 
 log4cxx::LoggerPtr tdParam::logger = log4cxx::Logger::getLogger("Teardrop");
 
 tdParam::tdParam() {
+		log4cxx::PropertyConfigurator::configure(selectFile::getHomeDirectory() + LOG_CONFIG);
     echopages = false;
     browser = "";
     proxy_address = "";
@@ -20,7 +21,6 @@ tdParam::tdParam() {
     max_threads = THMAX;
     selectFile::createDirectoryStructure();
     getInitValues();
-	  log4cxx::PropertyConfigurator::configure(selectFile::getHomeDirectory() + LOG_CONFIG);
 }
 
 void tdParam::setBrowser(string b) {
