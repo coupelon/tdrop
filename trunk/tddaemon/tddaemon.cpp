@@ -10,8 +10,9 @@ See the License for the specific language governing permissions and limitations 
 
 map<string, metaRank*> *TdDaemon::globalSearches = NULL;
 tdParam *TdDaemon::tdp = NULL;
+users *TdDaemon::clients = NULL;
 
-void TdDaemon::save_config(string s) {
+string TdDaemon::save_config(string s) {
 	xmlFile xf;
 	getHttp gh;
 	string path = selectFile::getHomeDirectory();
@@ -59,6 +60,7 @@ void TdDaemon::save_config(string s) {
 		}
 		tdp->commit();
 	}
+	return DEFAULT_HEADER_NL;
 }
 
 string TdDaemon::createJSON(bool final, metaRank *mr) {
@@ -97,6 +99,15 @@ string TdDaemon::createJSON(bool final, metaRank *mr) {
   return mr->getString(text,"/","},{",pre,post,true);
 }
 
+string TdDaemon::get_authenticate_user(struct shttpd_arg *arg, string user,string pass) {
+	string id = clients->authenticateUser(user, pass, shttpd_get_header(arg, "Cookie"));
+	string out = DEFAULT_HEADER;
+	if (id != "") {
+		out += "Set-Cookie: ID=" + id + "\r\n"; 
+	}
+	return out + "\r\n";
+}
+
 string TdDaemon::newQuery(struct shttpd_arg *arg, string query,string engines,string limit) {
 	list<string> lse;
   engineResults *er = new engineResults();
@@ -109,14 +120,11 @@ string TdDaemon::newQuery(struct shttpd_arg *arg, string query,string engines,st
   }
   er->addEngine(engines);
   string newID = UIDSession::getID();
-  shttpd_printf(arg, "HTTP/1.0 200 OK\n"
-										 "Content-Type: text/plain\r\n");
-  shttpd_printf(arg, "%s%s%s", "Set-TDSession: query=",
-  														 newID.c_str(),
-  														 ";\r\n\r\n");
   (*globalSearches)[newID] = new metaRank(er,tdp);
   (*globalSearches)[newID]->startParsing();
-  return createJSON((*globalSearches)[newID]->waitForNewResults(),
+  string output = DEFAULT_HEADER;
+  output += "Set-TDSession: query=" + newID + ";\r\n\r\n";
+  return output + createJSON((*globalSearches)[newID]->waitForNewResults(),
    					 (*globalSearches)[newID]);
 }
 
@@ -129,13 +137,13 @@ string TdDaemon::get_next_results(struct shttpd_arg *arg) {
 		if (!r.endOfMatch()) {
 			string newID(r.getMatch(1));
 			if (globalSearches->find(newID) != globalSearches->end()) {
-			  return createJSON((*globalSearches)[newID]->waitForNewResults(),
+			  return DEFAULT_HEADER_NL + createJSON((*globalSearches)[newID]->waitForNewResults(),
 	   					 (*globalSearches)[newID]);
 			}
     }
 	}
 	LOG4CXX_DEBUG(tdParam::logger, "An error occurred while retrieving next results.");
-  return "";
+  return DEFAULT_HEADER_NL;
 }
 
 /*
@@ -157,7 +165,7 @@ void TdDaemon::show_index(struct shttpd_arg *arg) {
 string TdDaemon::show_tree() {
 	xmlFile xf;
 	string config_path;
-	string output = "";
+	string output = DEFAULT_HEADER_NL;
 	
 	if (selectFile::find(CONFIG_FILE,config_path) && xf.openFile(config_path)) {
 		nodeDoc ndCateg(&xf,"category");
@@ -205,7 +213,7 @@ string TdDaemon::show_tree() {
 string TdDaemon::show_available_engines() {
 	xmlFile xf;
 	string config_path;
-	string output = "";
+	string output = DEFAULT_HEADER_NL;
   output += "{\"engines\":[";
 	if (selectFile::find(CONFIG_FILE,config_path) && xf.openFile(config_path)) {
 		nodeDoc ndCateg(&xf,"category");
@@ -292,14 +300,19 @@ void TdDaemon::query_process(struct shttpd_arg *arg) {
 	/* If the connection was broken prematurely, cleanup */
 	if (arg->flags & SHTTPD_CONNECTION_ERROR && arg->state) {
 		delete (struct state *)arg->state;
-	} else if ((uri == QUERY_POST || uri == SAVE_ENGINES) && (s = shttpd_get_header(arg, "Content-Length")) == NULL) {
+	} else if ((uri == QUERY_POST ||
+						  uri == SAVE_ENGINES ||
+              uri == AUTHENTICATE_USER) &&
+             (s = shttpd_get_header(arg, "Content-Length")) == NULL) {
 		shttpd_printf(arg, "HTTP/1.0 411 Length Required\n\n");
 		LOG4CXX_INFO(tdParam::logger, "Error 411: Content-Length not specified.");
 		arg->flags |= SHTTPD_END_OF_OUTPUT;
 	} else if (arg->state == NULL) {
 		/* New request. Allocate a state structure */
 		arg->state = state = new (struct state);
-		if (uri == QUERY_POST || uri == SAVE_ENGINES)
+		if (uri == QUERY_POST ||
+        uri == SAVE_ENGINES ||
+        uri == AUTHENTICATE_USER)
 			state->cl = strtoul(s, NULL, 10);
 		else
 			state->cl = 0;
@@ -331,12 +344,18 @@ void TdDaemon::query_process(struct shttpd_arg *arg) {
 		      } else {
 		        state->buffer = "{\"results\":[{}]}";
 					}
+				} else if (uri == AUTHENTICATE_USER) {
+					regExp r("username=([^;]+);password=(.+)");
+					r.newPage(state->buffer);
+					if (!r.endOfMatch()) {
+						state->buffer = get_authenticate_user(arg,r.getMatch(1),r.getMatch(2));
+					}
 				} else if (uri == REQUEST_TREE) {
 					state->buffer = show_tree();
 				} else if (uri == AVAILABLE_ENGINES) {
 					state->buffer = show_available_engines();
 				} else if (uri == SAVE_ENGINES) {
-					save_config(state->buffer);
+					state->buffer = save_config(state->buffer);
 				}
 			}
 			while (arg->out.num_bytes < arg->out.len && state->count < state->buffer.length()) {
@@ -426,6 +445,7 @@ void TdDaemon::launchDaemon(tdParam *t) {
 	shttpd_register_uri(ctx, WEBINTERFACE_URI, &show_wi, NULL);
 	shttpd_register_uri(ctx, AVAILABLE_ENGINES, &query_process, NULL);
 	shttpd_register_uri(ctx, SAVE_ENGINES, &query_process, NULL);
+	shttpd_register_uri(ctx, AUTHENTICATE_USER, &query_process, NULL);
 
 	shttpd_handle_error(ctx, 404, show_404, NULL);
 

@@ -27,6 +27,7 @@ See the License for the specific language governing permissions and limitations 
 #include "metaRank.h"
 #include "UIDSession.h"
 #include "shttpd.h"
+#include "users.h"
 
 #define WEBINTERFACE_URI "/WebInterface/*"
 #define WEBINTERFACE_PATH "/tddaemonclient/www/com.teardrop.WebInterface/"
@@ -40,6 +41,9 @@ See the License for the specific language governing permissions and limitations 
 #define AVAILABLE_ENGINES "/config/get_available_engines"
 #define UPDATE_URL "http://tdrop.googlecode.com/svn/trunk/tdengines/updates.xml"
 #define SAVE_ENGINES "/config/save_engines"
+#define AUTHENTICATE_USER "/login"
+#define DEFAULT_HEADER "HTTP/1.0 200 OK\nContent-Type: text/plain\r\n"
+#define DEFAULT_HEADER_NL "HTTP/1.0 200 OK\nContent-Type: text/plain\r\n\r\n"
 
 using namespace std;
 
@@ -64,12 +68,14 @@ private:
 	static void show_engines_icons(struct shttpd_arg *arg);
 	static void show_wi(struct shttpd_arg *arg);
 	static string show_available_engines();
-	static void save_config(string s);
+	static string save_config(string s);
+	static string get_authenticate_user(struct shttpd_arg *arg, string user,string pass);
 	
 	//The map that will hold sessions
 	static map<string, metaRank*> *globalSearches;
 	//The teardrop parameters
 	static tdParam *tdp;
+	static users *clients;
 };
 
 #endif /*DAEMON_H_*/
