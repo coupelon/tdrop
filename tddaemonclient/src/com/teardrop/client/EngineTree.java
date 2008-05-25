@@ -169,11 +169,17 @@ public class EngineTree extends TreePanel {
 	    	      if (200 == response.getStatusCode()) {
 	    	    	  try {
 	    	  	        JSONValue jsonValue = JSONParser.parse(response.getText());
-	    	  	      generateEngineTree(getRootNode(), jsonValue);
+	    	  	        generateEngineTree(getRootNode(), jsonValue);
 	    	  	      } catch (JSONException e) {
 	    	  	        displayError(response.getText());
 	    	  	      }
 	    	          // Process the response in response.getText()
+	    	      } else if (403 == response.getStatusCode()) {
+	    	  			new Login(new Login.LoginCallback() {
+							public void onCloseRun() {
+			    	  			loadEngineTree();
+							}
+	    	  			});
 	    	      } else {
 	    	    	    displayError(response.getStatusText());
 	    	      }
