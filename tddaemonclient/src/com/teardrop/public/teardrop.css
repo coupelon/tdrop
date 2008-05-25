@@ -83,3 +83,7 @@
 .edit_tree .x-btn-text {
 	background-image: url( imgs/edit_tree.png );
 }
+
+#search-button {
+	margin-top: 5px;
+}

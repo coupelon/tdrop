@@ -18,6 +18,7 @@ import com.gwtext.client.widgets.Button;
 import com.gwtext.client.widgets.Window;
 import com.gwtext.client.core.EventObject;
 import com.gwtext.client.widgets.event.ButtonListenerAdapter;
+import com.gwtext.client.widgets.event.KeyListener;
 import com.gwtext.client.widgets.form.FormPanel;
 import com.gwtext.client.widgets.form.Label;
 import com.gwtext.client.widgets.form.TextField;
@@ -54,11 +55,21 @@ public class Login {
 	
 		TextField loginText = new TextField("Login", "username");
 		loginText.setAllowBlank(false);
+		loginText.addKeyListener(EventObject.ENTER, new KeyListener() {
+			public void onKey(int key, EventObject e) {
+				if (authentPanel.getForm().isValid())
+					doAuthenticate(authentPanel.getForm().getValues());
+			}});
 		authentPanel.add(loginText, new AnchorLayoutData("90%"));
 		
 		TextField passwdText = new TextField("Password","password");
 		passwdText.setPassword(true);
 		passwdText.setAllowBlank(false);
+		passwdText.addKeyListener(EventObject.ENTER, new KeyListener() {
+			public void onKey(int key, EventObject e) {
+				if (authentPanel.getForm().isValid())
+					doAuthenticate(authentPanel.getForm().getValues());
+			}});
 		authentPanel.add(passwdText, new AnchorLayoutData("90%"));
 		
 		Button authentButton = new Button("Sign In", new ButtonListenerAdapter() {  
