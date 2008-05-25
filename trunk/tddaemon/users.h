@@ -15,6 +15,7 @@ See the License for the specific language governing permissions and limitations 
 #include "tdParam.h"
 #include "UIDSession.h"
 #include "selectFile.h"
+#include "sha1.h"
 
 using namespace std;
 
