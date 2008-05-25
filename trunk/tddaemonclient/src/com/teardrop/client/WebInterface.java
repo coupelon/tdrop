@@ -18,10 +18,10 @@ import com.gwtext.client.widgets.TabPanel;
 import com.gwtext.client.widgets.Viewport;
 import com.gwtext.client.widgets.form.FormPanel;
 import com.gwtext.client.widgets.form.TextField;
+import com.gwtext.client.widgets.layout.AnchorLayoutData;
 import com.gwtext.client.widgets.layout.BorderLayout;
 import com.gwtext.client.widgets.layout.BorderLayoutData;
 import com.gwtext.client.widgets.layout.FitLayout;
-import com.gwtext.client.widgets.layout.RowLayout;
 import com.gwtext.client.widgets.layout.RowLayoutData;
 import com.gwtext.client.widgets.menu.CheckItem;
 
@@ -74,9 +74,17 @@ public class WebInterface implements EntryPoint {
 	    /**
 	     * The panel for the search criterions
 	     */
-	    searchButton.addListener(new OnSearchSubmit(engTree, queryText,limitButton,centerPanel));
-	    searchButton.setTabIndex(2);
-	    searchButton.setCls("x-btn-text-icon btn-search-icon");
+	    FormPanel criterPanel = new FormPanel();
+	    //criterPanel.setLayout(new RowLayout());
+	    criterPanel.setPaddings(5);
+	    criterPanel.setMargins(0, 0, 0, 10);
+	    criterPanel.setTitle("Search Criterions");
+	    criterPanel.setCollapsible(true);
+	    
+	    queryText.setHideLabel(true);
+	    queryText.setTabIndex(0);
+	    queryText.addKeyListener(EventObject.ENTER, new OnSearchSubmit(engTree, queryText,limitButton,centerPanel));
+	    criterPanel.add(queryText, new AnchorLayoutData("100%"));
 	    
 	    limitButton.setShowText(true);  
 	    limitButton.setPrependText("Results per engines: ");
@@ -86,22 +94,13 @@ public class WebInterface implements EntryPoint {
 	    limitButton.addItem(new CheckItem("100",false));
 	    limitButton.addItem(new CheckItem("500",false));
 	    limitButton.setTabIndex(1);
-	    
-	    queryText.setHideLabel(true);
-	    //queryText.setWidth(limitButton.getOffsetWidth());
-	    queryText.setTabIndex(0);
-
-	    queryText.addKeyListener(EventObject.ENTER, new OnSearchSubmit(engTree, queryText,limitButton,centerPanel));
-	    
-	    FormPanel criterPanel = new FormPanel();
-	    criterPanel.setLayout(new RowLayout());
-	    criterPanel.setPaddings(5);
-	    criterPanel.setMargins(0, 0, 0, 10);
-	    criterPanel.setTitle("Search Criterions");
-	    criterPanel.add(queryText);
 	    criterPanel.add(limitButton);
+	    
+	    searchButton.addListener(new OnSearchSubmit(engTree, queryText,limitButton,centerPanel));
+	    searchButton.setTabIndex(2);
+	    searchButton.setCls("x-btn-text-icon btn-search-icon");
+	    searchButton.setId("search-button");
 	    criterPanel.add(searchButton);
-	    criterPanel.setCollapsible(true);
 	    
 	    /**
 	     * The west panel is used for the search parameters
