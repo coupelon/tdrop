@@ -100,7 +100,7 @@ string TdDaemon::createJSON(bool final, metaRank *mr) {
 }
 
 string TdDaemon::get_authenticate_user(struct shttpd_arg *arg, string user,string pass) {
-	string id = clients->authenticateUser(user, pass, shttpd_get_header(arg, "Cookie"));
+	string id = clients->authenticateUser(user, pass, shttpd_get_env(arg, "REMOTE_ADDR"));
 	string out = DEFAULT_HEADER;
 	if (id != "") {
 		out += "Set-Cookie: ID=" + id + "\r\n"; 
@@ -307,7 +307,11 @@ void TdDaemon::query_process(struct shttpd_arg *arg) {
 		shttpd_printf(arg, "HTTP/1.0 411 Length Required\n\n");
 		LOG4CXX_INFO(tdParam::logger, "Error 411: Content-Length not specified.");
 		arg->flags |= SHTTPD_END_OF_OUTPUT;
-	} else if (arg->state == NULL) {
+	} else if (arg->state == NULL && !clients->isValid(shttpd_get_header(arg, "Cookie"),shttpd_get_env(arg, "REMOTE_ADDR")) && uri != AUTHENTICATE_USER) {
+		shttpd_printf(arg, "HTTP/1.0 403 Authentication Required\n\n");
+		LOG4CXX_INFO(tdParam::logger, "Error 403: User not authenticated.");
+		arg->flags |= SHTTPD_END_OF_OUTPUT;
+  } else if (arg->state == NULL) {
 		/* New request. Allocate a state structure */
 		arg->state = state = new (struct state);
 		if (uri == QUERY_POST ||
@@ -345,7 +349,7 @@ void TdDaemon::query_process(struct shttpd_arg *arg) {
 		        state->buffer = "{\"results\":[{}]}";
 					}
 				} else if (uri == AUTHENTICATE_USER) {
-					regExp r("username=([^;]+);password=(.+)");
+					regExp r("username=([^\\&]+)\\&password=([^\\&]+)");
 					r.newPage(state->buffer);
 					if (!r.endOfMatch()) {
 						state->buffer = get_authenticate_user(arg,r.getMatch(1),r.getMatch(2));
@@ -420,6 +424,7 @@ void TdDaemon::launchDaemon(tdParam *t) {
 	LOG4CXX_INFO(tdParam::logger, "Teardrop started.");
 	
 	globalSearches = new map<string, metaRank*>();
+	clients = new users();
 
 	signal(SIGPIPE, SIG_IGN);
 
