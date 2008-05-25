@@ -21,6 +21,7 @@ import com.gwtext.client.widgets.event.ButtonListenerAdapter;
 import com.gwtext.client.widgets.form.FormPanel;
 import com.gwtext.client.widgets.form.Label;
 import com.gwtext.client.widgets.form.TextField;
+import com.gwtext.client.widgets.layout.AnchorLayoutData;
 import com.gwtext.client.widgets.layout.FitLayout;
 
 public class Login {
@@ -37,25 +38,28 @@ public class Login {
 		initializeLoginForm();
 	}
 
-	private void initializeLoginForm() {		
+	private void initializeLoginForm() {
+		
 		final FormPanel authentPanel = new FormPanel();
 		authentPanel.setFrame(false);
-		//authentPanel.setTitle("Login Information");
 		authentPanel.setHeader(false);
+		authentPanel.setBaseCls("x-plain");
 		authentPanel.setWidth(350);
+		authentPanel.setHeight(200);
 		
 		Label label = new Label();  
-		label.setHtml("<p>You need an account to access Teardrop.</p>");
-		authentPanel.add(label);
+		label.setHtml("<p>Please provide your login information for connecting Teardrop.</p><br />");
+		label.setHeight(20);
+		authentPanel.add(label, new AnchorLayoutData("100%"));
 	
-		TextField loginText = new TextField("Login", "username", 230);
+		TextField loginText = new TextField("Login", "username");
 		loginText.setAllowBlank(false);
-		authentPanel.add(loginText);
+		authentPanel.add(loginText, new AnchorLayoutData("90%"));
 		
-		TextField passwdText = new TextField("Password","password",230);
+		TextField passwdText = new TextField("Password","password");
 		passwdText.setPassword(true);
 		passwdText.setAllowBlank(false);
-		authentPanel.add(passwdText);
+		authentPanel.add(passwdText, new AnchorLayoutData("90%"));
 		
 		Button authentButton = new Button("Sign In", new ButtonListenerAdapter() {  
 			public void onClick(Button button, EventObject e) {
@@ -68,8 +72,11 @@ public class Login {
 			
 		loginWindow = new Window("Teardrop Login", true, true);
 		loginWindow.setClosable(false);
-		loginWindow.setWidth(600);
-		loginWindow.setHeight(350);
+		loginWindow.setWidth(350);
+		loginWindow.setHeight(200);
+		loginWindow.setMinWidth(250);
+		loginWindow.setMinHeight(175);
+		loginWindow.setPaddings(10);
 		loginWindow.setLayout(new FitLayout());
 		loginWindow.add(authentPanel);
 		loginWindow.show();
