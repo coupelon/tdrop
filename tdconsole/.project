@@ -4,6 +4,7 @@
 	<comment></comment>
 	<projects>
 		<project>tdcommon</project>
+		<project>tddaemon</project>
 		<project>tdresults</project>
 		<project>tdwrapper</project>
 	</projects>
