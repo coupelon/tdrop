@@ -16,6 +16,7 @@ ADD_DEFINITIONS(-Wall -Werror)
 ADD_DEFINITIONS(-DHOME_LINUX_DEV=\\"${TEARDROP_SOURCE_DIR}/tdengines/\\")
 ADD_DEFINITIONS(-DWORKSPACE=\\"${TEARDROP_SOURCE_DIR}/\\")
 
+add_subdirectory(shttpd)
 add_subdirectory(tdcommon)
 add_subdirectory(tdwrapper)
 add_subdirectory(tdresults)
