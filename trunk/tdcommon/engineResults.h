@@ -25,7 +25,7 @@ public:
 		threadPool<engineResults>::lock(new_results);
 	  abort = false;
 	};
-	~engineResults() {
+	virtual ~engineResults() {
 		delete new_results;
 	};
 

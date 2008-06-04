@@ -4,6 +4,7 @@ set( CMAKE_VERBOSE_MAKEFILE ON )
 
 find_package(LibXml2 REQUIRED)
 find_package(CURL REQUIRED)
+find_package(OpenSSL REQUIRED)
 #find_package(PCRE REQUIRED)
 
 include_directories( "/usr/include" ${CURL_INCLUDE_DIR} ${LIBXML2_INCLUDE_DIR} )
@@ -15,6 +16,7 @@ ADD_DEFINITIONS(-Wall -Werror)
 # Teardrop special definitions
 ADD_DEFINITIONS(-DHOME_LINUX_DEV=\\"${TEARDROP_SOURCE_DIR}/tdengines/\\")
 ADD_DEFINITIONS(-DWORKSPACE=\\"${TEARDROP_SOURCE_DIR}/\\")
+ADD_DEFINITIONS(-DSSL_LIB=\\"${OPENSSL_LIBRARIES}\\")
 
 add_subdirectory(shttpd)
 add_subdirectory(tdcommon)
