@@ -15,6 +15,7 @@ ENDIF( NOT ICONV_FOUND)
 
 find_package(PCRE REQUIRED)
 find_package(Log4Cxx REQUIRED)
+find_package(Qt4)
 
 include_directories( "/usr/include" ${CURL_INCLUDE_DIR} ${LIBXML2_INCLUDE_DIR} )
 link_directories ( "/usr/lib" ${CURL_LIBRARY_DIR} ${LIBXML2_LIBRARY_DIR} )
@@ -25,7 +26,6 @@ ADD_DEFINITIONS(-Wall -Werror)
 # Teardrop special definitions
 ADD_DEFINITIONS(-DHOME_LINUX_DEV=\\"${TEARDROP_SOURCE_DIR}/tdengines/\\")
 ADD_DEFINITIONS(-DWORKSPACE=\\"${TEARDROP_SOURCE_DIR}/\\")
-ADD_DEFINITIONS(-DSSL_LIB=\\"${OPENSSL_LIBRARIES}\\")
 
 add_subdirectory(shttpd)
 add_subdirectory(tdcommon)
@@ -33,3 +33,11 @@ add_subdirectory(tdwrapper)
 add_subdirectory(tdresults)
 add_subdirectory(tddaemon)
 add_subdirectory(tdconsole)
+
+IF (QT4_FOUND)
+	MESSAGE(STATUS "QT4 found, so systray will be build")
+	INCLUDE(${QT_USE_FILE})
+	add_subdirectory(tdsystray)
+ELSE (QT4_FOUND)
+	MESSAGE(STATUS "QT4 not found, so systray won't be build")
+ENDIF(QT4_FOUND)
