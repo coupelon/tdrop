@@ -1,2 +1,2 @@
 include_directories( "../tdcommon")
-add_library(tdwrapper SHARED metaRank pageParser)
+add_library(tdwrapper metaRank pageParser)
