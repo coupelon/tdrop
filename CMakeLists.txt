@@ -16,6 +16,7 @@ ENDIF( NOT ICONV_FOUND)
 find_package(PCRE REQUIRED)
 find_package(Log4Cxx REQUIRED)
 find_package(Qt4)
+find_package(Java)
 
 include_directories( "/usr/include" ${CURL_INCLUDE_DIR} ${LIBXML2_INCLUDE_DIR} )
 link_directories ( "/usr/lib" ${CURL_LIBRARY_DIR} ${LIBXML2_LIBRARY_DIR} )
@@ -41,3 +42,5 @@ IF (QT4_FOUND)
 ELSE (QT4_FOUND)
 	MESSAGE(STATUS "QT4 not found, so systray won't be build")
 ENDIF(QT4_FOUND)
+
+add_subdirectory(tddaemonclient)
