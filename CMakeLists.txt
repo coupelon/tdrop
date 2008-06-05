@@ -1,6 +1,6 @@
 project (TEARDROP)
 cmake_minimum_required(VERSION 2.4)
-set( CMAKE_VERBOSE_MAKEFILE ON )
+#set( CMAKE_VERBOSE_MAKEFILE ON )
 
 set( CMAKE_MODULE_PATH "${TEARDROP_BINARY_DIR}/cmake/" )
 
@@ -17,6 +17,7 @@ find_package(PCRE REQUIRED)
 find_package(Log4Cxx REQUIRED)
 find_package(Qt4)
 find_package(Java)
+find_package(GWT)
 
 include_directories( "/usr/include" ${CURL_INCLUDE_DIR} ${LIBXML2_INCLUDE_DIR} )
 link_directories ( "/usr/lib" ${CURL_LIBRARY_DIR} ${LIBXML2_LIBRARY_DIR} )
@@ -43,4 +44,9 @@ ELSE (QT4_FOUND)
 	MESSAGE(STATUS "QT4 not found, so systray won't be build")
 ENDIF(QT4_FOUND)
 
-add_subdirectory(tddaemonclient)
+IF (JAVA_RUNTIME AND GWT_FOUND)
+    MESSAGE(STATUS "GWT and Java found, the client will be build")
+	add_subdirectory(tddaemonclient)
+ELSE  (JAVA_RUNTIME AND GWT_FOUND)
+	MESSAGE(STATUS "GWT or Java not found, the client won't be build")
+ENDIF  (JAVA_RUNTIME AND GWT_FOUND)
