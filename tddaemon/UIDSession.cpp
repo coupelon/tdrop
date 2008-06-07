@@ -9,9 +9,14 @@ See the License for the specific language governing permissions and limitations 
 #include "UIDSession.h"
 
 UIDSession::UIDSession(){
+	//Initialize le random generator on startup
+	initRand();
+	
+	searches = new map<string, clientSearch>();
 }
 
 UIDSession::~UIDSession(){
+	delete searches;
 }
 
 string UIDSession::getID() {
@@ -26,4 +31,19 @@ string UIDSession::getID() {
 
 void UIDSession::initRand() {
 	srand((unsigned)time(0));
+}
+
+string UIDSession::addSearch(string userID, metaRank *mr) {
+	string newID = getID();
+	(*searches)[newID].mr = mr;
+	(*searches)[newID].userID = userID;
+	return newID;
+}
+
+metaRank *UIDSession::getSearch(string userID, string searchID) {
+	if (searches->find(searchID) != searches->end()) {
+	  if ((*searches)[searchID].userID == userID)
+		  return (*searches)[searchID].mr;
+	}
+	return NULL;
 }
