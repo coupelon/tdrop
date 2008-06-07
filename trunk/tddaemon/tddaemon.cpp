@@ -8,9 +8,9 @@ See the License for the specific language governing permissions and limitations 
 
 #include "tddaemon.h"
 
-map<string, metaRank*> *TdDaemon::globalSearches = NULL;
 tdParam *TdDaemon::tdp = NULL;
 users *TdDaemon::clients = NULL;
+UIDSession *TdDaemon::searches = NULL;
 
 string TdDaemon::save_config(string s) {
 	xmlFile xf;
@@ -119,26 +119,27 @@ string TdDaemon::newQuery(struct shttpd_arg *arg, string query,string engines,st
   	engines = engines.substr(pos+1);
   }
   er->addEngine(engines);
-  string newID = UIDSession::getID();
-  (*globalSearches)[newID] = new metaRank(er,tdp);
-  (*globalSearches)[newID]->startParsing();
+  string userID = shttpd_get_header(arg, "Cookie");
+  string newID = searches->addSearch(userID,new metaRank(er,tdp));
+  searches->getSearch(userID,newID)->startParsing();
   string output = DEFAULT_HEADER;
   output += "Set-TDSession: query=" + newID + ";\r\n\r\n";
-  return output + createJSON((*globalSearches)[newID]->waitForNewResults(),
-   					 (*globalSearches)[newID]);
+  return output + createJSON(searches->getSearch(userID,newID)->waitForNewResults(),
+   					 searches->getSearch(userID,newID));
 }
 
 string TdDaemon::get_next_results(struct shttpd_arg *arg) {
 	const char *cookie_string = shttpd_get_header(arg, "TDSession");
+	string userID = shttpd_get_header(arg, "Cookie");
 	if(cookie_string) {
 		regExp r("query=([a-zA-Z0-9]*)");
 		string cstring = cookie_string;
 	  r.newPage(cstring);
 		if (!r.endOfMatch()) {
 			string newID(r.getMatch(1));
-			if (globalSearches->find(newID) != globalSearches->end()) {
-			  return DEFAULT_HEADER_NL + createJSON((*globalSearches)[newID]->waitForNewResults(),
-	   					 (*globalSearches)[newID]);
+			if (searches->getSearch(userID,newID) != NULL) {
+			  return DEFAULT_HEADER_NL + createJSON(searches->getSearch(userID,newID)->waitForNewResults(),
+	   					 searches->getSearch(userID,newID));
 			}
     }
 	}
@@ -422,14 +423,10 @@ void TdDaemon::launchDaemon(tdParam *t) {
 	tdp = t;
 	
 	LOG4CXX_INFO(tdParam::logger, "Teardrop started.");
-	
-	globalSearches = new map<string, metaRank*>();
 	clients = new users();
+	searches = new UIDSession();
 
 	signal(SIGPIPE, SIG_IGN);
-
-	//Initialize le random generator on startup
-	UIDSession::initRand();
 
 	/*
 	 * Initialize SHTTPD context.

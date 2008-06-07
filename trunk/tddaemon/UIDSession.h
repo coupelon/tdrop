@@ -12,6 +12,7 @@ See the License for the specific language governing permissions and limitations 
 #include <iostream>
 #include <ctime> 
 #include <cstdlib>
+#include "metaRank.h"
 
 using namespace std;
 
@@ -28,6 +29,14 @@ public:
 	virtual ~UIDSession();
 	static string getID();
 	static void initRand();
+	string addSearch(string userID, metaRank *mr);
+	metaRank *getSearch(string userID, string searchID);
+private:
+	struct clientSearch {
+		string userID;
+		metaRank *mr;
+	};
+	map<string, clientSearch> *searches;
 };
 
 #endif /*UIDSESSION_H_*/

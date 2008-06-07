@@ -70,12 +70,11 @@ private:
 	static string show_available_engines();
 	static string save_config(string s);
 	static string get_authenticate_user(struct shttpd_arg *arg, string user,string pass);
-	
-	//The map that will hold sessions
-	static map<string, metaRank*> *globalSearches;
+
 	//The teardrop parameters
 	static tdParam *tdp;
 	static users *clients;
+	static UIDSession *searches;
 };
 
 #endif /*DAEMON_H_*/
