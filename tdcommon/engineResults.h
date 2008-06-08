@@ -47,7 +47,7 @@ public:
    * were yet retrieved 
    * @param e The engine name. 
    */
-  void addEngine(string e) { engines[e] = -1; }
+  void addEngine(string e, int qte = -1) { engines[e] = qte; }
   
   /**
    * Add a new option to this search
@@ -96,10 +96,10 @@ public:
 	bool everyResultsReceived();
 	
 	unsigned long & getLimit() { return limit; }
-  map<string, int> & getEngines() { return engines; }
-  string & getQuery() { return query; }
-  map<string, string> & getOptions() { return options; }
-  vector<row> & getResults();
+  	map<string, int> & getEngines() { return engines; }
+  	const string & getQuery() const { return query; }
+  	map<string, string> & getOptions() { return options; }
+  	vector<row> & getResults();
 	void setResults(const vector<row> & r);
 	map<string,int> & getEngineResults();
 	bool *getAbort() { return &abort; }
@@ -109,7 +109,7 @@ public:
 	 */
 	void toString();
 protected:
-  unsigned long limit;
+  	unsigned long limit;
 	map<string,int> engines;
 	map<string, string> options;
 	string query;

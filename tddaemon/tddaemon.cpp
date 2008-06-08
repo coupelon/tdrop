@@ -70,7 +70,7 @@ string TdDaemon::createJSON(bool final, metaRank *mr) {
 	} else {
 		pre = "{\"final\":\"false\",";
 	}
-	map<string,int> *map_engines = mr->getEngineResults();
+	map<string,int> *map_engines = mr->getEngineResultsNumber();
 	if (map_engines) {
 		pre += "\"engines\":[";
 		char number[11];
@@ -120,12 +120,12 @@ string TdDaemon::newQuery(struct shttpd_arg *arg, string query,string engines,st
   }
   er->addEngine(engines);
   string userID = shttpd_get_header(arg, "Cookie");
-  string newID = searches->addSearch(userID,new metaRank(er,tdp));
-  searches->getSearch(userID,newID)->startParsing();
+  string newID = searches->addSearch(userID,new metaRank(er,tdp),clients->getUsername(userID));
+  searches->getSearch(userID,newID,clients->getUsername(userID))->startParsing();
   string output = DEFAULT_HEADER;
   output += "Set-TDSession: query=" + newID + ";\r\n\r\n";
-  return output + createJSON(searches->getSearch(userID,newID)->waitForNewResults(),
-   					 searches->getSearch(userID,newID));
+  return output + createJSON(searches->getSearch(userID,newID,clients->getUsername(userID))->waitForNewResults(),
+   					 searches->getSearch(userID,newID,clients->getUsername(userID)));
 }
 
 string TdDaemon::get_next_results(struct shttpd_arg *arg) {
@@ -134,16 +134,32 @@ string TdDaemon::get_next_results(struct shttpd_arg *arg) {
 	if(cookie_string) {
 		regExp r("query=([a-zA-Z0-9]*)");
 		string cstring = cookie_string;
-	  r.newPage(cstring);
+	  	r.newPage(cstring);
 		if (!r.endOfMatch()) {
 			string newID(r.getMatch(1));
-			if (searches->getSearch(userID,newID) != NULL) {
-			  return DEFAULT_HEADER_NL + createJSON(searches->getSearch(userID,newID)->waitForNewResults(),
-	   					 searches->getSearch(userID,newID));
+			if (searches->getSearch(userID,newID,clients->getUsername(userID)) != NULL) {
+			  return DEFAULT_HEADER_NL + createJSON(searches->getSearch(userID,newID,clients->getUsername(userID))->waitForNewResults(),
+	   					 searches->getSearch(userID,newID,clients->getUsername(userID)));
 			}
-    }
+    	}
 	}
 	LOG4CXX_DEBUG(tdParam::logger, "An error occurred while retrieving next results.");
+  return DEFAULT_HEADER_NL;
+}
+
+string TdDaemon::export_csv(struct shttpd_arg *arg) {
+	string userID = shttpd_get_header(arg, "Cookie");
+	regExp r("query=([a-zA-Z0-9]*)");
+	string cstring = shttpd_get_env(arg, "QUERY_STRING");
+  	r.newPage(cstring);
+	if (!r.endOfMatch()) {
+		string newID(r.getMatch(1));
+		metaRank *mr = searches->getSearch(userID,newID,clients->getUsername(userID));
+		if (mr != NULL) {
+		  return CSV_HEADER_NL + openSave::csvExport(mr);
+		}
+	}
+	LOG4CXX_DEBUG(tdParam::logger, "An error occurred while trying to export.");
   return DEFAULT_HEADER_NL;
 }
 
@@ -215,7 +231,7 @@ string TdDaemon::show_available_engines() {
 	xmlFile xf;
 	string config_path;
 	string output = DEFAULT_HEADER_NL;
-  output += "{\"engines\":[";
+  	output += "{\"engines\":[";
 	if (selectFile::find(CONFIG_FILE,config_path) && xf.openFile(config_path)) {
 		nodeDoc ndCateg(&xf,"category");
 		while(ndCateg.isValid()) {
@@ -283,7 +299,7 @@ string TdDaemon::show_available_engines() {
 void TdDaemon::show_404(struct shttpd_arg *arg) {
 	shttpd_printf(arg, "%s", "HTTP/1.1 404 OK\r\n");
 	shttpd_printf(arg, "%s", "Content-Type: text/plain\r\n\r\n");
-	shttpd_printf(arg, "%s%s%s", "404 file ", shttpd_get_env(arg, "REQUEST_URI") , " not found! ");
+	shttpd_printf(arg, "%s%s%s", "404 file not found! ");
 	LOG4CXX_INFO(tdParam::logger, "Error 404: " << shttpd_get_env(arg, "REQUEST_URI"));
 	arg->flags |= SHTTPD_END_OF_OUTPUT;
 }
@@ -346,8 +362,8 @@ void TdDaemon::query_process(struct shttpd_arg *arg) {
 					r.newPage(state->buffer);
 					if (!r.endOfMatch()) {
 				    state->buffer = newQuery(arg,r.getMatch(1),r.getMatch(2),r.getMatch(3));
-		      } else {
-		        state->buffer = "{\"results\":[{}]}";
+				    } else {
+				        state->buffer = "{\"results\":[{}]}";
 					}
 				} else if (uri == AUTHENTICATE_USER) {
 					regExp r("username=([^\\&]+)\\&password=([^\\&]+)");
@@ -361,6 +377,8 @@ void TdDaemon::query_process(struct shttpd_arg *arg) {
 					state->buffer = show_available_engines();
 				} else if (uri == SAVE_ENGINES) {
 					state->buffer = save_config(state->buffer);
+				} else if (uri == EXPORT_CSV) {
+					state->buffer = export_csv(arg);
 				}
 			}
 			while (arg->out.num_bytes < arg->out.len && state->count < state->buffer.length()) {
@@ -424,7 +442,7 @@ void TdDaemon::launchDaemon(tdParam *t) {
 	
 	LOG4CXX_INFO(tdParam::logger, "Teardrop started.");
 	clients = new users();
-	searches = new UIDSession();
+	searches = new UIDSession(tdp);
 
 	signal(SIGPIPE, SIG_IGN);
 
@@ -448,6 +466,7 @@ void TdDaemon::launchDaemon(tdParam *t) {
 	shttpd_register_uri(ctx, AVAILABLE_ENGINES, &query_process, NULL);
 	shttpd_register_uri(ctx, SAVE_ENGINES, &query_process, NULL);
 	shttpd_register_uri(ctx, AUTHENTICATE_USER, &query_process, NULL);
+	shttpd_register_uri(ctx, EXPORT_CSV, &query_process, NULL);
 
 	shttpd_handle_error(ctx, 404, show_404, NULL);
 

@@ -15,6 +15,7 @@ metaRank::metaRank(engineResults *res,tdParam *t) {
 void metaRank::init(engineResults *res,tdParam *t) {
   ranked_results = res;
   tdp = t;
+  finished = false;
   threads = new threadPool<pageParser>(t->getMaxThreads()); 
 }
 
@@ -74,8 +75,8 @@ string metaRank::getString(string page, string delim_engs,string delim_res, stri
         for(r.newPage(p); !r.endOfMatch(); r.next()) {
             //cout << "_" << r.getMatch(1) << "_" << endl;
             string field;
-            if (escape) field = gh.escape(lrit->getFields()[r.getMatch(1)]);
-            else field = lrit->getFields()[r.getMatch(1)];
+            if (escape) field = gh.escape(lrit->getField(r.getMatch(1)));
+            else field = lrit->getField(r.getMatch(1));
             p = regExp::replaceAll(p,"\\x7b" + r.getMatch(1) + "\\x7d",field);
         }
         out += ((out!="")?delim_res:"") + p;
@@ -103,13 +104,13 @@ void metaRank::sort(vector<row> & lr,string field) {
     std::sort(lr.begin(), lr.end(), compareRow(field));
 }
 
-int metaRank::getEngineResults(const string & name) {
+int metaRank::getEngineResultsNumber(const string & name) {
   if (ranked_results != NULL)
     return ranked_results->getEngineResults(name);
   return 0;
 }
 
-map<string,int> *metaRank::getEngineResults() {
+map<string,int> *metaRank::getEngineResultsNumber() {
 	if (ranked_results != NULL)
   	return &(ranked_results->getEngineResults());
   return NULL;
@@ -123,7 +124,20 @@ void metaRank::sortResults(string s, bool ascending) {
 bool metaRank::waitForNewResults(){
 	if (ranked_results->waitForNewResults()) {
 		joinAll();
+		setFinished();
 		return true;
 	}
 	return false;
+}
+
+bool metaRank::isFinished() {
+	return finished;
+}
+
+void metaRank::setFinished(bool val) {
+	finished = val;
+}
+
+engineResults & metaRank::getEngineResults() {
+	return *ranked_results;
 }

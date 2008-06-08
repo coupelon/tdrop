@@ -13,6 +13,8 @@ See the License for the specific language governing permissions and limitations 
 #include <ctime> 
 #include <cstdlib>
 #include "metaRank.h"
+#include "tdParam.h"
+#include "openSave.h"
 
 using namespace std;
 
@@ -25,17 +27,51 @@ using namespace std;
 class UIDSession
 {
 public:
-	UIDSession();
+	UIDSession(tdParam *tdp);
 	virtual ~UIDSession();
+	
+	/**
+	 * Generate a new unique ID. The uniqueness property is assumed
+	 * due to the ramdomness of the ID generation.
+	 * @return the ramdom unique ID
+	 */
 	static string getID();
+	
+	/**
+	 * Initialize the random number generator.
+	 * Here we should be using some kind of mersene twister random
+	 * number generator, but the default one is considered sufficient
+	 * as of now.
+	 */
 	static void initRand();
-	string addSearch(string userID, metaRank *mr);
-	metaRank *getSearch(string userID, string searchID);
+	
+	/**
+	 * Add a new search to the list, and generate its ID.
+	 * @param usedID The Cookie of the current user
+	 * @param mr The metaRank search
+	 * @return the search new ID 
+	 */
+	string addSearch(string userID, metaRank *mr, string userName);
+	
+	/**
+	 * This method returns the metaRank corresponding the the given
+	 * search ID, and ensures that the user is correct.
+	 * @return the search metaRank
+	 */
+	metaRank *getSearch(string userID, string searchID, string userName);
+	
+	/**
+	 * This method stores currently in memory terminated searches
+	 * to disk, as sessions searches. 
+	 */
+	void dumpToDisk();
 private:
 	struct clientSearch {
 		string userID;
+		string userName;
 		metaRank *mr;
 	};
+	tdParam *tdp;
 	map<string, clientSearch> *searches;
 };
 

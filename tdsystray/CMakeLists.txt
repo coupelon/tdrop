@@ -18,7 +18,7 @@ QT4_WRAP_UI(FORMS_H ${FORMS})
 
 QT4_WRAP_CPP(MOC_SOURCES ${HEADERS})
 
-include_directories(../tddaemon ../tdcommon ../tdcommon/xml ../tdcommon/regexp ../tdwrapper )
+include_directories(../tddaemon ../tdcommon ../tdcommon/xml ../tdcommon/regexp ../tdwrapper ../tdresults)
 
 add_executable (teardrop ${FORMS_H} ${SOURCES} ${MOC_SOURCES})
 

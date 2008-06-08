@@ -12,23 +12,23 @@ bool selectFile::find(string f, string & path) {
     /*
     First check for the file in the current directory or with absolute path
     */    
-    if (fileexist(f)) { path=f; return true; }
+    if (fileExists(f)) { path=f; return true; }
     LOG4CXX_DEBUG(tdParam::logger,"couldn't find ./" << f);
     
     /*
     Then check the different home directory
     */
     string home = getHomeDirectory();
-    if (fileexist(home + f)) { path = home + f; return true; }
-    if (fileexist(home + "xml/" + f)) { path = home + "xml/" + f; return true; }
-    if (fileexist(home + "icons/" + f)) { path = home + "icons/" + f; return true; }
+    if (fileExists(home + f)) { path = home + f; return true; }
+    if (fileExists(home + "xml/" + f)) { path = home + "xml/" + f; return true; }
+    if (fileExists(home + "icons/" + f)) { path = home + "icons/" + f; return true; }
     LOG4CXX_DEBUG(tdParam::logger,"couldn't find " << home << "/{.|xml|icons}/ " << f);
     
     /*
     If available, check the installation directory
     */
     #ifdef TEARDROP_DATADIR
-        if (fileexist(TEARDROP_DATADIR + string("/") + f)) { path = TEARDROP_DATADIR + string("/") + f; return true; }
+        if (fileExists(TEARDROP_DATADIR + string("/") + f)) { path = TEARDROP_DATADIR + string("/") + f; return true; }
         LOG4CXX_DEBUG(tdParam::logger,"couldn't find " << TEARDROP_DATADIR << "/" << f);
     #endif
     
@@ -37,7 +37,7 @@ bool selectFile::find(string f, string & path) {
     return false;
 }
 
-bool selectFile::fileexist(string f) {
+bool selectFile::fileExists(string f) {
     fstream fin;
     fin.open(f.c_str(),ios::in);
     bool flag = fin.is_open();
@@ -73,12 +73,12 @@ string selectFile::getHomeConfigFile() {
 void selectFile::createDirectoryStructure() {
 		/* Create the Teardrop personal directory if it doesn't exist */
     string path = selectFile::getHomeDirectory();
-    umask(0);
-    mkdir(path.c_str(),0755);
-    
-    mkdir((path+HOME_XML).c_str(),0755);
-    mkdir((path+HOME_ICONS).c_str(),0755);
-    if (!fileexist(getHomeConfigFile())) {
+ 
+    createDirectory(path);
+    createDirectory(path+HOME_XML);
+    createDirectory(path+HOME_ICONS);
+    createDirectory(path+HOME_SESSIONS);
+    if (!fileExists(getHomeConfigFile())) {
     	ofstream config;
 			config.open(selectFile::getHomeConfigFile().c_str(), ios::out | ios::app | ios::binary);
 			config << "<?xml version=\"1.0\"?>"
@@ -86,5 +86,10 @@ void selectFile::createDirectoryStructure() {
 						 << "</config>" << endl;
 			config.close();
     }
+}
+
+bool selectFile::createDirectory(string path) {
+	umask(0);
+	return !mkdir(path.c_str(),0700);
 }
 
