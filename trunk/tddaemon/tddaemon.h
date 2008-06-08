@@ -38,12 +38,14 @@ See the License for the specific language governing permissions and limitations 
 #define NEXT_RESULTS "/services/get_next_results"
 #define QUERY_POST "/services/query_post"
 #define REQUEST_TREE "/services/request_tree"
+#define EXPORT_CSV "/services/export_csv"
 #define AVAILABLE_ENGINES "/config/get_available_engines"
 #define UPDATE_URL "http://tdrop.googlecode.com/svn/trunk/tdengines/updates.xml"
 #define SAVE_ENGINES "/config/save_engines"
 #define AUTHENTICATE_USER "/login"
 #define DEFAULT_HEADER "HTTP/1.0 200 OK\nContent-Type: text/plain\r\n"
 #define DEFAULT_HEADER_NL "HTTP/1.0 200 OK\nContent-Type: text/plain\r\n\r\n"
+#define CSV_HEADER_NL "HTTP/1.0 200 OK\nContent-Type: text/csv\r\n\r\n"
 
 using namespace std;
 
@@ -60,6 +62,7 @@ private:
 	static string createJSON(bool final, metaRank *mr);
 	static string newQuery(struct shttpd_arg *arg, string query,string engines,string limit);
 	static string get_next_results(struct shttpd_arg *arg);
+	static string export_csv(struct shttpd_arg *arg);
 	static void show_index(struct shttpd_arg *arg);
 	static string show_tree();
 	static void show_404(struct shttpd_arg *arg);

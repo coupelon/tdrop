@@ -84,6 +84,10 @@
 	background-image: url( imgs/edit_tree.png );
 }
 
+.csv .x-btn-text {
+	background-image: url( imgs/csv.gif );
+}
+
 #search-button {
 	margin-top: 5px;
 }

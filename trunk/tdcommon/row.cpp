@@ -70,7 +70,7 @@ void row::toString(bool n) {
 	cout << endl;
 }
 
-map<string, string, compstr> & row::getFields() {
+const map<string, string, compstr> & row::getFields() const {
     return fields;
 }
 

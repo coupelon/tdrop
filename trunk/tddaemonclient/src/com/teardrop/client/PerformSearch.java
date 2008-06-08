@@ -15,6 +15,7 @@ import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.RequestException;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.http.client.URL;
+import com.google.gwt.user.client.Window;
 import com.gwtext.client.core.EventObject;
 import com.gwtext.client.core.SortDir;
 import com.gwtext.client.data.FieldDef;
@@ -49,6 +50,7 @@ import com.gwtext.client.widgets.tree.TreeNode;
 public class PerformSearch {
 	private static final String DEFAULT_SEARCH_URL = "/services/query_post";
 	private static final String DEFAULT_NEXT_URL = "/services/get_next_results";
+	private static final String EXPORT_CSV_URL = "/services/export_csv?";
 	EngineTree engTree;
 	TextField queryText;
 	CycleButton limitButton;
@@ -60,7 +62,7 @@ public class PerformSearch {
 	Store resultsStore;
 	Store enginesStore;
 	String checkedNodeString;
-	String cookie = "";
+	String tdsession = "";
 	float numberOfEngines = 0;
 	
 	private final RecordDef recordResultsDef = new RecordDef(new FieldDef[]{
@@ -194,6 +196,16 @@ public class PerformSearch {
 		});
 		moreInfo.setCls("x-btn-text-icon info");
 		moreInfo.setTooltip("Get detailed information about this search.");
+		
+		ToolbarButton exportCsv = new ToolbarButton("Export as CSV");
+		exportCsv.setCls("x-btn-text-icon csv");  
+		exportCsv.addListener(new ButtonListenerAdapter() {  
+			public void onClick(Button button, EventObject e) {  
+				Window.open(EXPORT_CSV_URL + tdsession, "_blank", "menubar=no,location=no,resizable=no,scrollbars=no,status=no");
+			}
+		});
+		exportCsv.setTooltip("Export the results in a spreadsheet.");
+		
 		ToolbarButton toggleDetails = new ToolbarButton("Detailed");  
 		toggleDetails.setPressed(showDetails);
 		toggleDetails.setEnableToggle(true);  
@@ -223,9 +235,12 @@ public class PerformSearch {
 		pBar.setText("Searching...");
 		
 		toolbar.addFill();
+		toolbar.addButton(exportCsv);
 		toolbar.addButton(moreInfo);
+		toolbar.addSeparator();
 		toolbar.addButton(toggleDetails);
 		toolbar.addButton(toggleHighlight);
+		toolbar.addSeparator();
 		toolbar.addElement(pBar.getElement());
 		resultsPanel.setBottomToolbar(toolbar);
 		
@@ -243,8 +258,8 @@ public class PerformSearch {
 	    RequestBuilder builder = new RequestBuilder(RequestBuilder.POST, URL.encode(url));
 	    try {
 	    	builder.setHeader("Content-Length", String.valueOf(post.length()));
-	    	if (!cookie.equals("")) {
-	    		builder.setHeader("TDSession", cookie);
+	    	if (!tdsession.equals("")) {
+	    		builder.setHeader("TDSession", tdsession);
 	    	}
 	    	builder.sendRequest(post, new RequestCallback() {
 	    	    public void onError(Request request, Throwable exception) {
@@ -272,7 +287,7 @@ public class PerformSearch {
         }
         for (int i = 0; i < headers.length; i++) {
             if (headers[i] != null && "Set-TDSession".equalsIgnoreCase(headers[i].getName())) {
-            	cookie = headers[i].getValue();
+            	tdsession = headers[i].getValue();
             }
         }
 	}

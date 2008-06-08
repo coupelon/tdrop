@@ -26,13 +26,14 @@ public:
 	virtual ~users();
 	string authenticateUser(const string & username, const string & password, const char *host);
 	bool isValid(const char *id, const char *host);
+	string getUsername(const string & id);
 private:
 	struct usr {
-		string id;
 		string host;
+		string name;
 	};
-	list<usr> clients;
-	void addUser(const string & id, const string & host);
+	map<string, usr> clients;
+	void addUser(const string & id, const string & host, const string & name);
 	bool validateCouple(const string & user, const string & pass);
 };
 

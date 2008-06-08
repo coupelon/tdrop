@@ -149,9 +149,9 @@ int main(int argc, char *argv[]) {
 	        //mr.startRanking();
 	        if (output_flag) {
 	            if (format == "tdp" )
-	                openSave::xmlSave(output, query, lse, limit, mr.getResults());
+	                openSave::xmlSave(output, &mr);
 	            else if (format == "html")
-	                openSave::htmlExport(output, query, lse, limit, mr.getResults());
+	                openSave::htmlExport(output, &mr);
 	            else if (format == "csv")
 	                openSave::csvExport(output, mr.getResults());
 	        } else mr.toString(print,delim);

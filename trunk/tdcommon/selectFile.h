@@ -24,6 +24,7 @@ See the License for the specific language governing permissions and limitations 
 #define PASS_FILE "passwd"
 #define HOME_XML "xml/"
 #define HOME_ICONS "icons/"
+#define HOME_SESSIONS "sessions/"
 
 using namespace std;
 
@@ -67,9 +68,18 @@ public:
     /**
      * Creates the home directory structure
      */
-     static void createDirectoryStructure();
-private:
-    static bool fileexist(string);
+    static void createDirectoryStructure();
+     
+    /**
+     * Creates a new directory
+     * @return true in case of success
+     */ 
+    static bool createDirectory(string path);
+    
+	/**
+	 * @return true if the file exists
+	 */
+    static bool fileExists(string);
 };
 
 #endif

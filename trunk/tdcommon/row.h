@@ -84,7 +84,7 @@ public:
   int getNum() const;
   void setNum(int);
   const list<string> & getEngine() const;
-  map<string, string, compstr> & getFields();
+  const map<string, string, compstr> & getFields() const;
   string getField(string s) const;
   
   bool operator==(const row &) const;
@@ -104,9 +104,9 @@ struct compareRow {
     }
     bool operator()(/*const */row r1, /*const */row r2) const {
       if (num) return r1.getNum() < r2.getNum();
-      string s1 = r1.getFields()[field];
+      string s1 = r1.getField(field);
       transform(s1.begin(),s1.end(),s1.begin(),(int (*)(int)) toupper);
-      string s2 = r2.getFields()[field];
+      string s2 = r2.getField(field);
       transform(s2.begin(),s2.end(),s2.begin(),(int (*)(int)) toupper);
       return s1 < s2;
       //return r1.getFields()[field] < r2.getFields()[field];

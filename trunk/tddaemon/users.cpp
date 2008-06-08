@@ -18,7 +18,7 @@ users::~users() {
 string users::authenticateUser(const string & username, const string & password, const char *host) {
 	if (host && validateCouple(username,password)) {
 		string id = UIDSession::getID();
-		addUser(id,string(host));
+		addUser(id,string(host), username);
 		LOG4CXX_INFO(tdParam::logger, "User " << username << " connected, ID: " << id << " (" << host << ")");
 		return id;
 	}
@@ -26,19 +26,19 @@ string users::authenticateUser(const string & username, const string & password,
 	return "";
 }
 
-void users::addUser(const string & id, const string & host) {
+void users::addUser(const string & id, const string & host, const string & name) {
 	usr newUser;
-	newUser.id = id;
 	newUser.host = host;
-	clients.push_front(newUser);
+	newUser.name = name;
+	clients[id] = newUser;
 }
 
 bool users::isValid(const char *id, const char *host) {
 	if (id && host) {
-		string idS = string(id);
+		string idS = string(id).substr(3);
 		string hostS = string(host);
-		for(list<usr>::iterator usrIt = clients.begin(); usrIt != clients.end(); ++usrIt) {
-			if (("ID=" + usrIt->id) == idS && usrIt->host == hostS) return true;
+		if (clients.find(idS) != clients.end()) {
+			if (clients[idS].host == hostS) return true;
 		}
 	}
 	LOG4CXX_DEBUG(tdParam::logger, "Failed to verify cookie " << string(id?id:"(null)") << ":" << string(host?host:"(null)"));
@@ -80,4 +80,12 @@ bool users::validateCouple(const string & user, const string & pass) {
 	}
 	LOG4CXX_INFO(tdParam::logger, "Invalid couple " << user << ":" << shaString);
 	return false;
+}
+
+string users::getUsername(const string & id) {
+	string idS = id.substr(3);
+	if (clients.find(idS) != clients.end()) {
+		return clients[idS].name;
+	}
+	return "";
 }

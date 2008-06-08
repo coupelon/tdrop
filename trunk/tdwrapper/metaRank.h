@@ -98,12 +98,12 @@ public:
      * @param name The name of the engine
      * @return The number of results that have been retrieved for the given engine
      */
-    int getEngineResults(const string & name);
+    int getEngineResultsNumber(const string & name);
     
     /**
      * @return A pointer to the results number map
      */
-    map<string,int> *getEngineResults();
+    map<string,int> *getEngineResultsNumber();
     
     
     /**
@@ -114,9 +114,25 @@ public:
     void sortResults(string s, bool ascending = true);
     
     /** This method only returns when new results are available
-     * @return true if every awaited results available
+     * @return true if every awaited results are available
      */
     bool waitForNewResults();
+    
+    /**
+     * @return true if the search operation is terminated.
+     */
+    bool isFinished();
+    
+    /**
+     * Mark the search as finished.
+     * @val true to mark the search as finished.
+     */
+     void setFinished(bool val = true);
+    
+    /**
+     * @return the engineResults. Use with caution.
+     */
+    engineResults & getEngineResults();
     
 private:
     threadPool<pageParser> *threads;
@@ -124,6 +140,7 @@ private:
     engineResults *ranked_results;
     static string intToString(int);
     tdParam *tdp;
+    bool finished;
 };
 
 #endif
