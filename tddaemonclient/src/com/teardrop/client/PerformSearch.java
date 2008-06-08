@@ -15,7 +15,6 @@ import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.RequestException;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.http.client.URL;
-import com.google.gwt.user.client.Window;
 import com.gwtext.client.core.EventObject;
 import com.gwtext.client.core.SortDir;
 import com.gwtext.client.data.FieldDef;
@@ -29,8 +28,7 @@ import com.gwtext.client.data.StringFieldDef;
 import com.gwtext.client.util.Format;
 import com.gwtext.client.widgets.Button;
 import com.gwtext.client.widgets.CycleButton;
-import com.gwtext.client.widgets.MessageBox;
-import com.gwtext.client.widgets.MessageBoxConfig;
+import com.gwtext.client.widgets.Panel;
 import com.gwtext.client.widgets.ProgressBar;
 import com.gwtext.client.widgets.TabPanel;
 import com.gwtext.client.widgets.Toolbar;
@@ -45,7 +43,9 @@ import com.gwtext.client.widgets.grid.GridView;
 import com.gwtext.client.widgets.grid.Renderer;
 import com.gwtext.client.widgets.grid.RowParams;
 import com.gwtext.client.widgets.grid.RowSelectionModel;
+import com.gwtext.client.widgets.layout.FitLayout;
 import com.gwtext.client.widgets.tree.TreeNode;
+import com.gwtext.client.widgets.Window;
 
 public class PerformSearch {
 	private static final String DEFAULT_SEARCH_URL = "/services/query_post";
@@ -181,17 +181,31 @@ public class PerformSearch {
 		
 		Toolbar toolbar = new Toolbar();  
 		ToolbarButton moreInfo = new ToolbarButton("More Information", new ButtonListenerAdapter() {  
-			public void onClick(final Button innerButton, EventObject e) {  
-				MessageBox.show(new MessageBoxConfig() {  
-					{  
-						setTitle("Search Information");  
-						setMsg("<b>Results number</b>: " + resultsStore.getCount() + "<br />" +
-							   "<b>Engines:</b>: " + checkedNodeString);  
-						setWidth(300);  
-						setButtons(MessageBox.OK);
-						setAnimEl(innerButton.getId());  
-					}  
-				});
+			public void onClick(final Button innerButton, EventObject e) {
+				Window infoWindow = new Window("Search Information", true, true);
+				infoWindow.setClosable(true);
+				infoWindow.setMinWidth(250);
+				infoWindow.setMinHeight(175);
+				infoWindow.setHeight(200);
+				infoWindow.setPaddings(10);
+				infoWindow.setLayout(new FitLayout());
+				String html = "<b>Results number</b>: " + resultsStore.getCount() + "<br /><br />";
+
+				for (int i = 0; i < enginesStore.getCount(); ++i) {
+					if (enginesStore.getAt(i).getAsInteger("cpt") != -1) {
+						html += "<b>" + enginesStore.getAt(i).getAsString("name") +
+								"</b>: " + enginesStore.getAt(i).getAsInteger("cpt") + "<br />";
+					}
+				}
+				
+				Panel engPanel = new Panel("", html);
+				engPanel.setBodyBorder(false);
+				engPanel.setHeader(false);
+				engPanel.setBaseCls("x-plain");
+				engPanel.setAutoScroll(true);
+				infoWindow.add(engPanel);
+				
+				infoWindow.show();
 			}  
 		});
 		moreInfo.setCls("x-btn-text-icon info");
@@ -201,7 +215,7 @@ public class PerformSearch {
 		exportCsv.setCls("x-btn-text-icon csv");  
 		exportCsv.addListener(new ButtonListenerAdapter() {  
 			public void onClick(Button button, EventObject e) {  
-				Window.open(EXPORT_CSV_URL + tdsession, "_blank", "menubar=no,location=no,resizable=no,scrollbars=no,status=no");
+				com.google.gwt.user.client.Window.open(EXPORT_CSV_URL + tdsession, "_blank", "menubar=no,location=no,resizable=no,scrollbars=no,status=no");
 			}
 		});
 		exportCsv.setTooltip("Export the results in a spreadsheet.");
@@ -359,7 +373,7 @@ public class PerformSearch {
 				results += enginesStore.getAt(i).getAsInteger("cpt");
 			}
 		}
-		setProgessMessage(count/numberOfEngines, results + " Results (" + count + "/" + numberOfEngines + ")");
+		setProgessMessage(count/numberOfEngines, resultsStore.getCount() + " (" + results + ") Results (" + count + "/" + numberOfEngines + ")");
 	}
 	
 	//To circumvent the tree checks bug...
