@@ -12,6 +12,8 @@ See the License for the specific language governing permissions and limitations 
 
 #include <iostream>
 #include <list>
+#include <sys/types.h>
+#include <dirent.h>
 #include "tdParam.h"
 #include "UIDSession.h"
 #include "selectFile.h"
@@ -27,6 +29,7 @@ public:
 	string authenticateUser(const string & username, const string & password, const char *host);
 	bool isValid(const char *id, const char *host);
 	string getUsername(const string & id);
+	string getUserHistory(const char *id, const char *host);
 	bool authenticationRequired();
 	void addUser(const string & id, const string & host, const string & name);
 private:

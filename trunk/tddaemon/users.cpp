@@ -94,6 +94,30 @@ string users::getUsername(const string & id) {
 	return "";
 }
 
+string users::getUserHistory(const char *id, const char *host) {
+  if (!isValid(id,host)) return "";
+  DIR *dp;
+  struct dirent *ep;
+  string directory = selectFile::getHomeDirectory()
+						+ HOME_SESSIONS
+						+ getUsername(id)
+						+ "/";
+  dp = opendir (directory.c_str());
+  if (dp != NULL) {
+  string output = "";
+    while ((ep = readdir(dp))) {
+    
+      puts (ep->d_name);
+    }
+    closedir (dp);
+    return output;
+  }
+  else {
+    LOG4CXX_INFO(tdParam::logger, "Couldn't load search list.");
+  }
+  return "";
+}
+
 bool users::authenticationRequired() {
     ifstream passfile;
 	string filename = selectFile::getHomeDirectory() + PASS_FILE;
@@ -104,3 +128,4 @@ bool users::authenticationRequired() {
 	}
 	return false;
 }
+
