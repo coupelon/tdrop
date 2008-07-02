@@ -43,6 +43,7 @@ See the License for the specific language governing permissions and limitations 
 #define UPDATE_URL "http://tdrop.googlecode.com/svn/trunk/tdengines/updates.xml"
 #define SAVE_ENGINES "/config/save_engines"
 #define AUTHENTICATE_USER "/login"
+#define GET_USER_HISTORY "/get_user_history"
 #define DEFAULT_HEADER "HTTP/1.0 200 OK\nContent-Type: text/plain\r\n"
 #define DEFAULT_HEADER_NL "HTTP/1.0 200 OK\nContent-Type: text/plain\r\n\r\n"
 #define CSV_HEADER_NL "HTTP/1.0 200 OK\nContent-Type: text/csv\r\n\r\n"

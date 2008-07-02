@@ -389,6 +389,8 @@ void TdDaemon::query_process(struct shttpd_arg *arg) {
 					state->buffer = save_config(state->buffer);
 				} else if (uri == EXPORT_CSV) {
 					state->buffer = export_csv(arg);
+				} else if (uri == GET_USER_HISTORY) {
+				  state->buffer = clients->getUserHistory(shttpd_get_header(arg, "Cookie"),shttpd_get_env(arg, "REMOTE_ADDR"));
 				}
 			}
 			while (arg->out.num_bytes < arg->out.len && state->count < state->buffer.length()) {
@@ -477,6 +479,7 @@ void TdDaemon::launchDaemon(tdParam *t) {
 	shttpd_register_uri(ctx, SAVE_ENGINES, &query_process, NULL);
 	shttpd_register_uri(ctx, AUTHENTICATE_USER, &query_process, NULL);
 	shttpd_register_uri(ctx, EXPORT_CSV, &query_process, NULL);
+	shttpd_register_uri(ctx, GET_USER_HISTORY, &query_process, NULL);
 
 	shttpd_handle_error(ctx, 404, show_404, NULL);
 
