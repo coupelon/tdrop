@@ -106,8 +106,24 @@ string users::getUserHistory(const char *id, const char *host) {
   if (dp != NULL) {
   string output = "";
     while ((ep = readdir(dp))) {
-    
-      puts (ep->d_name);
+      engineResults er;
+      if (openSave::xmlOpenHeader(directory + ep->d_name,&er)) {
+        output += "{\"id\":\"";
+        string fname = ep->d_name;
+        output += fname.substr(0,fname.length()-4); //Remove the '.xml' suffix
+			  output += "\",\"query\":\"";
+			  output += er.getQuery();
+			  output += "\",\"limit\":\"";
+			  output += er.getLimit();
+			  output += "\",\"engines\":[";
+			  for (map<string, int>::const_iterator it = er.getEngines().begin(); it != er.getEngines().end(); ++it) {
+			    output += "{\"name\":\"";
+			    output += it->first;
+			    output += "\"}";
+			  }
+			  output += "]}";
+      }
+      // puts (ep->d_name);
     }
     closedir (dp);
     return output;
@@ -119,7 +135,7 @@ string users::getUserHistory(const char *id, const char *host) {
 }
 
 bool users::authenticationRequired() {
-    ifstream passfile;
+  ifstream passfile;
 	string filename = selectFile::getHomeDirectory() + PASS_FILE;
 	passfile.open (filename.c_str(), fstream::in);
 	if (passfile.is_open()) {

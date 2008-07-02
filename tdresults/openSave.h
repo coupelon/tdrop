@@ -82,6 +82,13 @@ public:
      */
     static void csvExport(stringstream & myfile, const vector<row> & r);
     
+    /*
+     * This gets the header of the given file. Rows are not retrieved.
+     * @param file The XML file
+     * @param er The container of the header
+     */
+    static bool xmlOpenHeader(const string & file, engineResults *er);
+    
 };
 
 #endif
