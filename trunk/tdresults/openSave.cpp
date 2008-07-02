@@ -58,54 +58,87 @@ bool openSave::xmlSave(string file, metaRank *mr) {
 bool openSave::xmlOpen(const string & file, metaRank **mr, tdParam *tdp) {
     xmlFile input;
     if (input.openFile(file)) {
-    	vector<row> r;
+    vector<row> r;
 		getHttp gh;
-    	engineResults *er = new engineResults();
-		
-    	nodeDoc *cur = new nodeDoc(&input,"engines");
-        if(!cur->isValid()) return false;
-        cur->findChildByName("name");
-        while(cur->isValid()) {
-            er->addEngine(gh.unescape(cur->getNodeValue()),atoi(cur->getAttributeValueByName("results").c_str()));
-            cur->next();
-        }
-        
-        cur->findChildByName("query",NULL);
-        if (!cur->isValid()) return false;
-        er->setQuery(gh.unescape(cur->getNodeValue()));
-        
-        cur->findChildByName("limit",NULL);
-        if (!cur->isValid()) return false;
+  	engineResults *er = new engineResults();
+	
+  	nodeDoc *cur = new nodeDoc(&input,"engines");
+    if(!cur->isValid()) return false;
+    cur->findChildByName("name");
+    while(cur->isValid()) {
+        er->addEngine(gh.unescape(cur->getNodeValue()),atoi(cur->getAttributeValueByName("results").c_str()));
+        cur->next();
+    }
+    
+    cur->findChildByName("query",NULL);
+    if (!cur->isValid()) return false;
+    er->setQuery(gh.unescape(cur->getNodeValue()));
+    
+    cur->findChildByName("limit",NULL);
+    if (!cur->isValid()) return false;
 		er->setLimit(atol(gh.unescape(cur->getNodeValue()).c_str()));
         
-        cur->findChildByName("row",NULL);
-        while(cur->isValid()) {
-            nodeDoc *xmlRow = new nodeDoc(&input,"number",*cur);
-            if(!xmlRow->isValid()) return false;
-            row rw(atoi(xmlRow->getNodeValue().c_str()));
-            
-            xmlRow->findChildByName("engines",cur);
-            if(!xmlRow->isValid()) return false;
-            xmlRow->findChildByName("name");
-            while(xmlRow->isValid()) {
-                rw.addEngine(gh.unescape(xmlRow->getNodeValue()));
-                xmlRow->next();
-            }
-            xmlRow->findChildByName("fields",cur);
-            if(!xmlRow->isValid()) return false;
-            while(xmlRow->isValid()) {
-                rw.addField(gh.unescape(xmlRow->getNodeValue()), gh.unescape(xmlRow->getAttributeValueByName("name")));
-                xmlRow->next();
-            }
-            r.push_back(rw);
-            cur->next();
+    cur->findChildByName("row",NULL);
+    while(cur->isValid()) {
+        nodeDoc *xmlRow = new nodeDoc(&input,"number",*cur);
+        if(!xmlRow->isValid()) return false;
+        row rw(atoi(xmlRow->getNodeValue().c_str()));
+        
+        xmlRow->findChildByName("engines",cur);
+        if(!xmlRow->isValid()) return false;
+        xmlRow->findChildByName("name");
+        while(xmlRow->isValid()) {
+            rw.addEngine(gh.unescape(xmlRow->getNodeValue()));
+            xmlRow->next();
         }
-        er->setResults(r);
+        xmlRow->findChildByName("fields",cur);
+        if(!xmlRow->isValid()) return false;
+        while(xmlRow->isValid()) {
+            rw.addField(gh.unescape(xmlRow->getNodeValue()), gh.unescape(xmlRow->getAttributeValueByName("name")));
+            xmlRow->next();
+        }
+        r.push_back(rw);
+        cur->next();
+    }
+    er->setResults(r);
 		*mr = new metaRank(er,tdp);
 		(*mr)->setFinished();
 		return true;
     }
     return false;
+}
+
+bool openSave::xmlOpenHeader(const string & file, engineResults *er) {
+  xmlFile input;
+  if (input.openFile(file)) {
+  	vector<row> r;
+	  getHttp gh;
+	
+  	nodeDoc *cur = new nodeDoc(&input,"engines");
+      if(!cur->isValid()) return false;
+      cur->findChildByName("name");
+      while(cur->isValid()) {
+          er->addEngine(gh.unescape(cur->getNodeValue()),atoi(cur->getAttributeValueByName("results").c_str()));
+          cur->next();
+      }
+      
+      cur->findChildByName("query",NULL);
+      if (!cur->isValid()) return false;
+      er->setQuery(gh.unescape(cur->getNodeValue()));
+      
+      cur->findChildByName("limit",NULL);
+      if (!cur->isValid()) return false;
+	    er->setLimit(atol(gh.unescape(cur->getNodeValue()).c_str()));
+      
+      /* cur->findChildByName("row",NULL);
+      int count = 0;
+      while(cur->isValid()) {
+          count++;
+          cur->next();
+      } */
+	  return true;
+  }
+  return false;
 }
 
 void openSave::htmlExport(stringstream & myfile, metaRank *mr) {
