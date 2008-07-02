@@ -72,9 +72,13 @@ bool users::validateCouple(const string & user, const string & pass) {
 			regExp r("([^:]+):(.+)");
 			r.newPage(line);
 		  if (!r.endOfMatch()) {
-		  	if (user == r.getMatch(1) && shaString == r.getMatch(2)) return true;
+		  	if (user == r.getMatch(1) && shaString == r.getMatch(2)) {
+		  	    passfile.close();
+		  	    return true;
+		  	}
 		  }
 		}
+		passfile.close();
 	} else {
 		LOG4CXX_WARN(tdParam::logger, "Could not find password file " << selectFile::getHomeDirectory() << PASS_FILE);
 	}
@@ -88,4 +92,15 @@ string users::getUsername(const string & id) {
 		return clients[idS].name;
 	}
 	return "";
+}
+
+bool users::authenticationRequired() {
+    ifstream passfile;
+	string filename = selectFile::getHomeDirectory() + PASS_FILE;
+	passfile.open (filename.c_str(), fstream::in);
+	if (passfile.is_open()) {
+	    passfile.close();
+	    return true;
+	}
+	return false;
 }

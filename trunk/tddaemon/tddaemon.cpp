@@ -325,9 +325,19 @@ void TdDaemon::query_process(struct shttpd_arg *arg) {
 		LOG4CXX_INFO(tdParam::logger, "Error 411: Content-Length not specified.");
 		arg->flags |= SHTTPD_END_OF_OUTPUT;
 	} else if (arg->state == NULL && !clients->isValid(shttpd_get_header(arg, "Cookie"),shttpd_get_env(arg, "REMOTE_ADDR")) && uri != AUTHENTICATE_USER) {
-		shttpd_printf(arg, "HTTP/1.0 403 Authentication Required\n\n");
-		LOG4CXX_INFO(tdParam::logger, "Error 403: User not authenticated.");
-		arg->flags |= SHTTPD_END_OF_OUTPUT;
+	    if (!clients->authenticationRequired()) {
+	    	shttpd_printf(arg, "%s", "HTTP/1.1 301 Moved Permanently\r\n");
+	        string id = UIDSession::getID();
+		    clients->addUser(id,string(shttpd_get_env(arg, "REMOTE_ADDR")), "default");
+		    shttpd_printf(arg, "%s%s%s", "Set-Cookie: ID=", id.c_str(),"\r\n");
+	        shttpd_printf(arg, "%s%s%s", "Location: ",shttpd_get_env(arg, "REQUEST_URI"),"\r\n");
+		    LOG4CXX_INFO(tdParam::logger, "Error 301: Reload the page with the correct cookie informations, for default user.");
+		    arg->flags |= SHTTPD_END_OF_OUTPUT;
+	    } else {
+		    shttpd_printf(arg, "HTTP/1.0 403 Authentication Required\n\n");
+		    LOG4CXX_INFO(tdParam::logger, "Error 403: User not authenticated.");
+		    arg->flags |= SHTTPD_END_OF_OUTPUT;
+		}
   } else if (arg->state == NULL) {
 		/* New request. Allocate a state structure */
 		arg->state = state = new (struct state);
