@@ -299,7 +299,7 @@ string TdDaemon::show_available_engines() {
 void TdDaemon::show_404(struct shttpd_arg *arg) {
 	shttpd_printf(arg, "%s", "HTTP/1.1 404 OK\r\n");
 	shttpd_printf(arg, "%s", "Content-Type: text/plain\r\n\r\n");
-	shttpd_printf(arg, "%s%s%s", "404 file not found! ");
+	shttpd_printf(arg, "%s", "404 file not found! ");
 	LOG4CXX_INFO(tdParam::logger, "Error 404: " << shttpd_get_env(arg, "REQUEST_URI"));
 	arg->flags |= SHTTPD_END_OF_OUTPUT;
 }
