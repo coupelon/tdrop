@@ -107,23 +107,23 @@ string users::getUserHistory(const char *id, const char *host) {
   string output = "";
     while ((ep = readdir(dp))) {
       engineResults er;
-      if (openSave::xmlOpenHeader(directory + ep->d_name,&er)) {
+      string fname = ep->d_name;
+      if (fname.find(".xml") != string::npos && openSave::xmlOpenHeader(directory + fname,&er)) {
         output += "{\"id\":\"";
-        string fname = ep->d_name;
         output += fname.substr(0,fname.length()-4); //Remove the '.xml' suffix
-			  output += "\",\"query\":\"";
-			  output += er.getQuery();
-			  output += "\",\"limit\":\"";
-			  output += er.getLimit();
-			  output += "\",\"engines\":[";
-			  for (map<string, int>::const_iterator it = er.getEngines().begin(); it != er.getEngines().end(); ++it) {
-			    output += "{\"name\":\"";
-			    output += it->first;
-			    output += "\"}";
-			  }
-			  output += "]}";
+        output += "\",\"query\":\"";
+        output += er.getQuery();
+        output += "\",\"limit\":\"";
+        output += xmlFile::ltoa(er.getLimit());
+        output += "\",\"engines\":[";
+        for (map<string, int>::const_iterator it = er.getEngines().begin(); it != er.getEngines().end(); ++it) {
+            if (it != er.getEngines().begin()) output += ",";
+            output += "{\"name\":\"";
+            output += it->first;
+            output += "\"}";
+        }
+        output += "]}";
       }
-      // puts (ep->d_name);
     }
     closedir (dp);
     return output;
