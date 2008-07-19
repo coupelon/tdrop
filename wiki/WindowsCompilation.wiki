@@ -17,3 +17,4 @@ This page is a note on the full windows compilation procedure.
   * libcurl (7.14.0ssl)
  * Download & Install Cmake (2.6.0)
  * Compile log4cxx
+ * ... To be completed
