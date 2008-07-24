@@ -13,7 +13,7 @@ bool selectFile::find(string f, string & path) {
     First check for the file in the current directory or with absolute path
     */    
     if (fileExists(f)) { path=f; return true; }
-    LOG4CXX_DEBUG(tdParam::logger,"couldn't find ./" << f);
+    LOG4CXX_DEBUG(tdParam::logger,"couldn't find ./" + f);
     
     /*
     Then check the different home directory
@@ -22,7 +22,7 @@ bool selectFile::find(string f, string & path) {
     if (fileExists(home + f)) { path = home + f; return true; }
     if (fileExists(home + "xml/" + f)) { path = home + "xml/" + f; return true; }
     if (fileExists(home + "icons/" + f)) { path = home + "icons/" + f; return true; }
-    LOG4CXX_DEBUG(tdParam::logger,"couldn't find " << home << "/{.|xml|icons}/ " << f);
+    LOG4CXX_DEBUG(tdParam::logger,"couldn't find " + home + "/{.|xml|icons}/ " + f);
     
     /*
     If available, check the installation directory
@@ -32,7 +32,7 @@ bool selectFile::find(string f, string & path) {
         LOG4CXX_DEBUG(tdParam::logger,"couldn't find " << TEARDROP_DATADIR << "/" << f);
     #endif
     
-    LOG4CXX_WARN(tdParam::logger,"File " << f << " not found.");
+    LOG4CXX_WARN(tdParam::logger,"File " + f + " not found.");
     path = "";
     return false;
 }
@@ -90,6 +90,10 @@ void selectFile::createDirectoryStructure() {
 
 bool selectFile::createDirectory(string path) {
 	umask(0);
-	return !mkdir(path.c_str(),0700);
+	#ifdef WIN32
+	return !mkdir(path.c_str());
+  #else
+  return !mkdir(path.c_str(),0700);
+  #endif
 }
 

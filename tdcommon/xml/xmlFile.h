@@ -11,6 +11,7 @@ See the License for the specific language governing permissions and limitations 
 
 #include <libxml/parser.h>
 #include <libxml/tree.h>
+#include <sstream>
 
 //Cross references
 class xmlFile;

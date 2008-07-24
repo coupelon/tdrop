@@ -10,7 +10,10 @@ See the License for the specific language governing permissions and limitations 
 #define DAEMON_H_
 
 #include <sys/types.h>
+
+#ifndef WIN32
 #include <sys/select.h>
+#endif
 
 #include <stdio.h>
 #include <stdlib.h>

@@ -14,6 +14,12 @@ See the License for the specific language governing permissions and limitations 
 #include <sys/types.h>
 #include <sys/stat.h>
 
+#ifdef WIN32
+//For umask and mkdir
+#include <direct.h>
+#include <io.h>
+#endif
+
 #include "tdParam.h"
 
 #ifndef HOME_LINUX

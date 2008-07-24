@@ -19,10 +19,10 @@ string users::authenticateUser(const string & username, const string & password,
 	if (host && validateCouple(username,password)) {
 		string id = UIDSession::getID();
 		addUser(id,string(host), username);
-		LOG4CXX_INFO(tdParam::logger, "User " << username << " connected, ID: " << id << " (" << host << ")");
+		LOG4CXX_INFO(tdParam::logger, "User " + username + " connected, ID: " + id + " (" + host + ")");
 		return id;
 	}
-	LOG4CXX_WARN(tdParam::logger, "Failed to authenticate user " << username);
+	LOG4CXX_WARN(tdParam::logger, "Failed to authenticate user " + username);
 	return "";
 }
 
@@ -41,7 +41,7 @@ bool users::isValid(const char *id, const char *host) {
 			if (clients[idS].host == hostS) return true;
 		}
 	}
-	LOG4CXX_DEBUG(tdParam::logger, "Failed to verify cookie " << string(id?id:"(null)") << ":" << string(host?host:"(null)"));
+	LOG4CXX_DEBUG(tdParam::logger, "Failed to verify cookie " + string(id?id:"(null)") + ":" + string(host?host:"(null)"));
 	return false;
 }
 
@@ -80,9 +80,9 @@ bool users::validateCouple(const string & user, const string & pass) {
 		}
 		passfile.close();
 	} else {
-		LOG4CXX_WARN(tdParam::logger, "Could not find password file " << selectFile::getHomeDirectory() << PASS_FILE);
+		LOG4CXX_WARN(tdParam::logger, "Could not find password file " + selectFile::getHomeDirectory() + PASS_FILE);
 	}
-	LOG4CXX_INFO(tdParam::logger, "Invalid couple " << user << ":" << shaString);
+	LOG4CXX_INFO(tdParam::logger, "Invalid couple " + user + ":" + shaString);
 	return false;
 }
 
