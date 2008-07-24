@@ -23,7 +23,7 @@ include_directories( "/usr/include" ${CURL_INCLUDE_DIR} ${LIBXML2_INCLUDE_DIR} )
 link_directories ( "/usr/lib" ${CURL_LIBRARY_DIR} ${LIBXML2_LIBRARY_DIR} )
 
 # Turn on warnings
-ADD_DEFINITIONS(-Wall -Werror)
+ADD_DEFINITIONS(-Wall)
 
 # Teardrop special definitions
 ADD_DEFINITIONS(-DHOME_LINUX_DEV=\\"${TEARDROP_SOURCE_DIR}/tdengines/\\")

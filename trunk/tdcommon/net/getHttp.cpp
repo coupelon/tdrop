@@ -66,7 +66,7 @@ bool getHttp::validatePage (string & url) {
     curl_easy_setopt (curl, CURLOPT_TIMEOUT, m_timeout);
 
     curl_easy_setopt (curl, CURLOPT_URL, url.c_str ());
-    curl_easy_setopt (curl, CURLOPT_NOBODY);
+    curl_easy_setopt (curl, CURLOPT_NOBODY,1);
     
     if (m_proxyAddress != "") {
       curl_easy_setopt(curl, CURLOPT_PROXY, m_proxyAddress.c_str());
@@ -124,8 +124,8 @@ bool getHttp::getRawData (address & ad, rawContainer *r) {
 	if (ad.isPOST ()) {
 		url = ad.param.post;
 		curl_easy_setopt (curl, CURLOPT_POSTFIELDS, url.c_str ());
-		curl_easy_setopt (curl, CURLOPT_POST);
-	} else curl_easy_setopt (curl, CURLOPT_HTTPGET);
+		curl_easy_setopt (curl, CURLOPT_POST,1);
+	} else curl_easy_setopt (curl, CURLOPT_HTTPGET,1);
   if (m_proxyAddress != "") {
     curl_easy_setopt(curl, CURLOPT_PROXY, m_proxyAddress.c_str());
     curl_easy_setopt(curl, CURLOPT_PROXYPORT, m_proxyPort);
@@ -210,11 +210,11 @@ string getHttp::charsetConvert(string s, string from_charset, string to_charset)
     iconv_t trans = iconv_open(to_charset.c_str(), from_charset.c_str());
     
     if (trans == (iconv_t)(-1)) {
-        LOG4CXX_WARN(tdParam::logger,"A problem with the choosen charset occured ! (from " << from_charset.c_str() << " to " << to_charset.c_str());
+        LOG4CXX_WARN(tdParam::logger,"A problem with the choosen charset occured ! (from " + from_charset + " to " + to_charset);
         return s;
     }
     
-    #ifdef _LIBICONV_W32_H
+    #ifdef WIN32
         size_t res = iconv(trans, (const char **) &buf1, &size1, &buf2, &size2);
     #else
         size_t res = iconv(trans, &buf1, &size1, &buf2, &size2);
@@ -226,7 +226,7 @@ string getHttp::charsetConvert(string s, string from_charset, string to_charset)
     delete buf2cop;
     //if (buf2) delete buf2;
     if (res == (size_t) -1) {
-         LOG4CXX_WARN(tdParam::logger,"A conversion error occured, from " << from_charset.c_str() << " to " << to_charset.c_str());
+         LOG4CXX_WARN(tdParam::logger,"A conversion error occured, from " + from_charset + " to " + to_charset);
         return s;
         
     }

@@ -25,8 +25,8 @@
 # LOG4CXX_INCLUDE_DIR - the liblog4cxx include directory
 # LOG4CXX_LIBRARIES - liblog4cxx library
 
-FIND_PATH(LOG4CXX_INCLUDE_DIR logger.h PATHS /usr/include/log4cxx /usr/local/include/log4cxx )
-FIND_LIBRARY(LOG4CXX_LIBRARIES NAMES log4cxx PATHS /usr/lib /usr/local/lib )
+FIND_PATH(LOG4CXX_INCLUDE_DIR logger.h PATHS /include/log4cxx /usr/include/log4cxx /usr/local/include/log4cxx )
+FIND_LIBRARY(LOG4CXX_LIBRARIES NAMES log4cxx log4cxxd PATHS /lib /usr/lib /usr/local/lib )
 
 IF(LOG4CXX_INCLUDE_DIR AND LOG4CXX_LIBRARIES)
   SET(Log4cxx_FOUND 1)

@@ -56,7 +56,7 @@ metaRank *UIDSession::getSearch(string userID, string searchID, string userName)
 						+ ".xml";
 	if (selectFile::fileExists(file)) {
 		metaRank *mr = NULL;
-		LOG4CXX_DEBUG(tdParam::logger, "Loading file back : " << file);
+		LOG4CXX_DEBUG(tdParam::logger, "Loading file back : " + file);
 		if (openSave::xmlOpen(file, &mr, tdp)) {
 			(*searches)[searchID].mr = mr;
 			(*searches)[searchID].userID = userID;
@@ -78,7 +78,7 @@ void UIDSession::dumpToDisk() {
 						+ HOME_SESSIONS
 						+ srch->second.userName;
 			selectFile::createDirectory(path);
-			LOG4CXX_DEBUG(tdParam::logger, "Dumping to disk : " << path+"/"+srch->first+".xml");
+			LOG4CXX_DEBUG(tdParam::logger, "Dumping to disk : " + path+"/"+srch->first+".xml");
 			openSave::xmlSave(path+"/"+srch->first+".xml",srch->second.mr);
 			to_erase.push_back(srch);
 		}

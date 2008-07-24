@@ -1,3 +1,4 @@
+
 /*
  * Copyright (c) 2004-2007 Sergey Lyubka <valenok@gmail.com>
  * All rights reserved
@@ -39,7 +40,11 @@
 
 #define	ERRNO			GetLastError()
 #define	NO_SOCKLEN_T
+
+#ifndef SSL_LIB
 #define	SSL_LIB			L"libssl32.dll"
+#endif // SSL_LIB
+
 #define	DIRSEP			'\\'
 #define	IS_DIRSEP_CHAR(c)	((c) == '/' || (c) == '\\')
 #define	O_NONBLOCK		0

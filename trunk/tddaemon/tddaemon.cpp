@@ -300,7 +300,7 @@ void TdDaemon::show_404(struct shttpd_arg *arg) {
 	shttpd_printf(arg, "%s", "HTTP/1.1 404 OK\r\n");
 	shttpd_printf(arg, "%s", "Content-Type: text/plain\r\n\r\n");
 	shttpd_printf(arg, "%s", "404 file not found! ");
-	LOG4CXX_INFO(tdParam::logger, "Error 404: " << shttpd_get_env(arg, "REQUEST_URI"));
+	LOG4CXX_INFO(tdParam::logger, "Error 404: %s" + string(shttpd_get_env(arg, "REQUEST_URI")));
 	arg->flags |= SHTTPD_END_OF_OUTPUT;
 }
 
@@ -455,8 +455,11 @@ void TdDaemon::launchDaemon(tdParam *t) {
 	LOG4CXX_INFO(tdParam::logger, "Teardrop started.");
 	clients = new users();
 	searches = new UIDSession(tdp);
-
+	
+  #ifndef __MINGW32__
+  // SIGPIPE is not supported by mingw
 	signal(SIGPIPE, SIG_IGN);
+	#endif
 
 	/*
 	 * Initialize SHTTPD context.

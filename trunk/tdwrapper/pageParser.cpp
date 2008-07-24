@@ -81,7 +81,7 @@ void pageParser::doParse() {
 		if (getAbort()) break;
 		address ad = getNextAddress();
 		if (ad.isEmpty()) { 
-			LOG4CXX_INFO(tdParam::logger, "Can't find enough results for " << engname);
+			LOG4CXX_INFO(tdParam::logger, "Can't find enough results for " + engname);
 			break;
 		}
 		string page = gh.getPage(ad,eng->getCharset());
@@ -89,7 +89,7 @@ void pageParser::doParse() {
     if (getAbort()) break;
     if (tdp->getEcho()) cout << ">" << ad << endl;
 		if (page == "") { 
-			LOG4CXX_INFO(tdParam::logger, "Invalid url : " << ad.getFullUrl());
+			LOG4CXX_INFO(tdParam::logger, "Invalid url : " + ad.getFullUrl());
 			break;
 		}
 

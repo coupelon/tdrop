@@ -11,6 +11,12 @@
 #ifndef MD5_HEADER_INCLUDED
 #define	MD5_HEADER_INCLUDED
 
+#ifdef WIN32
+typedef unsigned short uint16_t;
+typedef unsigned int uint32_t;
+typedef unsigned long uint64_t;
+#endif
+
 typedef struct MD5Context {
 	uint32_t	buf[4];
 	uint32_t	bits[2];
