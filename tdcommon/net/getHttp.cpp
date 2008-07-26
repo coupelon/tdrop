@@ -138,45 +138,58 @@ bool getHttp::getRawData (address & ad, rawContainer *r) {
   //while(CURLM_CALL_MULTI_PERFORM == curl_multi_perform(curl_multi, &still_running));
   
   while(still_running) {
-    struct timeval timeout;
-    int rc; /* select() return code */
+    //struct timeval timeout;
+    //int rc; /* select() return code */
+    long tmout = 0;
+    curl_multi_timeout(curl_multi, &tmout);
+    if (tmout != 0) {
+      LOG4CXX_DEBUG(tdParam::logger, "Supposed to wait socket for " + xmlFile::ltoa(tmout) + "ms");
+      if (tmout < 0) { 
+        tmout = 1000; // if libcurl returns a -1 timeout here, it just means that libcurl currently has no stored timeout value. You must not wait too long (more than a few seconds perhaps) before you call curl_multi_perform() again. 
+      } else {
+        tmout = tmout % 500; // Just don't wait more than 500ms, even if requested. 'Correct' curl_multi_timeout behavior under windows
+      }
+    #ifdef WIN32
+      Sleep(tmout);
+    #else
+      usleep(tmout);
+    #endif
+    }
+    //fd_set fdread;
+    //fd_set fdwrite;
+    //fd_set fdexcep;
+    //int maxfd;
 
-    fd_set fdread;
-    fd_set fdwrite;
-    fd_set fdexcep;
-    int maxfd;
-
-    FD_ZERO(&fdread);
-    FD_ZERO(&fdwrite);
-    FD_ZERO(&fdexcep);
+    //FD_ZERO(&fdread);
+    //FD_ZERO(&fdwrite);
+    //FD_ZERO(&fdexcep);
 
     /* set a suitable timeout to play around with */
-    timeout.tv_sec = 1;
-    timeout.tv_usec = 0;
+    //timeout.tv_sec = 1;
+    //timeout.tv_usec = 0;
 
     /* get file descriptors from the transfers */
-    curl_multi_fdset(curl_multi, &fdread, &fdwrite, &fdexcep, &maxfd);
+    //curl_multi_fdset(curl_multi, &fdread, &fdwrite, &fdexcep, &maxfd);
 
-    rc = select(maxfd+1, &fdread, &fdwrite, &fdexcep, &timeout);
-
-    switch(rc) {
-    case -1:
+    //rc = select(maxfd+1, &fdread, &fdwrite, &fdexcep, &timeout);
+    //rc = 8;
+    //LOG4CXX_DEBUG(tdParam::logger, "Retrieving keeps runing (" + xmlFile::itoa(rc) + ")...");
+    //switch(rc) {
+    //case -1:
       /* select error */
-      break;
-    case 0:
-      LOG4CXX_DEBUG(tdParam::logger, "Timeout expired before anything interesting happened.");
-    default:
-      /* timeout or readable/writable sockets */
-      //printf("perform!\n");
+      //LOG4CXX_INFO(tdParam::logger, "An error occured while retrieving the page: " + xmlFile::itoa(WSAGetLastError()));
+      //break;
+    //case 0:
+      //LOG4CXX_DEBUG(tdParam::logger, "Timeout expired before anything interesting happened.");
+    //default:
       while(CURLM_CALL_MULTI_PERFORM ==
             curl_multi_perform(curl_multi, &still_running) && !getAbort());
-      //printf("running: %d!\n", still_running);
       if (getAbort()) {
         free(buffer_url);
         return false;
       }
-      break;
-    }
+      //break;
+    //}
   }
 
   res = curl_multi_info_read(curl_multi,&still_running)->data.result;
@@ -184,10 +197,11 @@ bool getHttp::getRawData (address & ad, rawContainer *r) {
 	//res = curl_easy_perform (curl);
 	free(buffer_url);
 	if (res != CURLE_OK) {
-		cerr << "This page could'nt be retrieved : " << ad << endl;
+	  LOG4CXX_DEBUG(tdParam::logger,"Failed to retrie " + ad.getFullUrl());
 		return false;
 	}
 	if (getAbort()) return false;
+	LOG4CXX_DEBUG(tdParam::logger,"Successfully retrieved " + ad.getFullUrl());
 	return true;
 }
 

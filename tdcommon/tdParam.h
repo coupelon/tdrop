@@ -11,6 +11,8 @@ See the License for the specific language governing permissions and limitations 
 
 #include <log4cxx/logger.h>
 #include <log4cxx/propertyconfigurator.h>
+#include <log4cxx/consoleappender.h>
+#include <log4cxx/patternlayout.h>
 #include <log4cxx/helpers/exception.h>
 
 

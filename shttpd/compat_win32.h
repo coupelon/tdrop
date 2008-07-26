@@ -41,9 +41,12 @@
 #define	ERRNO			GetLastError()
 #define	NO_SOCKLEN_T
 
-#ifndef SSL_LIB
-#define	SSL_LIB			L"libssl32.dll"
+//SSL_LIB is defined by cmake, so undefine it here to get the proper windows value (not the lib, the dll)
+#ifdef SSL_LIB
+#undef SSL_LIB
 #endif // SSL_LIB
+#define	SSL_LIB			L"libssl32.dll"
+
 
 #define	DIRSEP			'\\'
 #define	IS_DIRSEP_CHAR(c)	((c) == '/' || (c) == '\\')
