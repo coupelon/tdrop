@@ -12,6 +12,11 @@ log4cxx::LoggerPtr tdParam::logger = log4cxx::Logger::getLogger("Teardrop");
 
 tdParam::tdParam() {
 		log4cxx::PropertyConfigurator::configure(selectFile::getHomeDirectory() + LOG_CONFIG);
+		
+		//FOr backward compatibility with log4cxx 0.9
+		log4cxx::ConsoleAppender::getStaticClass();
+		log4cxx::PatternLayout::getStaticClass();
+		
     echopages = false;
     browser = "";
     proxy_address = "";

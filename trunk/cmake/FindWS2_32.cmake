@@ -10,6 +10,8 @@ FIND_LIBRARY(WS2_32_LIBRARIES NAMES ws2_32 PATHS /lib)
 
 IF(WS2_32_LIBRARIES)
   SET(WS2_32_FOUND 1)
+  #Under windows, xml2 is required too, quick hack to add it !
+  SET (WS2_32_LIBRARIES ${WS2_32_LIBRARIES} -lxml2)
   if(NOT WS2_32_FIND_QUIETLY)
    message(STATUS "Found ws2_32: ${WS2_32_LIBRARIES}")
   endif(NOT WS2_32_FIND_QUIETLY)
