@@ -116,7 +116,6 @@ bool getHttp::getRawData (address & ad, rawContainer *r) {
 	LOG4CXX_DEBUG(tdParam::logger,ad.getFullUrl());
 	//This copy to url must be done, instead of what you might get a malformed url error from curl
 	url = ad.getFullUrl ();
-	//		cout << url <<  endl;
 	char *buffer_url = (char *) calloc(2048,1);
 	strncpy(buffer_url,url.c_str(),2047);
 	//curl_easy_setopt (curl, CURLOPT_VERBOSE, 1);
@@ -135,11 +134,7 @@ bool getHttp::getRawData (address & ad, rawContainer *r) {
   curl_multi_add_handle(curl_multi,curl);
   int still_running = 1;
   
-  //while(CURLM_CALL_MULTI_PERFORM == curl_multi_perform(curl_multi, &still_running));
-  
   while(still_running) {
-    //struct timeval timeout;
-    //int rc; /* select() return code */
     long tmout = 0;
     curl_multi_timeout(curl_multi, &tmout);
     if (tmout != 0) {
@@ -152,52 +147,21 @@ bool getHttp::getRawData (address & ad, rawContainer *r) {
     #ifdef WIN32
       Sleep(tmout);
     #else
-      usleep(tmout);
+      usleep(tmout*1000);
     #endif
     }
-    //fd_set fdread;
-    //fd_set fdwrite;
-    //fd_set fdexcep;
-    //int maxfd;
-
-    //FD_ZERO(&fdread);
-    //FD_ZERO(&fdwrite);
-    //FD_ZERO(&fdexcep);
-
-    /* set a suitable timeout to play around with */
-    //timeout.tv_sec = 1;
-    //timeout.tv_usec = 0;
-
-    /* get file descriptors from the transfers */
-    //curl_multi_fdset(curl_multi, &fdread, &fdwrite, &fdexcep, &maxfd);
-
-    //rc = select(maxfd+1, &fdread, &fdwrite, &fdexcep, &timeout);
-    //rc = 8;
-    //LOG4CXX_DEBUG(tdParam::logger, "Retrieving keeps runing (" + xmlFile::itoa(rc) + ")...");
-    //switch(rc) {
-    //case -1:
-      /* select error */
-      //LOG4CXX_INFO(tdParam::logger, "An error occured while retrieving the page: " + xmlFile::itoa(WSAGetLastError()));
-      //break;
-    //case 0:
-      //LOG4CXX_DEBUG(tdParam::logger, "Timeout expired before anything interesting happened.");
-    //default:
-      while(CURLM_CALL_MULTI_PERFORM ==
-            curl_multi_perform(curl_multi, &still_running) && !getAbort());
-      if (getAbort()) {
-        free(buffer_url);
-        return false;
-      }
-      //break;
-    //}
+    while(CURLM_CALL_MULTI_PERFORM == curl_multi_perform(curl_multi, &still_running) && !getAbort());
+    if (getAbort()) {
+      free(buffer_url);
+      return false;
+    }
   }
 
   res = curl_multi_info_read(curl_multi,&still_running)->data.result;
   curl_multi_remove_handle(curl_multi,curl);
-	//res = curl_easy_perform (curl);
 	free(buffer_url);
 	if (res != CURLE_OK) {
-	  LOG4CXX_DEBUG(tdParam::logger,"Failed to retrie " + ad.getFullUrl());
+	  LOG4CXX_DEBUG(tdParam::logger,"Failed to retrieve " + ad.getFullUrl());
 		return false;
 	}
 	if (getAbort()) return false;
