@@ -106,7 +106,7 @@ string users::getUserHistory(const char *id, const char *host) {
   if (dp != NULL) {
   string output = "";
     while ((ep = readdir(dp))) {
-      engineResults er;
+      rowContainer er;
       string fname = ep->d_name;
       if (fname.find(".xml") != string::npos && openSave::xmlOpenHeader(directory + fname,&er)) {
         output += "{\"id\":\"";

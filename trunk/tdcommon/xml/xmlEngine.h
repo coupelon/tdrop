@@ -18,7 +18,7 @@ See the License for the specific language governing permissions and limitations 
 #include "../address.h"
 #include "../net/getHttp.h"
 #include "../selectFile.h"
-#include "../engineResults.h"
+#include "../rowContainer.h"
 
 using namespace std;
 
@@ -97,14 +97,14 @@ public:
    * @param r The regular expression from the init block
    * @return the init complete address
    */
-  address getInitAddress(engineResults *res, regExp *r);
+  address getInitAddress(rowContainer *res, regExp *r);
 
   /**
    * @param res The query information
    * @param r The regular expression from the query block
    * @return the query complete address
    */
-  address getQueryAddress(engineResults *res, regExp *r);      
+  address getQueryAddress(rowContainer *res, regExp *r);      
   
   /**
    * @param res The query information
@@ -112,7 +112,7 @@ public:
    * @param r The number of results needed to produce the address
    * @return the nextinput complete address
    */
-	address getNextInputAddress(engineResults *res, regExp *reg, int r);
+	address getNextInputAddress(rowContainer *res, regExp *reg, int r);
 
   /**
    * The nextinput tag is optional. This function checks for its presence
@@ -163,16 +163,16 @@ private:
   string getUrl(nodeDoc *);
 
   /** Returns the value of the given init inputfield */
-  methodParam getInitInputFields(engineResults *, regExp *, bool methodGet);
+  methodParam getInitInputFields(rowContainer *, regExp *, bool methodGet);
   
   /** Returns the value of the given query inputfield */
-  methodParam getQueryInputFields(engineResults *, regExp *, bool methodGet);
+  methodParam getQueryInputFields(rowContainer *, regExp *, bool methodGet);
 
   /** Returns the value of the given nextinput inputfield */
-  methodParam getNextInputFields(engineResults *, regExp *, bool methodGet, int res);      
+  methodParam getNextInputFields(rowContainer *, regExp *, bool methodGet, int res);      
   
   /** This method generate the value of a given inputfield */
-  methodParam getInputFields(engineResults *, regExp *,nodeDoc *,bool methodGet, int res = -1);
+  methodParam getInputFields(rowContainer *, regExp *,nodeDoc *,bool methodGet, int res = -1);
 
   /** Returns the input method of the init block */
   string getInitMethod();
@@ -187,7 +187,7 @@ private:
   string getMethod(nodeDoc *);
   
   /** Generates the query based on the input, charset, and the separator */
-  string generateQuery(engineResults *res);
+  string generateQuery(rowContainer *res);
 
 	nodeDoc *init;
 	nodeDoc *query;

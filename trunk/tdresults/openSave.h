@@ -87,7 +87,7 @@ public:
      * @param file The XML file
      * @param er The container of the header
      */
-    static bool xmlOpenHeader(const string & file, engineResults *er);
+    static bool xmlOpenHeader(const string & file, rowContainer *er);
     
 };
 

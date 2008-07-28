@@ -60,7 +60,7 @@ bool openSave::xmlOpen(const string & file, metaRank **mr, tdParam *tdp) {
     if (input.openFile(file)) {
     vector<row> r;
 		getHttp gh;
-  	engineResults *er = new engineResults();
+  	rowContainer *er = new rowContainer();
 	
   	nodeDoc *cur = new nodeDoc(&input,"engines");
     if(!cur->isValid()) return false;
@@ -108,7 +108,7 @@ bool openSave::xmlOpen(const string & file, metaRank **mr, tdParam *tdp) {
     return false;
 }
 
-bool openSave::xmlOpenHeader(const string & file, engineResults *er) {
+bool openSave::xmlOpenHeader(const string & file, rowContainer *er) {
   xmlFile input;
   if (input.openFile(file)) {
   	vector<row> r;
@@ -147,7 +147,7 @@ void openSave::htmlExport(stringstream & myfile, metaRank *mr) {
     myfile << "<div class=\"info\">" << endl;
     //Engines
     myfile << "\t<div class=\"engines\">Engines : ";
-    for(map<string, int>::iterator lit = mr->getEngineResults().getEngines().begin(); lit != mr->getEngineResults().getEngines().end(); ++ lit) {
+    for(map<string, int>::const_iterator lit = mr->getEngineResults().getEngines().begin(); lit != mr->getEngineResults().getEngines().end(); ++ lit) {
         myfile << lit->first << "(" << lit->second << ") ";
     }
     myfile << "</div>" << endl;
@@ -159,7 +159,7 @@ void openSave::htmlExport(stringstream & myfile, metaRank *mr) {
     myfile << "</div>"<< endl;
     myfile << "<div class=\"title\">Results</div>" << endl;
     myfile << "<div class=\"table\">" << endl;
-    for(vector<row>::iterator lit = mr->getEngineResults().getResults().begin(); lit != mr->getEngineResults().getResults().end(); ++ lit) {
+    for(vector<row>::const_iterator lit = mr->getEngineResults().getResults().begin(); lit != mr->getEngineResults().getResults().end(); ++ lit) {
         myfile << "\t<div class=\"line\">" << endl;
         myfile << "\t\t<div class=\"num\">" << lit->getNum() << "</div><div class=\"engines\">" << endl;
         list<string> lrEngines = lit->getEngine();

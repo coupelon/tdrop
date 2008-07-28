@@ -6,32 +6,28 @@ Unless required by applicable law or agreed to in writing, software distributed 
 See the License for the specific language governing permissions and limitations under the License.
 */
 
-#include "engineResults.h"
+#include "rowContainer.h"
 
-vector<row> & engineResults::getResults() {
-	return results;
-}
-
-void engineResults::setResults(const vector<row> & r) {
+void rowContainer::setResults(const vector<row> & r) {
 	results = r;
 }
 
-void engineResults::toString() {
+void rowContainer::toString() const {
 	cout << "Query: " << query << " | limit: " << limit << endl;
-	for(vector<row>::iterator it = results.begin(); it != results.end(); ++it) {
+	for(vector<row>::const_iterator it = results.begin(); it != results.end(); ++it) {
 		it->toString();
 	}
 }
 
-int engineResults::getEngineResults(const string & name) {
+int rowContainer::getEngineResults(const string & name) {
   return engines[name];
 }
 
-map<string,int> & engineResults::getEngineResults() {
+const map<string,int> & rowContainer::getEngineResults() const {
   return engines;
 }
 
-void engineResults::addRankedResults(const vector<row> & r, string sname) {
+void rowContainer::addRankedResults(const vector<row> & r, const string & sname) {
   engines[sname] = r.size();
 	//for each row in the input list
 	for(vector<row>::const_iterator input = r.begin(); input != r.end(); ++input) {
@@ -56,23 +52,23 @@ void engineResults::addRankedResults(const vector<row> & r, string sname) {
 	}
 	//Sort results by num
 	sortResults(ROW_NUMBER);
-	threadPool<engineResults>::unlock(new_results);
+	threadPool<rowContainer>::unlock(newResultsLock);
 }
 
-void engineResults::sortResults(string s, bool ascending) {
+void rowContainer::sortResults(const string & s, bool ascending) {
   if (ascending)
     sort(results.begin(), results.end(), compareRow(s));
   else 
     sort(results.rbegin(), results.rend(), compareRow(s));
 }
 
-bool engineResults::waitForNewResults() {
+bool rowContainer::waitForNewResults() {
 	if (everyResultsReceived()) return true;
-	threadPool<engineResults>::lock(new_results);
+	threadPool<rowContainer>::lock(newResultsLock);
 	return false;
 }
 
-bool engineResults::everyResultsReceived() {
+bool rowContainer::everyResultsReceived() {
 	for(map<string,int>::iterator it = engines.begin(); it != engines.end(); ++it) {
 		if (it->second == -1) return false;
 	}

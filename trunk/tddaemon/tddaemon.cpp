@@ -70,11 +70,11 @@ string TdDaemon::createJSON(bool final, metaRank *mr) {
 	} else {
 		pre = "{\"final\":\"false\",";
 	}
-	map<string,int> *map_engines = mr->getEngineResultsNumber();
+	const map<string,int> *map_engines = mr->getEngineResultsNumber();
 	if (map_engines) {
 		pre += "\"engines\":[";
 		char number[11];
-		for(map<string,int>::iterator me_it = map_engines->begin();
+		for(map<string,int>::const_iterator me_it = map_engines->begin();
 			  me_it != map_engines->end(); ++me_it) {
 			  sprintf(number,"%i",me_it->second);
 			  pre += (me_it == map_engines->begin())?"":",";
@@ -110,7 +110,7 @@ string TdDaemon::get_authenticate_user(struct shttpd_arg *arg, string user,strin
 
 string TdDaemon::newQuery(struct shttpd_arg *arg, string query,string engines,string limit) {
 	list<string> lse;
-  engineResults *er = new engineResults();
+  rowContainer *er = new rowContainer();
   er->setQuery(query);
   er->setLimit(atol(limit.c_str()));
   size_t pos;

@@ -97,20 +97,20 @@ string xmlEngine::getUrl(nodeDoc *nd) {
 	return n.getNodeValue();
 }
 
-methodParam xmlEngine::getInitInputFields(engineResults *res, regExp *reg, bool methodGet) {
+methodParam xmlEngine::getInitInputFields(rowContainer *res, regExp *reg, bool methodGet) {
 	return getInputFields(res,reg,init,methodGet);
 }
 
-methodParam xmlEngine::getQueryInputFields(engineResults *res, regExp *reg, bool methodGet) {
+methodParam xmlEngine::getQueryInputFields(rowContainer *res, regExp *reg, bool methodGet) {
 	return getInputFields(res,reg,query,methodGet);
 }
 
-methodParam xmlEngine::getNextInputFields(engineResults *res, regExp *reg,bool methodGet,int r) {
+methodParam xmlEngine::getNextInputFields(rowContainer *res, regExp *reg,bool methodGet,int r) {
 	nodeDoc n(xml,"nextinput");
 	return getInputFields(res,reg,&n,methodGet,r);
 }
 
-methodParam xmlEngine::getInputFields(engineResults *res, regExp *reg,nodeDoc *nd, bool methodGet, int results_per_pages) {
+methodParam xmlEngine::getInputFields(rowContainer *res, regExp *reg,nodeDoc *nd, bool methodGet, int results_per_pages) {
   string value;
  	methodParam param;
 	string *output;
@@ -132,10 +132,13 @@ methodParam xmlEngine::getInputFields(engineResults *res, regExp *reg,nodeDoc *n
 			if (fieldname != "")
 				*output += fieldname + "=";
 			if ((value = n.getNodeValue()) == "") value = n.getAttributeValueByName("value");
-			if (value.find("%u",0) != string::npos)
-			  if ((opt = res->getOptions()[fieldname]) != "")
-	  		  value = regExp::replaceAll(value,"%u",opt);
+			if (value.find("%u",0) != string::npos) {
+			  map<string, string>::const_iterator mit = res->getOptions().find("fieldname");
+			  if (mit != res->getOptions().end() && mit->second != "") {
+	  		  value = regExp::replaceAll(value, "%u", mit->second);
+	  		}
 	  		else value = regExp::replaceAll(value,"%u",n.getAttributeValueByName("default"));
+	  	}
 	  	string q;
 			if ((q = generateQuery(res)) != "" && value.find("%q",0) != string::npos)
 				value = regExp::replaceAll(value,"%q",q);
@@ -161,7 +164,7 @@ methodParam xmlEngine::getInputFields(engineResults *res, regExp *reg,nodeDoc *n
 	return param;
 }
 
-string xmlEngine::generateQuery(engineResults *res) {
+string xmlEngine::generateQuery(rowContainer *res) {
 	string q = res->getQuery();
 	if (getCharset() != "") q = gh->charsetConvert(q, HTTP_DEFAULT_CHARSET, getCharset());
   q = regExp::replaceAll(q, " ", getSeparator());
@@ -242,7 +245,7 @@ string xmlEngine::getNextInputUrl() {
 	return n.getNodeValue();
 }
 
-address xmlEngine::getNextInputAddress(engineResults *res, regExp *reg, int r) {
+address xmlEngine::getNextInputAddress(rowContainer *res, regExp *reg, int r) {
 	address a;
 	a.url = getNextInputUrl();
 	if (getNextInputMethod() == "GET") a.setGET();
@@ -251,7 +254,7 @@ address xmlEngine::getNextInputAddress(engineResults *res, regExp *reg, int r) {
 	return a;
 }
 
-address xmlEngine::getInitAddress(engineResults *res, regExp *r) {
+address xmlEngine::getInitAddress(rowContainer *res, regExp *r) {
 	address a;
 	a.url = getInitUrl();
 	if (getInitMethod() == "GET") a.setGET();
@@ -290,7 +293,7 @@ bool xmlEngine::getNextResultField() {
     return result->isValid();
 }
 
-address xmlEngine::getQueryAddress(engineResults *res, regExp *r) {
+address xmlEngine::getQueryAddress(rowContainer *res, regExp *r) {
 	address a;
 	a.url = getQueryUrl();
 	if (getQueryMethod() == "GET") a.setGET();
