@@ -12,7 +12,7 @@ row::row(int n) {
 	num = n;
 }
 
-row::row(int n, string e) {
+row::row(int n, const string & e) {
     num = n;
     engine.push_back(e);
 }
@@ -42,11 +42,11 @@ string row::getEngineList(int max) const {
   return output;
 }
 
-void row::addField(string f, string n) {
+void row::addField(const string & f, const string & n) {
 	fields[n] += f;
 }
 
-void row::addComparable(string c) {
+void row::addComparable(const string & c) {
     comparable.push_back(c);
 }
 
@@ -58,12 +58,12 @@ void row::addEngine(const list<string> & e) {
     engine.insert(engine.end(),e.begin(),e.end());
 }
 
-void row::toString(bool n) {
+void row::toString(bool n) const {
 	if (n) cout << num;
-    for(list<string>::iterator lsit = engine.begin(); lsit != engine.end(); ++lsit) {
+    for(list<string>::const_iterator lsit = engine.begin(); lsit != engine.end(); ++lsit) {
         cout << " " << *lsit;
     }
-    for(map<string, string, compstr>::iterator msscit = fields.begin(); msscit != fields.end(); ++msscit) {
+    for(map<string, string, compstr>::const_iterator msscit = fields.begin(); msscit != fields.end(); ++msscit) {
         if (n || msscit != fields.begin()) cout << endl;
         cout << "\t" << msscit->first << ":" << msscit->second;
 	}
@@ -74,7 +74,7 @@ const map<string, string, compstr> & row::getFields() const {
     return fields;
 }
 
-string row::getField(string s) const {
+string row::getField(const string & s) const {
     map<string, string, compstr>::const_iterator fnd  = fields.find(s);
     if (fnd != fields.end()) return fnd->second;
     return "";
