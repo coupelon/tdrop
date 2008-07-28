@@ -42,20 +42,20 @@ public:
 	 * @param n The row number (Defaults to 0)
 	 * @param e The engine that retrieved that row
 	 */
-  row(int n, string e);
+  row(int n, const string & e);
   
   /**
    * Add a field (i.e. a column) to that row
    * @param n the field name
    * @param f the field value
    */
-  void addField(string f, string n);
+  void addField(const string & f, const string & n);
   
   /**
    * Set a field as comparable
    * @param c The field name 
    */
-  void addComparable(string c);
+  void addComparable(const string & c);
   
   /**
    * Add an engine to that row
@@ -79,13 +79,13 @@ public:
   /**
    * Output that row as a string to stdout 
    */
-  void toString(bool n = true);
+  void toString(bool n = true) const;
   
   int getNum() const;
   void setNum(int);
   const list<string> & getEngine() const;
   const map<string, string, compstr> & getFields() const;
-  string getField(string s) const;
+  string getField(const string & s) const;
   
   bool operator==(const row &) const;
 
