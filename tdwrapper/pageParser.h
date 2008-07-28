@@ -17,7 +17,7 @@ See the License for the specific language governing permissions and limitations 
 #include "xml/xmlEngine.h"
 #include "net/getHttp.h"
 #include "address.h"
-#include "engineResults.h"
+#include "rowContainer.h"
 #include "tdParam.h"
 #include "tdExcp.h"
 #include "threads/threadPool.h"
@@ -34,7 +34,7 @@ public:
    * @param mut The mutex to use to update the results.
    * @param t the glocal engine parameters (proxies, etc...).
    */
-	pageParser(const string & e, engineResults *ler, threadPool<pageParser> *mut, tdParam *t);
+	pageParser(const string & e, rowContainer *ler, threadPool<pageParser> *mut, tdParam *t);
 	pageParser(const pageParser &);
 	~pageParser();
 	
@@ -71,7 +71,7 @@ private:
 	list<address> pages;
 	set<address> visited_pages;
 	vector<row> results;
-	engineResults *global_results;
+	rowContainer *global_results;
 	threadPool<pageParser> *results_lock;
 	unsigned long limit;
 	getHttp gh;

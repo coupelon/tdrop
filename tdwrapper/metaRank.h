@@ -17,7 +17,7 @@ See the License for the specific language governing permissions and limitations 
 #include "threads/threadPool.h"
 #include "pageParser.h"
 #include "row.h"
-#include "engineResults.h"
+#include "rowContainer.h"
 #include "tdParam.h"
 
 using namespace std;
@@ -28,14 +28,14 @@ public:
 		 * @param res This objects contains the query, the list of engines that should be queried and the number of results per engines. It will also be used to store the results.
 		 * @param t the tdParam parameters to pass to engines  
 		 */
-    metaRank(engineResults *res, tdParam *t);
+    metaRank(rowContainer *res, tdParam *t);
     
 		/**
 		 * Metarank initializer.
 		 * @param res This objects contains the query, the list of engines that should be queried and the number of results per engines. It will also be used to store the results.
 		 * @param t the tdParam parameters to pass to engines  
 		 */
-    void init(engineResults *res, tdParam *t);
+    void init(rowContainer *res, tdParam *t);
     
     ~metaRank();
 
@@ -51,7 +51,7 @@ public:
 
     /** The list of results finaly obtained
     */
-    vector<row> & getResults();
+    const vector<row> & getResults() const;
     
     /** Stops the current threads by cancelling them.
     */
@@ -103,7 +103,7 @@ public:
     /**
      * @return A pointer to the results number map
      */
-    map<string,int> *getEngineResultsNumber();
+    const map<string,int> *getEngineResultsNumber() const;
     
     
     /**
@@ -130,14 +130,14 @@ public:
      void setFinished(bool val = true);
     
     /**
-     * @return the engineResults. Use with caution.
+     * @return the rowContainer. Use with caution.
      */
-    engineResults & getEngineResults();
+    rowContainer & getEngineResults();
     
 private:
     threadPool<pageParser> *threads;
     list<pageParser *> pplist;
-    engineResults *ranked_results;
+    rowContainer *ranked_results;
     static string intToString(int);
     tdParam *tdp;
     bool finished;

@@ -6,8 +6,8 @@ Unless required by applicable law or agreed to in writing, software distributed 
 See the License for the specific language governing permissions and limitations under the License.
 */
 
-#ifndef ENGINERESULTS_H
-#define ENGINERESULTS_H
+#ifndef ROWCONTAINER_H
+#define ROWCONTAINER_H
 
 #include <iostream>
 #include <vector>
@@ -16,17 +16,18 @@ See the License for the specific language governing permissions and limitations 
 
 using namespace std;
 
-class engineResults {
+class rowContainer {
 public:
-	engineResults() {
+	rowContainer() {
 	  //This shouldn't be used to create threads, only mutex, so
 	  // the maximum number of threads is set to 0.
-	  new_results = new threadPool<engineResults>(0);
-		threadPool<engineResults>::lock(new_results);
+	  newResultsLock = new threadPool<rowContainer>(0);
+		threadPool<rowContainer>::lock(newResultsLock);
 	  abort = false;
 	};
-	virtual ~engineResults() {
-		delete new_results;
+	
+	virtual ~rowContainer() {
+		delete newResultsLock;
 	};
 
   /**
@@ -39,7 +40,7 @@ public:
    * Set the query
    * @param q The query string
    */
-  void setQuery(string q) { query = q; }
+  void setQuery(const string & q) { query = q; }
   
   /**
    * Add a new engine to the list, which will be used during the search
@@ -47,14 +48,14 @@ public:
    * were yet retrieved 
    * @param e The engine name. 
    */
-  void addEngine(string e, int qte = -1) { engines[e] = qte; }
+  void addEngine(const string & e, int qte = -1) { engines[e] = qte; }
   
   /**
    * Add a new option to this search
    * @param name The option name
    * @param value The option value
    */
-  void addOption(string name, string value) { options[name] = value; }
+  void addOption(const string & name, const string & value) { options[name] = value; }
   
   /**
    * Add a list of retrieved results to that engineResults
@@ -62,7 +63,7 @@ public:
    * @param engname The engine the results were retrieved from
    * @param sname The engine raw name, as it was added by addEngine()
    */
-	virtual void addRankedResults(const vector<row> & r, string sname = "");
+	virtual void addRankedResults(const vector<row> & r, const string & sname = "");
 	
 	/**
 	 * Get the number of results already retrieved from an engine
@@ -82,7 +83,7 @@ public:
 	 * @param s The field name that should be sorted
 	 * @param ascending If true, sort the results in ascending order, descending otherwise
 	 */
-	void sortResults(string s, bool ascending = true);
+	void sortResults(const string & s, bool ascending = true);
 	
 	/**
 	 * Uses a mutex to wait for new results.
@@ -95,27 +96,27 @@ public:
 	 */
 	bool everyResultsReceived();
 	
-	unsigned long & getLimit() { return limit; }
-  	map<string, int> & getEngines() { return engines; }
-  	const string & getQuery() const { return query; }
-  	map<string, string> & getOptions() { return options; }
-  	vector<row> & getResults();
+	const unsigned long & getLimit() const { return limit; }
+ 	const map<string, int> & getEngines() const { return engines; }
+  const string & getQuery() const { return query; }
+  const map<string, string> & getOptions() const { return options; }
+  const vector<row> & getResults() const { return results; }
 	void setResults(const vector<row> & r);
-	map<string,int> & getEngineResults();
+	const map<string,int> & getEngineResults() const;
 	bool *getAbort() { return &abort; }
 	
 	/**
 	 * Output that instance to stdout
 	 */
-	void toString();
+	void toString() const;
 protected:
-  	unsigned long limit;
+  unsigned long limit;
 	map<string,int> engines;
 	map<string, string> options;
 	string query;
 	vector<row> results;
 	bool abort;
-	threadPool<engineResults> *new_results;
+	threadPool<rowContainer> *newResultsLock;
 };
 
 #endif

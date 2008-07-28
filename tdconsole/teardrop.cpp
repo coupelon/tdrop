@@ -52,7 +52,7 @@ int main(int argc, char *argv[]) {
     string proxy_address = "";
     string proxy_port = "0";
     string proxy_type = "HTTP";
-    engineResults *er = new engineResults();
+    rowContainer *er = new rowContainer();
 
     struct option long_options[] = {
         {"limit", required_argument, 0, 'l'},

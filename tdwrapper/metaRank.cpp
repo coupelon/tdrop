@@ -8,11 +8,11 @@ See the License for the specific language governing permissions and limitations 
 
 #include "metaRank.h"
 
-metaRank::metaRank(engineResults *res,tdParam *t) {
+metaRank::metaRank(rowContainer *res,tdParam *t) {
 	init(res,t);
 }
 
-void metaRank::init(engineResults *res,tdParam *t) {
+void metaRank::init(rowContainer *res,tdParam *t) {
   ranked_results = res;
   tdp = t;
   finished = false;
@@ -43,7 +43,7 @@ void metaRank::stop() {
 }
 
 void metaRank::toString() {
-  for (vector<row>::iterator lrit = ranked_results->getResults().begin(); ranked_results->getResults().end() != lrit; ++lrit) {
+  for (vector<row>::const_iterator lrit = ranked_results->getResults().begin(); ranked_results->getResults().end() != lrit; ++lrit) {
     lrit->toString();
   }
 }
@@ -55,11 +55,10 @@ void metaRank::toString(string page, string d) {
 string metaRank::getString(string page, string delim_engs,string delim_res, string pre, string post, bool escape) {
 		string out = "";
     string p;   
-    for (vector<row>::iterator lrit = ranked_results->getResults().begin(); ranked_results->getResults().end() != lrit; ++lrit) {
+    for (vector<row>::const_iterator lrit = ranked_results->getResults().begin(); ranked_results->getResults().end() != lrit; ++lrit) {
         p = page;
-        list<string> ls = lrit->getEngine();
         string engines = "";
-        for(list<string>::iterator lsit = ls.begin(); lsit != ls.end(); ++lsit) {
+        for(list<string>::const_iterator lsit = lrit->getEngine().begin(); lsit != lrit->getEngine().end(); ++lsit) {
             if (engines != "") engines += delim_engs;
             engines += *lsit;
         }  
@@ -84,7 +83,7 @@ string metaRank::getString(string page, string delim_engs,string delim_res, stri
     return pre + out + post;
 }
 
-vector<row> & metaRank::getResults() {
+const vector<row> & metaRank::getResults() const {
     return ranked_results->getResults();
 }
 
@@ -110,7 +109,7 @@ int metaRank::getEngineResultsNumber(const string & name) {
   return 0;
 }
 
-map<string,int> *metaRank::getEngineResultsNumber() {
+const map<string,int> *metaRank::getEngineResultsNumber() const {
 	if (ranked_results != NULL)
   	return &(ranked_results->getEngineResults());
   return NULL;
@@ -138,6 +137,6 @@ void metaRank::setFinished(bool val) {
 	finished = val;
 }
 
-engineResults & metaRank::getEngineResults() {
+rowContainer & metaRank::getEngineResults() {
 	return *ranked_results;
 }

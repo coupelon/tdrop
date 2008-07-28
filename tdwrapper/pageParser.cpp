@@ -8,7 +8,7 @@ See the License for the specific language governing permissions and limitations 
 
 #include "pageParser.h"
 
-pageParser::pageParser(const string & e, engineResults *ler, threadPool<pageParser> *mut, tdParam *t) {
+pageParser::pageParser(const string & e, rowContainer *ler, threadPool<pageParser> *mut, tdParam *t) {
 	engname = e;
 	eng = NULL;
 	query = ler->getQuery();
